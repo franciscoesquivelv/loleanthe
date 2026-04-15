@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 
 const benefits = [
   {
@@ -31,19 +30,25 @@ const stats = [
 
 const services = [
   {
+    number: '01',
     title: 'Arreglos por encargo',
     desc: 'Disenamos el arreglo perfecto para tu ocasion especial. Bodas, eventos corporativos, aniversarios o simplemente un capricho exquisito.',
-    image: '/images/artboard-4.png',
+    bg: 'bg-[#2A3D35]',
+    accent: 'text-[#8BAF9F]',
   },
   {
+    number: '02',
     title: 'Seleccion personalizada',
     desc: 'Cuentanos tu vision y te ayudamos a elegir las variedades ideales de nuestro catalogo exclusivo para hacer realidad tu arreglo sonado.',
-    image: '/images/artboard-5.png',
+    bg: 'bg-[#1A130A]',
+    accent: 'text-[#B08D6B]',
   },
   {
+    number: '03',
     title: 'Catalogo estacional',
     desc: 'Nuestras selecciones cambian con las temporadas para garantizarte siempre lo mejor de cada periodo del ano a nivel mundial.',
-    image: '/images/artboard-6.png',
+    bg: 'bg-[#3D2A1A]',
+    accent: 'text-[#D4B896]',
   },
 ];
 
@@ -112,24 +117,18 @@ export default function BenefitsSection() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {services.map((s, i) => (
               <div
                 key={i}
-                className={`border border-[#EDE0CE] overflow-hidden hover:border-[#B08D6B] transition-all duration-300 group ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                className={`${s.bg} p-10 flex flex-col justify-between min-h-[320px] group hover:opacity-90 transition-opacity duration-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                 style={{ transitionDelay: `${900 + i * 100}ms`, transitionProperty: 'opacity, transform', transitionDuration: '800ms' }}
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#F2EDE4]">
-                  <Image
-                    src={s.image}
-                    alt={s.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="font-display text-xl text-[#1A130A] font-medium mb-2 group-hover:text-[#B08D6B] transition-colors">{s.title}</h3>
-                  <p className="text-[#7A6654] text-sm leading-relaxed">{s.desc}</p>
+                <div>
+                  <span className={`font-display text-6xl font-light ${s.accent} opacity-30 block mb-6 leading-none`}>{s.number}</span>
+                  <div className={`w-8 h-px ${s.accent} opacity-60 mb-6`} style={{ background: 'currentColor' }} />
+                  <h3 className="font-display text-2xl text-[#FAF7F2] font-light mb-4">{s.title}</h3>
+                  <p className="text-[#FAF7F2]/50 text-sm leading-relaxed">{s.desc}</p>
                 </div>
               </div>
             ))}

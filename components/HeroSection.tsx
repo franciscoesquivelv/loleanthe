@@ -28,7 +28,7 @@ export default function HeroSection() {
           className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1A130A]/85 via-[#1A130A]/50 to-[#1A130A]/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1A130A]/90 via-[#1A130A]/60 to-[#1A130A]/20" />
       </div>
 
       {/* Content */}
@@ -42,7 +42,10 @@ export default function HeroSection() {
 
         <h1
           className="font-display text-5xl md:text-7xl lg:text-8xl font-light text-[#FAF7F2] leading-[1.05] mb-8 opacity-0"
-          style={{ animation: 'fadeInUp 1s ease 0.5s forwards' }}
+          style={{
+            animation: 'fadeInUp 1s ease 0.5s forwards',
+            textShadow: '0 2px 40px rgba(0,0,0,0.5), 0 1px 8px rgba(0,0,0,0.4)',
+          }}
         >
           Flores que<br />
           trascienden<br />
