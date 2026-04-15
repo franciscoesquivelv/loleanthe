@@ -11,10 +11,22 @@ export default function Header() {
   const { count } = useQuote();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // When over hero (not scrolled): white text + white logo (inverted)
+  // When scrolled: cream background + dark text + dark logo
+  const navTextClass = scrolled
+    ? 'text-[#2C1E10]/70 hover:text-[#B08D6B]'
+    : 'text-white/80 hover:text-white';
+
+  const cotizarClass = scrolled
+    ? 'border-[#B08D6B] text-[#B08D6B] hover:bg-[#B08D6B] hover:text-[#FAF7F2]'
+    : 'border-white/60 text-white/80 hover:border-white hover:text-white';
+
+  const hamburgerColor = scrolled ? 'bg-[#2C1E10]' : 'bg-white';
 
   return (
     <header
@@ -27,22 +39,22 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         {/* Left nav */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link href="#catalogo" className="font-display text-sm tracking-widest uppercase text-[#2C1E10]/70 hover:text-[#B08D6B] transition-colors hover-underline">
-            Catálogo
+          <Link href="#catalogo" className={`font-display text-sm tracking-widest uppercase transition-colors hover-underline ${navTextClass}`}>
+            Catalogo
           </Link>
-          <Link href="#nosotros" className="font-display text-sm tracking-widest uppercase text-[#2C1E10]/70 hover:text-[#B08D6B] transition-colors hover-underline">
+          <Link href="#nosotros" className={`font-display text-sm tracking-widest uppercase transition-colors hover-underline ${navTextClass}`}>
             Nosotros
           </Link>
         </nav>
 
-        {/* Logo center */}
+        {/* Logo center — inverted (white) over dark hero, normal over light */}
         <Link href="/" className="absolute left-1/2 -translate-x-1/2">
           <Image
             src="/logo.png"
             alt="Loleanthe Boutique"
             width={200}
             height={70}
-            className={`transition-all duration-500 object-contain ${scrolled ? 'h-12' : 'h-16'}`}
+            className={`transition-all duration-500 object-contain ${scrolled ? 'h-12' : 'h-16'} ${scrolled ? '' : 'invert brightness-200'}`}
             style={{ width: 'auto' }}
             priority
           />
@@ -50,12 +62,12 @@ export default function Header() {
 
         {/* Right nav */}
         <div className="hidden md:flex items-center gap-8">
-          <Link href="#contacto" className="font-display text-sm tracking-widest uppercase text-[#2C1E10]/70 hover:text-[#B08D6B] transition-colors hover-underline">
+          <Link href="#contacto" className={`font-display text-sm tracking-widest uppercase transition-colors hover-underline ${navTextClass}`}>
             Contacto
           </Link>
           <Link
             href="/cotizacion"
-            className="relative flex items-center gap-2 border border-[#B08D6B] text-[#B08D6B] px-4 py-2 font-display text-sm tracking-widest uppercase hover:bg-[#B08D6B] hover:text-[#FAF7F2] transition-all duration-300"
+            className={`relative flex items-center gap-2 border px-4 py-2 font-display text-sm tracking-widest uppercase transition-all duration-300 ${cotizarClass}`}
           >
             Cotizar
             {count > 0 && (
@@ -72,16 +84,16 @@ export default function Header() {
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Menu"
         >
-          <span className={`block w-6 h-[1px] bg-[#2C1E10] transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-          <span className={`block w-6 h-[1px] bg-[#2C1E10] transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
-          <span className={`block w-6 h-[1px] bg-[#2C1E10] transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+          <span className={`block w-6 h-[1px] transition-all duration-300 ${hamburgerColor} ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+          <span className={`block w-6 h-[1px] transition-all duration-300 ${hamburgerColor} ${menuOpen ? 'opacity-0' : ''}`} />
+          <span className={`block w-6 h-[1px] transition-all duration-300 ${hamburgerColor} ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
         </button>
       </div>
 
       {/* Mobile menu */}
       <div className={`md:hidden absolute top-full left-0 right-0 bg-[#FAF7F2]/98 backdrop-blur-md border-t border-[#D4B896]/30 transition-all duration-300 ${menuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
         <nav className="flex flex-col items-center gap-6 py-8">
-          <Link href="#catalogo" className="font-display text-base tracking-widest uppercase text-[#2C1E10]/70" onClick={() => setMenuOpen(false)}>Catálogo</Link>
+          <Link href="#catalogo" className="font-display text-base tracking-widest uppercase text-[#2C1E10]/70" onClick={() => setMenuOpen(false)}>Catalogo</Link>
           <Link href="#nosotros" className="font-display text-base tracking-widest uppercase text-[#2C1E10]/70" onClick={() => setMenuOpen(false)}>Nosotros</Link>
           <Link href="#contacto" className="font-display text-base tracking-widest uppercase text-[#2C1E10]/70" onClick={() => setMenuOpen(false)}>Contacto</Link>
           <Link href="/cotizacion" className="border border-[#B08D6B] text-[#B08D6B] px-6 py-2 font-display text-sm tracking-widest uppercase" onClick={() => setMenuOpen(false)}>
