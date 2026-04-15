@@ -69,13 +69,12 @@ export function validateImageFiles(files: File[]): string | null {
 
 export async function getPublicFlowers(): Promise<Flower[]> {
   const db = getDb();
-  const q = query(
-    collection(db, COLLECTION),
-    where('archived', '==', false),
-    orderBy('createdAt', 'desc')
-  );
+  // Simple query without compound index — filter archived client-side
+  const q = query(collection(db, COLLECTION), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Flower));
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() } as Flower))
+    .filter((f) => !f.archived);
 }
 
 export async function getAllFlowers(): Promise<Flower[]> {

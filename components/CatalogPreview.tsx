@@ -6,17 +6,15 @@ import FlowerCard from './FlowerCard';
 import { getPublicFlowers } from '@/lib/flowers';
 import type { Flower } from '@/lib/types';
 
-// Placeholder flowers for when DB is empty
-const PLACEHOLDERS: Flower[] = Array.from({ length: 6 }, (_, i) => ({
-  id: `placeholder-${i}`,
-  name: ['Rosa Ecuatoriana', 'Peonia Blush', 'Ranúnculo', 'Helecho Asiático', 'Lisianthus', 'Gypsophila'][i],
-  description: 'Flor exótica de alta gama, importada directamente con las más altas condiciones de calidad y frescura.',
-  images: [],
-  inStock: i !== 3,
-  archived: false,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-}));
+// Static placeholders with real images for when DB is empty
+const PLACEHOLDERS: Flower[] = [
+  { id: 'p1', name: 'Rosa Garden Spirit', description: 'Rosa de tallo largo con cabeza grande y petales voluminosos. Duracion excepcional de hasta dos semanas.', images: ['/images/flor-portada.png'], inStock: true, archived: false, createdAt: '', updatedAt: '' },
+  { id: 'p2', name: 'Ranunculus Pink Amandine', description: 'Ranunculo importado en tono rosado pastel. Perfecto para arreglos de alta delicadeza.', images: ['/images/ranunculus-pink.png'], inStock: true, archived: false, createdAt: '', updatedAt: '' },
+  { id: 'p3', name: 'Ranunculus Bianco', description: 'Variedad blanca pura con textura en capas. Un clasico de lujo para ocasiones especiales.', images: ['/images/ranunculus-bianco.png'], inStock: true, archived: false, createdAt: '', updatedAt: '' },
+  { id: 'p4', name: 'Ranunculus Butterfly Hestia', description: 'Variedad de ranunculo con degradado unico entre crema y rosa suave. Irrepetible.', images: ['/images/ranunculus-hestia.png'], inStock: true, archived: false, createdAt: '', updatedAt: '' },
+  { id: 'p5', name: 'Flor Exotica Filler', description: 'Flores de relleno exoticas que complementan cualquier arreglo con textura y volumen natural.', images: ['/images/flor-filler.png'], inStock: true, archived: false, createdAt: '', updatedAt: '' },
+  { id: 'p6', name: 'Ranunculus Amarillo', description: 'Ranunculo en tono amarillo vibrante. Agrega luminosidad y vida a cualquier composicion.', images: ['/images/flor-ranunculus.png'], inStock: true, archived: false, createdAt: '', updatedAt: '' },
+];
 
 export default function CatalogPreview() {
   const [flowers, setFlowers] = useState<Flower[]>([]);
@@ -46,15 +44,15 @@ export default function CatalogPreview() {
     <section id="catalogo" ref={sectionRef} className="py-24 px-6 max-w-7xl mx-auto">
       {/* Section header */}
       <div className={`text-center mb-16 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <p className="font-script text-[#B08D6B] text-3xl mb-3">Nuestra colección</p>
+        <p className="font-script text-[#B08D6B] text-3xl mb-3">Nuestra coleccion</p>
         <h2 className="font-display text-5xl md:text-6xl font-light text-[#1A130A]">
-          Catálogo <em className="italic text-[#B08D6B]">Premium</em>
+          Catalogo <em className="italic text-[#B08D6B]">Premium</em>
         </h2>
         <div className="ornament max-w-xs mx-auto mt-6">
-          <span className="text-[#B08D6B] text-xs tracking-[0.3em] uppercase font-display">Flores de Excepción</span>
+          <span className="text-[#B08D6B] text-xs tracking-[0.3em] uppercase font-display">Flores de Excepcion</span>
         </div>
         <p className="mt-6 text-[#7A6654] max-w-xl mx-auto leading-relaxed">
-          Cada variedad es cuidadosamente seleccionada por su belleza, tamaño y durabilidad — estándares de calidad que van mucho más allá de lo convencional.
+          Cada variedad es cuidadosamente seleccionada por su belleza, tamano y durabilidad. Estandares de calidad que van mucho mas alla de lo convencional.
         </p>
       </div>
 
@@ -81,19 +79,16 @@ export default function CatalogPreview() {
 
       {/* See more */}
       <div className={`flex flex-col items-center mt-16 gap-6 transition-all duration-1000 delay-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="ornament max-w-sm w-full">
-          <div className="w-2 h-2 border border-[#B08D6B] rotate-45 shrink-0" />
-        </div>
         <Link
           href="/catalogo"
           className="group flex items-center gap-4 font-display text-lg tracking-widest uppercase text-[#1A130A] hover:text-[#B08D6B] transition-colors duration-300"
         >
-          <span className="w-12 h-[1px] bg-current transition-all duration-300 group-hover:w-20" />
-          Ver todo el catálogo
-          <span className="w-12 h-[1px] bg-current transition-all duration-300 group-hover:w-20" />
+          <span className="w-12 h-px bg-current transition-all duration-300 group-hover:w-20" />
+          Ver todo el catalogo
+          <span className="w-12 h-px bg-current transition-all duration-300 group-hover:w-20" />
         </Link>
-        <p className="text-[#7A6654] text-sm">
-          {flowers.length > 0 ? `${flowers.length}+ variedades disponibles` : 'Colección completa disponible'}
+        <p className="text-[#7A6654] text-sm font-display tracking-widest uppercase text-xs">
+          {flowers.length > 0 ? `${flowers.length}+ variedades disponibles` : 'Coleccion completa disponible'}
         </p>
       </div>
     </section>
