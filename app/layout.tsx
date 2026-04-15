@@ -14,11 +14,8 @@ export const metadata: Metadata = {
     type: 'website',
   },
   icons: {
-    icon: [
-      { url: '/favicon-light.png', media: '(prefers-color-scheme: light)' },
-      { url: '/favicon-dark.png', media: '(prefers-color-scheme: dark)' },
-    ],
-    apple: '/logo-icon.png',
+    icon: '/favicon-black.png',
+    apple: '/favicon-black.png',
   },
 };
 

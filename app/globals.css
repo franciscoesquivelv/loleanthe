@@ -147,11 +147,25 @@ input:focus, textarea:focus, select:focus {
   animation: fadeInUp 0.8s ease forwards;
 }
 
-/* Catalog grid masonry-like effect */
+/* Catalog grid */
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .catalog-grid {
+    gap: 1.5rem;
+  }
+}
+
+/* Disable hover lift on touch devices */
+@media (hover: none) {
+  .flower-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
 }
 
 /* Image carousel */

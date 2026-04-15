@@ -28,15 +28,15 @@ export default function CatalogoPage() {
   return (
     <>
       <Header />
-      <main className="pt-32 pb-24 min-h-screen">
+      <main className="pt-24 md:pt-32 pb-16 md:pb-24 min-h-screen">
         <div className="max-w-7xl mx-auto px-6">
           {/* Page header */}
-          <div className="text-center mb-16">
-            <p className="font-script text-[#B08D6B] text-3xl mb-3">Explora</p>
-            <h1 className="font-display text-5xl md:text-7xl font-light text-[#1A130A]">
+          <div className="text-center mb-10 md:mb-16">
+            <p className="font-script text-[#B08D6B] text-2xl md:text-3xl mb-3">Explora</p>
+            <h1 className="font-display text-4xl md:text-5xl lg:text-7xl font-light text-[#1A130A]">
               Catálogo <em className="italic text-[#B08D6B]">Completo</em>
             </h1>
-            <div className="ornament max-w-xs mx-auto mt-5 mb-6">
+            <div className="ornament max-w-xs mx-auto mt-5 mb-5">
               <span className="text-[#B08D6B] text-xs tracking-[0.3em] uppercase font-display">Loleanthe Boutique</span>
             </div>
             <p className="text-[#7A6654] max-w-xl mx-auto text-sm leading-relaxed">
@@ -45,7 +45,7 @@ export default function CatalogoPage() {
           </div>
 
           {/* Filters & CTA bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10 border-b border-[#EDE0CE] pb-6">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-8 border-b border-[#EDE0CE] pb-5">
             <div className="flex gap-2">
               <button
                 onClick={() => setFilter('all')}
@@ -109,7 +109,7 @@ export default function CatalogoPage() {
           )}
 
           {/* Back */}
-          <div className="text-center mt-16">
+          <div className="text-center mt-12 md:mt-16">
             <Link href="/" className="font-display text-sm tracking-widest uppercase text-[#7A6654] hover:text-[#B08D6B] transition-colors hover-underline">
               ← Volver al inicio
             </Link>

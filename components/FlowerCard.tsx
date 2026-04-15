@@ -72,7 +72,7 @@ export default function FlowerCard({ flower, priority = false }: Props) {
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-110"
             priority={priority}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-[#EDE0CE]">
@@ -80,19 +80,19 @@ export default function FlowerCard({ flower, priority = false }: Props) {
           </div>
         )}
 
-        {/* Image navigation arrows */}
+        {/* Image navigation arrows — only on md+ */}
         {flower.images.length > 1 && hovered && (
           <>
             <button
               onClick={prevImg}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#1A130A]/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-[#B08D6B] transition-colors z-10"
+              className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#1A130A]/60 backdrop-blur-sm text-white items-center justify-center hover:bg-[#B08D6B] transition-colors z-10"
               aria-label="Imagen anterior"
             >
               ‹
             </button>
             <button
               onClick={nextImg}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#1A130A]/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-[#B08D6B] transition-colors z-10"
+              className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#1A130A]/60 backdrop-blur-sm text-white items-center justify-center hover:bg-[#B08D6B] transition-colors z-10"
               aria-label="Siguiente imagen"
             >
               ›
@@ -100,9 +100,9 @@ export default function FlowerCard({ flower, priority = false }: Props) {
           </>
         )}
 
-        {/* Image dots */}
+        {/* Mobile image swipe dots */}
         {flower.images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+          <div className="absolute bottom-14 md:bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
             {flower.images.map((_, i) => (
               <button
                 key={i}
@@ -122,24 +122,34 @@ export default function FlowerCard({ flower, priority = false }: Props) {
           </div>
         )}
 
-        {/* Gradient overlay on hover */}
-        <div className={`absolute inset-0 bg-gradient-to-t from-[#1A130A]/80 via-transparent to-transparent transition-opacity duration-400 z-10 ${hovered ? 'opacity-100' : 'opacity-0'}`} />
+        {/* Gradient overlay:
+            Mobile — always visible so action buttons are readable
+            Desktop — only on hover */}
+        <div className={`absolute inset-0 bg-gradient-to-t from-[#1A130A]/80 via-transparent to-transparent z-10
+          opacity-100 md:opacity-0 md:transition-opacity md:duration-300
+          ${hovered ? 'md:opacity-100' : ''}
+        `} />
 
-        {/* Action buttons on hover */}
+        {/* Action buttons:
+            Mobile — always visible at bottom
+            Desktop — slide up on hover */}
         {flower.inStock && (
-          <div className={`absolute bottom-0 left-0 right-0 p-4 z-20 flex flex-col gap-2 transition-all duration-400 ${hovered ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          <div className={`absolute bottom-0 left-0 right-0 p-3 md:p-4 z-20 flex flex-col gap-2
+            md:transition-all md:duration-300
+            ${hovered ? 'md:translate-y-0 md:opacity-100' : 'md:translate-y-4 md:opacity-0'}
+          `}>
             <button
               onClick={handleQuoteNav}
-              className="w-full bg-[#FAF7F2] text-[#1A130A] font-display tracking-widest text-xs uppercase py-2.5 hover:bg-[#B08D6B] hover:text-white transition-all duration-300"
+              className="w-full bg-[#FAF7F2] text-[#1A130A] font-display tracking-widest text-xs uppercase py-3 hover:bg-[#B08D6B] hover:text-white transition-all duration-300 active:bg-[#B08D6B] active:text-white"
             >
               Solicitar Cotización
             </button>
             <button
               onClick={handleQuote}
-              className={`w-full font-display tracking-widest text-xs uppercase py-2.5 border transition-all duration-300 ${
+              className={`w-full font-display tracking-widest text-xs uppercase py-3 border transition-all duration-300 active:opacity-80 ${
                 inQuote
                   ? 'border-[#B08D6B] bg-[#B08D6B] text-white'
-                  : 'border-white/50 text-white hover:border-[#B08D6B] hover:text-[#B08D6B]'
+                  : 'border-white/70 text-white hover:border-[#B08D6B] hover:text-[#B08D6B]'
               }`}
             >
               {inQuote ? '✓ En cotización' : '+ Agregar a cotización'}
@@ -149,19 +159,20 @@ export default function FlowerCard({ flower, priority = false }: Props) {
       </div>
 
       {/* Info */}
-      <div className="p-4 border-t border-[#EDE0CE]">
-        <h3 className="font-display text-lg text-[#1A130A] font-medium">{flower.name}</h3>
+      <div className="p-3 md:p-4 border-t border-[#EDE0CE]">
+        <h3 className="font-display text-base md:text-lg text-[#1A130A] font-medium leading-tight">{flower.name}</h3>
         {flower.description && (
           <p className="text-[#7A6654] text-xs mt-1 leading-relaxed line-clamp-2">{flower.description}</p>
         )}
-        <div className="flex items-center justify-between mt-3">
+        <div className="flex items-center justify-between mt-2 md:mt-3">
           <span className={`text-xs tracking-widest uppercase font-display ${flower.inStock ? 'text-[#B08D6B]' : 'text-[#7A6654]'}`}>
             {flower.inStock ? 'Disponible' : 'Sin stock'}
           </span>
+          {/* Desktop only — on mobile the action bar is always visible above */}
           {!hovered && flower.inStock && (
             <button
               onClick={handleQuote}
-              className={`text-xs tracking-wider font-display uppercase transition-colors ${inQuote ? 'text-[#B08D6B]' : 'text-[#7A6654] hover:text-[#B08D6B]'}`}
+              className={`hidden md:block text-xs tracking-wider font-display uppercase transition-colors ${inQuote ? 'text-[#B08D6B]' : 'text-[#7A6654] hover:text-[#B08D6B]'}`}
             >
               {inQuote ? '✓ En cotización' : '+ Cotizar'}
             </button>

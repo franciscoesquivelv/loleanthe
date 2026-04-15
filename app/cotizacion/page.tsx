@@ -61,12 +61,12 @@ export default function CotizacionPage() {
   return (
     <>
       <Header />
-      <main className="pt-32 pb-24 min-h-screen">
+      <main className="pt-24 md:pt-32 pb-16 md:pb-24 min-h-screen">
         <div className="max-w-4xl mx-auto px-6">
           {/* Header */}
-          <div className="text-center mb-14">
-            <p className="font-script text-[#B08D6B] text-3xl mb-3">Tu selección</p>
-            <h1 className="font-display text-5xl md:text-6xl font-light text-[#1A130A]">
+          <div className="text-center mb-10 md:mb-14">
+            <p className="font-script text-[#B08D6B] text-2xl md:text-3xl mb-3">Tu selección</p>
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-light text-[#1A130A]">
               Solicitud de <em className="italic text-[#B08D6B]">Cotización</em>
             </h1>
             <div className="ornament max-w-xs mx-auto mt-5">
