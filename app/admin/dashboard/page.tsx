@@ -12,10 +12,14 @@ import {
   setFlowerArchived,
   setFlowerStock,
   deleteFlowerImage,
+  getStorageInfo,
+  validateImageFiles,
 } from '@/lib/flowers';
 import Image from 'next/image';
 import type { Flower } from '@/lib/types';
 import toast from 'react-hot-toast';
+
+const MAX_MB = 2;
 
 type Tab = 'catalog' | 'inquiries';
 type Mode = 'list' | 'create' | 'edit';
@@ -42,6 +46,7 @@ export default function AdminDashboard() {
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [storageInfo, setStorageInfo] = useState<{ usedBytes: number; limitBytes: number; nearLimit: boolean } | null>(null);
 
   useEffect(() => {
     const auth = getAuthInstance();
@@ -58,8 +63,9 @@ export default function AdminDashboard() {
 
   const loadFlowers = async () => {
     try {
-      const data = await getAllFlowers();
+      const [data, info] = await Promise.all([getAllFlowers(), getStorageInfo()]);
       setFlowers(data);
+      setStorageInfo(info);
     } catch {
       toast.error('Error al cargar flores');
     }
@@ -97,6 +103,15 @@ export default function AdminDashboard() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
+
+    // Validate size limit (2 MB per image)
+    const error = validateImageFiles(files);
+    if (error) {
+      toast.error(error, { duration: 5000 });
+      e.target.value = '';
+      return;
+    }
+
     setImageFiles((prev) => [...prev, ...files]);
     const newPreviews = files.map((f) => URL.createObjectURL(f));
     setImagePreviews((prev) => [...prev, ...newPreviews]);
@@ -123,6 +138,10 @@ export default function AdminDashboard() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name) { toast.error('El nombre es requerido'); return; }
+    if (storageInfo?.nearLimit && imageFiles.length > 0) {
+      toast.error('El almacenamiento está lleno. Elimina imágenes antes de subir nuevas.', { duration: 6000 });
+      return;
+    }
     setSaving(true);
     try {
       if (mode === 'create') {
@@ -216,6 +235,43 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
+
+      {/* Storage warning banner */}
+      {storageInfo?.nearLimit && (
+        <div className="bg-red-900/90 border-b border-red-700 px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-start gap-3">
+            <span className="text-red-300 text-lg shrink-0">⚠️</span>
+            <div>
+              <p className="text-red-100 font-display text-sm font-medium">
+                El almacenamiento ha alcanzado su límite (4.5 GB)
+              </p>
+              <p className="text-red-300 text-xs mt-1 leading-relaxed">
+                No es posible subir más imágenes. Para liberar espacio, elimina algunas imágenes de flores existentes desde el panel de edición. Si necesitas más espacio, contacta al administrador del sistema.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Storage usage bar (subtle, always visible) */}
+      {storageInfo && !storageInfo.nearLimit && (
+        <div className="bg-[#1A130A]/5 border-b border-[#EDE0CE] px-6 py-2">
+          <div className="max-w-7xl mx-auto flex items-center gap-3">
+            <span className="text-[#7A6654] text-xs font-display shrink-0">
+              Almacenamiento: {(storageInfo.usedBytes / (1024 * 1024 * 1024)).toFixed(2)} GB / 4.5 GB
+            </span>
+            <div className="flex-1 h-1 bg-[#EDE0CE] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#B08D6B] rounded-full transition-all"
+                style={{ width: `${Math.min((storageInfo.usedBytes / storageInfo.limitBytes) * 100, 100)}%` }}
+              />
+            </div>
+            <span className="text-[#7A6654] text-xs font-display shrink-0">
+              {Math.round((storageInfo.usedBytes / storageInfo.limitBytes) * 100)}%
+            </span>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
         {/* =========== CATALOG TAB =========== */}
@@ -436,7 +492,7 @@ export default function AdminDashboard() {
                       className="border-2 border-dashed border-[#D4B896] p-8 text-center cursor-pointer hover:border-[#B08D6B] transition-colors"
                     >
                       <p className="font-display text-[#7A6654] text-sm">Haz clic para subir imágenes</p>
-                      <p className="text-xs text-[#B08D6B]/60 mt-1">JPG, PNG, WebP — Múltiples archivos permitidos</p>
+                      <p className="text-xs text-[#B08D6B]/60 mt-1">JPG, PNG, WebP · Máximo {MAX_MB} MB por imagen</p>
                     </div>
                     <input
                       ref={fileInputRef}
