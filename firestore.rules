@@ -1,0 +1,75 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cualquier usuario autenticado en Firebase Auth = admin.
+    // El registro está cerrado, así que solo el equipo de Loleanthe tiene cuenta.
+    // MÁS RIGUROSO (a futuro): usar custom claims →
+    //   return request.auth != null && request.auth.token.admin == true;
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // ── flowers (catálogo público) ───────────────────────────────
+    match /flowers/{flowerId} {
+      // Lectura pública del catálogo.
+      allow read: if true;
+
+      // Solo admin crea/edita, con validación de forma.
+      allow create, update: if isAdmin()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 200
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 5000
+        && request.resource.data.inStock is bool
+        && request.resource.data.archived is bool
+        && request.resource.data.images is list
+        && request.resource.data.images.size() <= 20;
+
+      allow delete: if isAdmin();
+    }
+
+    // ── inquiries (solicitudes de cotización) ────────────────────
+    match /inquiries/{inquiryId} {
+      // Solo admin lee/edita/borra (protege la PII de los clientes).
+      allow read, update, delete: if isAdmin();
+
+      // Cualquiera CREA una cotización, pero con validación estricta de
+      // campos, tipos y longitudes para frenar spam y payloads gigantes.
+      // NOTA: cuando actives Firebase App Check, añade `request.app != null &&`
+      // al inicio de esta condición para bloquear bots automatizados.
+      allow create: if
+        request.resource.data.keys().hasOnly(
+             ['name', 'email', 'phone', 'message', 'flowers', 'createdAt', 'status'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.email is string
+        && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && request.resource.data.email.size() <= 200
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() <= 30
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 2000
+        && request.resource.data.flowers is list
+        && request.resource.data.flowers.size() <= 50
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time;
+    }
+
+    // ── _meta/storage (contador de cuota) ────────────────────────
+    // Lectura pública OK (la UI lo muestra). Escritura SOLO admin
+    // para que nadie manipule el contador y rompa el límite de Storage.
+    match /_meta/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Denegar todo lo demás explícitamente.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

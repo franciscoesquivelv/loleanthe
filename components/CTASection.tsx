@@ -133,7 +133,7 @@ export default function CTASection() {
                 type="tel"
                 value={form.phone}
                 onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                placeholder="+52 000 000 0000"
+                placeholder="+503 0000 0000"
                 className="w-full border border-[#D4B896] bg-transparent px-4 py-3 font-display text-[#1A130A] placeholder:text-[#B08D6B]/40 text-sm"
               />
             </div>

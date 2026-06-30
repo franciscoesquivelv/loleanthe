@@ -4,14 +4,37 @@ import { QuoteProvider } from '@/context/QuoteContext';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
-  title: 'Loleanthe Boutique — Luxury Florals',
+  metadataBase: new URL('https://loleanthe.com'),
+  title: {
+    default: 'Loleanthe Boutique — Flores de Lujo y Rosas Premium',
+    template: '%s | Loleanthe Boutique',
+  },
   description: 'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración, ideales para arreglos únicos e irrepetibles.',
   keywords: 'flores de lujo, rosas premium, flores exóticas, arreglos florales, boutique floral',
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'Loleanthe Boutique — Luxury Florals',
+    title: 'Loleanthe Boutique — Flores de Lujo',
     description: 'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración.',
+    url: 'https://loleanthe.com',
     siteName: 'Loleanthe Boutique',
     type: 'website',
+    locale: 'es_SV',
+    images: [
+      {
+        url: '/images/hero-roses.png',
+        width: 1200,
+        height: 630,
+        alt: 'Loleanthe Boutique — Flores de lujo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Loleanthe Boutique — Flores de Lujo',
+    description: 'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración.',
+    images: ['/images/hero-roses.png'],
   },
   icons: {
     icon: '/favicon-black.png',
