@@ -1,0 +1,28 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Igual que en Firestore: autenticado = admin.
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    match /flowers/{flowerId}/{fileName} {
+      // Lectura pública (las imágenes se sirven en el catálogo).
+      allow read: if true;
+
+      // Solo admin sube, y solo imágenes <= 2 MB.
+      allow write: if isAdmin()
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
+
+      allow delete: if isAdmin();
+    }
+
+    // Todo lo demás denegado.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -126,12 +126,17 @@ export default function AdminDashboard() {
   };
 
   const removeExistingImage = async (url: string) => {
-    if (editingFlower) {
-      await deleteFlowerImage(url);
-      const updatedImages = existingImages.filter((img) => img !== url);
-      setExistingImages(updatedImages);
+    if (!editingFlower) return;
+    const updatedImages = existingImages.filter((img) => img !== url);
+    try {
+      // Primero quitamos la URL del doc; solo si eso tiene éxito borramos el
+      // archivo de Storage, para no dejar imágenes rotas en el catálogo.
       await updateFlower(editingFlower.id, { images: updatedImages });
+      setExistingImages(updatedImages);
+      await deleteFlowerImage(url);
       toast.success('Imagen eliminada');
+    } catch {
+      toast.error('No se pudo eliminar la imagen. Intenta de nuevo.');
     }
   };
 
@@ -612,7 +617,7 @@ function InquiriesPanel() {
               <div className="flex items-center gap-3">
                 <span className="text-xs text-[#7A6654] font-display">
                   {inq.createdAt?.seconds
-                    ? new Date(inq.createdAt.seconds * 1000).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
+                    ? new Date(inq.createdAt.seconds * 1000).toLocaleDateString('es-SV', { day: 'numeric', month: 'long', year: 'numeric' })
                     : 'Fecha no disponible'}
                 </span>
               </div>

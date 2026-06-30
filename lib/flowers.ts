@@ -2,12 +2,10 @@ import {
   collection,
   getDocs,
   getDoc,
-  addDoc,
   updateDoc,
   deleteDoc,
   doc,
   query,
-  where,
   orderBy,
   serverTimestamp,
   setDoc,
@@ -18,6 +16,7 @@ import {
   uploadBytes,
   getDownloadURL,
   deleteObject,
+  getMetadata,
 } from 'firebase/storage';
 import { getDb, getStorageInstance } from './firebase';
 import type { Flower } from './types';
@@ -109,17 +108,43 @@ export async function uploadFlowerImage(file: File, flowerId: string): Promise<s
   return url;
 }
 
-export async function deleteFlowerImage(url: string, sizeBytes?: number): Promise<void> {
+export async function deleteFlowerImage(url: string): Promise<void> {
+  const storage = getStorageInstance();
+  const fileRef = ref(storage, url);
   try {
-    const storage = getStorageInstance();
-    const fileRef = ref(storage, url);
+    // Leemos el tamaño real del archivo ANTES de borrarlo para decrementar el
+    // contador de cuota con el valor correcto. Sin esto el contador solo crecía
+    // (nunca se persistía el tamaño por imagen) y terminaba bloqueando subidas.
+    const meta = await getMetadata(fileRef);
     await deleteObject(fileRef);
-    if (sizeBytes) {
-      await adjustStorageUsage(-sizeBytes);
-    }
+    await adjustStorageUsage(-(meta.size ?? 0));
   } catch {
-    // Ignore if file doesn't exist
+    // El archivo no existe o no se pudo leer: nada que borrar ni descontar.
   }
+}
+
+// Sube todas las imágenes de un lote. Si alguna falla, borra las que SÍ se
+// subieron (y revierte su parte del contador) y relanza el error, para no dejar
+// archivos huérfanos en Storage ni un doc a medio crear.
+async function uploadImagesAtomic(files: File[], flowerId: string): Promise<string[]> {
+  const results = await Promise.allSettled(
+    files.map((file) => uploadFlowerImage(file, flowerId))
+  );
+
+  const uploaded = results
+    .filter((r): r is PromiseFulfilledResult<string> => r.status === 'fulfilled')
+    .map((r) => r.value);
+
+  const failed = results.find((r) => r.status === 'rejected') as
+    | PromiseRejectedResult
+    | undefined;
+
+  if (failed) {
+    await Promise.all(uploaded.map((url) => deleteFlowerImage(url)));
+    throw failed.reason;
+  }
+
+  return uploaded;
 }
 
 export async function createFlower(
@@ -127,18 +152,19 @@ export async function createFlower(
   imageFiles: File[]
 ): Promise<string> {
   const db = getDb();
-  const docRef = await addDoc(collection(db, COLLECTION), {
+  // Reservamos un id sin escribir el doc todavía.
+  const docRef = doc(collection(db, COLLECTION));
+
+  // Subimos las imágenes ANTES de crear el doc. Si una falla, se limpian las
+  // demás y no se crea ningún doc fantasma.
+  const imageUrls = await uploadImagesAtomic(imageFiles, docRef.id);
+
+  await setDoc(docRef, {
     ...data,
-    images: [],
+    images: imageUrls,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
-
-  const imageUrls = await Promise.all(
-    imageFiles.map((file) => uploadFlowerImage(file, docRef.id))
-  );
-
-  await updateDoc(docRef, { images: imageUrls, updatedAt: serverTimestamp() });
   return docRef.id;
 }
 
@@ -148,23 +174,32 @@ export async function updateFlower(
   newImageFiles?: File[]
 ): Promise<void> {
   const db = getDb();
+  const docRef = doc(db, COLLECTION, id);
   const updates: Record<string, unknown> = { ...data, updatedAt: serverTimestamp() };
 
   if (newImageFiles && newImageFiles.length > 0) {
-    const newUrls = await Promise.all(
-      newImageFiles.map((file) => uploadFlowerImage(file, id))
-    );
-    const existing = data.images || [];
+    // Base de imágenes previas: usamos las que pasa el caller; si no las pasó,
+    // leemos las reales del doc para NUNCA borrarlas por accidente.
+    let existing: string[];
+    if (data.images !== undefined) {
+      existing = data.images;
+    } else {
+      const snap = await getDoc(docRef);
+      existing = (snap.exists() ? (snap.data().images as string[] | undefined) : undefined) ?? [];
+    }
+    const newUrls = await uploadImagesAtomic(newImageFiles, id);
     updates.images = [...existing, ...newUrls];
   }
 
-  await updateDoc(doc(db, COLLECTION, id), updates);
+  await updateDoc(docRef, updates);
 }
 
 export async function deleteFlower(id: string, images: string[]): Promise<void> {
   const db = getDb();
-  await Promise.all(images.map((url) => deleteFlowerImage(url)));
+  // Borramos el doc PRIMERO; luego, best-effort, las imágenes. Así un fallo al
+  // borrar archivos no deja un doc apuntando a imágenes inexistentes.
   await deleteDoc(doc(db, COLLECTION, id));
+  await Promise.all(images.map((url) => deleteFlowerImage(url)));
 }
 
 export async function setFlowerArchived(id: string, archived: boolean): Promise<void> {
