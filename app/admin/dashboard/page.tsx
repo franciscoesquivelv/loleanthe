@@ -312,7 +312,7 @@ export default function AdminDashboard() {
                   <div className="text-center py-20 border border-dashed border-[#D4B896]">
                     <p className="font-script text-4xl text-[#B08D6B] mb-4">Vacío</p>
                     <p className="text-[#7A6654] text-sm mb-6">No hay flores en el catálogo aún.</p>
-                    <button onClick={openCreate} className="border border-[#B08D6B] text-[#B08D6B] px-6 py-2 font-display text-xs tracking-widest uppercase hover:bg-[#B08D6B] hover:text-white transition-all">
+                    <button onClick={openCreate} className="border border-[#B08D6B] text-[#8A6A48] px-6 py-2 font-display text-xs tracking-widest uppercase hover:bg-[#B08D6B] hover:text-white transition-all">
                       Agregar primera flor
                     </button>
                   </div>
@@ -518,7 +518,7 @@ export default function AdminDashboard() {
                       className="border-2 border-dashed border-[#D4B896] p-8 text-center cursor-pointer hover:border-[#B08D6B] transition-colors"
                     >
                       <p className="font-display text-[#7A6654] text-sm">Haz clic para subir imágenes</p>
-                      <p className="text-xs text-[#B08D6B]/60 mt-1">JPG, PNG, WebP · Máximo {MAX_MB} MB por imagen</p>
+                      <p className="text-xs text-[#8A6A48] mt-1">JPG, PNG, WebP · Máximo {MAX_MB} MB por imagen</p>
                     </div>
                     <input
                       ref={fileInputRef}
