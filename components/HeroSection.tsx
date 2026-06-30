@@ -23,8 +23,9 @@ export default function HeroSection() {
       <div ref={imgRef} className="absolute inset-0 scale-110">
         <Image
           src="/images/hero-roses.png"
-          alt="Loleanthe Boutique"
+          alt="Rosas premium de tallo largo — Loleanthe Boutique"
           fill
+          sizes="100vw"
           className="object-cover object-center"
           priority
         />

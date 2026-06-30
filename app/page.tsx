@@ -4,14 +4,16 @@ import CatalogPreview from '@/components/CatalogPreview';
 import BenefitsSection from '@/components/BenefitsSection';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
+import { getPublicFlowersServer } from '@/lib/flowers-server';
 
-export default function Home() {
+export default async function Home() {
+  const flowers = await getPublicFlowersServer();
   return (
     <>
       <Header />
       <main>
         <HeroSection />
-        <CatalogPreview />
+        <CatalogPreview initialFlowers={flowers} />
         <BenefitsSection />
         <CTASection />
       </main>

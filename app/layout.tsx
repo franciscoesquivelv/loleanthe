@@ -1,7 +1,29 @@
 import type { Metadata } from 'next';
+import { DM_Sans, Cormorant_Garamond, Great_Vibes } from 'next/font/google';
 import './globals.css';
 import { QuoteProvider } from '@/context/QuoteContext';
 import { Toaster } from 'react-hot-toast';
+
+// Self-hosted vía next/font: sin request a Google, sin @import bloqueante, sin CLS.
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-display',
+  display: 'swap',
+});
+const greatVibes = Great_Vibes({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-script',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://loleanthe.com'),
@@ -48,7 +70,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" className={`${dmSans.variable} ${cormorant.variable} ${greatVibes.variable}`}>
       <body className="grain">
         <QuoteProvider>
           {children}
@@ -58,7 +80,7 @@ export default function RootLayout({
               style: {
                 background: '#1A130A',
                 color: '#FAF7F2',
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '14px',
                 borderRadius: '2px',
                 border: '1px solid #B08D6B',
