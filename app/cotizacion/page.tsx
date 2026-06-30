@@ -116,8 +116,8 @@ export default function CotizacionPage() {
                       </div>
                       <button
                         onClick={() => removeFromQuote(item.flowerId)}
-                        className="opacity-0 group-hover:opacity-100 text-[#7A6654] hover:text-red-400 transition-all text-lg w-6 h-6 flex items-center justify-center"
-                        aria-label="Eliminar"
+                        className="text-[#7A6654] hover:text-red-500 transition-colors text-xl w-11 h-11 flex items-center justify-center flex-shrink-0"
+                        aria-label={`Quitar ${item.flowerName}`}
                       >
                         ×
                       </button>

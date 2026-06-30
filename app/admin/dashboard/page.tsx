@@ -72,8 +72,11 @@ export default function AdminDashboard() {
   };
 
   const handleLogout = async () => {
-    await signOut(getAuthInstance());
-    router.replace('/admin');
+    try {
+      await signOut(getAuthInstance());
+    } finally {
+      router.replace('/admin');
+    }
   };
 
   const openCreate = () => {
@@ -189,15 +192,23 @@ export default function AdminDashboard() {
   };
 
   const toggleStock = async (flower: Flower) => {
-    await setFlowerStock(flower.id, !flower.inStock);
-    await loadFlowers();
-    toast.success(flower.inStock ? 'Marcada sin stock' : 'Marcada con stock');
+    try {
+      await setFlowerStock(flower.id, !flower.inStock);
+      await loadFlowers();
+      toast.success(flower.inStock ? 'Marcada sin stock' : 'Marcada con stock');
+    } catch {
+      toast.error('No se pudo actualizar el stock.');
+    }
   };
 
   const toggleArchive = async (flower: Flower) => {
-    await setFlowerArchived(flower.id, !flower.archived);
-    await loadFlowers();
-    toast.success(flower.archived ? 'Restaurada al catálogo' : 'Archivada');
+    try {
+      await setFlowerArchived(flower.id, !flower.archived);
+      await loadFlowers();
+      toast.success(flower.archived ? 'Restaurada al catálogo' : 'Archivada');
+    } catch {
+      toast.error('No se pudo actualizar la visibilidad.');
+    }
   };
 
   if (authLoading) {
@@ -439,29 +450,39 @@ export default function AdminDashboard() {
 
                   {/* Toggles */}
                   <div className="flex items-center gap-8">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <div
-                        onClick={() => setForm((p) => ({ ...p, inStock: !p.inStock }))}
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={form.inStock}
+                      onClick={() => setForm((p) => ({ ...p, inStock: !p.inStock }))}
+                      className="flex items-center gap-3 cursor-pointer group"
+                    >
+                      <span
                         className={`relative w-12 h-6 rounded-full transition-colors ${form.inStock ? 'bg-[#B08D6B]' : 'bg-[#D4B896]'}`}
                       >
-                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.inStock ? 'left-7' : 'left-1'}`} />
-                      </div>
+                        <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.inStock ? 'left-7' : 'left-1'}`} />
+                      </span>
                       <span className="font-display text-sm text-[#1A130A]">
                         {form.inStock ? 'En stock' : 'Sin stock'}
                       </span>
-                    </label>
+                    </button>
 
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <div
-                        onClick={() => setForm((p) => ({ ...p, archived: !p.archived }))}
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={form.archived}
+                      onClick={() => setForm((p) => ({ ...p, archived: !p.archived }))}
+                      className="flex items-center gap-3 cursor-pointer group"
+                    >
+                      <span
                         className={`relative w-12 h-6 rounded-full transition-colors ${form.archived ? 'bg-[#B08D6B]' : 'bg-[#D4B896]'}`}
                       >
-                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.archived ? 'left-7' : 'left-1'}`} />
-                      </div>
+                        <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.archived ? 'left-7' : 'left-1'}`} />
+                      </span>
                       <span className="font-display text-sm text-[#1A130A]">
                         {form.archived ? 'Archivada (oculta)' : 'Visible en catálogo'}
                       </span>
-                    </label>
+                    </button>
                   </div>
 
                   {/* Existing images */}
@@ -571,20 +592,27 @@ function InquiriesPanel() {
     status: string;
   }>>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    import('firebase/firestore').then(({ collection, getDocs, orderBy, query }) => {
-      import('@/lib/firebase').then(({ getDb }) => {
+    (async () => {
+      try {
+        const { collection, getDocs, orderBy, query } = await import('firebase/firestore');
+        const { getDb } = await import('@/lib/firebase');
         const q = query(collection(getDb(), 'inquiries'), orderBy('createdAt', 'desc'));
-        getDocs(q).then((snap) => {
-          setInquiries(snap.docs.map((d) => ({ id: d.id, ...d.data() } as never)));
-          setLoading(false);
-        });
-      });
-    });
+        const snap = await getDocs(q);
+        setInquiries(snap.docs.map((d) => ({ id: d.id, ...d.data() } as never)));
+      } catch {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   if (loading) return <div className="text-center py-16 font-display text-[#7A6654]">Cargando solicitudes...</div>;
+
+  if (error) return <div className="text-center py-16 font-display text-[#7A6654]">No se pudieron cargar las solicitudes. Recarga la página e intenta de nuevo.</div>;
 
   if (inquiries.length === 0) {
     return (
