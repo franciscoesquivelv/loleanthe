@@ -57,7 +57,7 @@ export default function CTASection() {
             Solicita tu <em className="italic text-[#B08D6B]">cotización</em>
           </h2>
           <div className="ornament max-w-xs mx-auto mt-5 mb-5">
-            <span className="text-[#B08D6B] text-xs tracking-[0.3em] uppercase font-display">Contacto exclusivo</span>
+            <span className="text-[#8A6A48] text-xs tracking-[0.3em] uppercase font-display">Contacto exclusivo</span>
           </div>
           <p className="text-[#7A6654] text-sm leading-relaxed max-w-md mx-auto">
             Cuéntanos sobre tu ocasión y las flores que te interesaron. Nos pondremos en contacto contigo con una cotización personalizada.
@@ -82,7 +82,7 @@ export default function CTASection() {
               ))}
             </div>
             <p className="text-center mt-3">
-              <Link href="/cotizacion" className="text-xs text-[#B08D6B] hover-underline font-display tracking-widest uppercase">
+              <Link href="/cotizacion" className="text-xs text-[#8A6A48] hover-underline font-display tracking-widest uppercase">
                 Ver formulario completo →
               </Link>
             </p>

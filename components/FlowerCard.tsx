@@ -165,7 +165,7 @@ export default function FlowerCard({ flower, priority = false }: Props) {
           <p className="text-[#7A6654] text-xs mt-1 leading-relaxed line-clamp-2">{flower.description}</p>
         )}
         <div className="flex items-center justify-between mt-2 md:mt-3">
-          <span className={`text-xs tracking-widest uppercase font-display ${flower.inStock ? 'text-[#B08D6B]' : 'text-[#7A6654]'}`}>
+          <span className={`text-xs tracking-widest uppercase font-display ${flower.inStock ? 'text-[#8A6A48]' : 'text-[#7A6654]'}`}>
             {flower.inStock ? 'Disponible' : 'Sin stock'}
           </span>
           {/* Desktop only — on mobile the action bar is always visible above */}

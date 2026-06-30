@@ -29,7 +29,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
               Catálogo <em className="italic text-[#B08D6B]">Completo</em>
             </h1>
             <div className="ornament max-w-xs mx-auto mt-5 mb-5">
-              <span className="text-[#B08D6B] text-xs tracking-[0.3em] uppercase font-display">Loleanthe Boutique</span>
+              <span className="text-[#8A6A48] text-xs tracking-[0.3em] uppercase font-display">Loleanthe Boutique</span>
             </div>
             <p className="text-[#7A6654] max-w-xl mx-auto text-sm leading-relaxed">
               Toda nuestra selección de flores exóticas de alta gama, disponibles para arreglos personalizados y cotizaciones exclusivas.
@@ -75,7 +75,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
               </p>
               <Link
                 href="/#contacto"
-                className="border border-[#B08D6B] text-[#B08D6B] px-6 py-3 font-display text-sm tracking-widest uppercase hover:bg-[#B08D6B] hover:text-white transition-all"
+                className="border border-[#B08D6B] text-[#8A6A48] px-6 py-3 font-display text-sm tracking-widest uppercase hover:bg-[#B08D6B] hover:text-white transition-all"
               >
                 Contactar
               </Link>

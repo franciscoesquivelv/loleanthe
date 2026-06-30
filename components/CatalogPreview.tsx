@@ -39,7 +39,7 @@ export default function CatalogPreview({ initialFlowers }: { initialFlowers: Flo
           Catálogo <em className="italic text-[#B08D6B]">Premium</em>
         </h2>
         <div className="ornament max-w-xs mx-auto mt-5">
-          <span className="text-[#B08D6B] text-xs tracking-[0.3em] uppercase font-display">Flores de Excepción</span>
+          <span className="text-[#8A6A48] text-xs tracking-[0.3em] uppercase font-display">Flores de Excepción</span>
         </div>
         <p className="mt-5 text-[#7A6654] max-w-xl mx-auto leading-relaxed text-sm md:text-base">
           Cada variedad es cuidadosamente seleccionada por su belleza, tamaño y durabilidad. Estándares de calidad que van mucho más allá de lo convencional.

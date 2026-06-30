@@ -70,7 +70,7 @@ export default function CotizacionPage() {
               Solicitud de <em className="italic text-[#B08D6B]">Cotización</em>
             </h1>
             <div className="ornament max-w-xs mx-auto mt-5">
-              <span className="text-[#B08D6B] text-xs tracking-[0.3em] uppercase font-display">Personalizada para ti</span>
+              <span className="text-[#8A6A48] text-xs tracking-[0.3em] uppercase font-display">Personalizada para ti</span>
             </div>
           </div>
 
@@ -88,7 +88,7 @@ export default function CotizacionPage() {
                   <p className="text-[#7A6654] text-sm mb-5">
                     Aún no has agregado flores a tu cotización. Explora el catálogo.
                   </p>
-                  <Link href="/catalogo" className="font-display text-xs tracking-widest uppercase text-[#B08D6B] hover-underline">
+                  <Link href="/catalogo" className="font-display text-xs tracking-widest uppercase text-[#8A6A48] hover-underline">
                     Ir al catálogo →
                   </Link>
                 </div>
@@ -112,7 +112,7 @@ export default function CotizacionPage() {
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="font-display text-sm text-[#1A130A] truncate">{item.flowerName}</p>
-                        <p className="text-xs text-[#B08D6B]">Para cotizar</p>
+                        <p className="text-xs text-[#8A6A48]">Para cotizar</p>
                       </div>
                       <button
                         onClick={() => removeFromQuote(item.flowerId)}
