@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500;600&family=Great+Vibes&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -25,17 +24,17 @@ html {
 body {
   background-color: var(--cream);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-sans), 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .font-display {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-display), 'Cormorant Garamond', serif;
 }
 
 .font-script {
-  font-family: 'Great Vibes', cursive;
+  font-family: var(--font-script), 'Great Vibes', cursive;
 }
 
 /* Ornamental divider */
@@ -129,6 +128,22 @@ input, textarea, select {
 
 input:focus, textarea:focus, select:focus {
   border-color: var(--gold) !important;
+}
+
+/* Foco visible accesible para navegación por teclado (a11y) */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Respeta la preferencia del sistema de movimiento reducido (a11y) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Fade-in animation */

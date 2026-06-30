@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import FlowerCard from './FlowerCard';
-import { getPublicFlowers } from '@/lib/flowers';
 import type { Flower } from '@/lib/types';
 
 const PLACEHOLDERS: Flower[] = [
@@ -15,18 +14,10 @@ const PLACEHOLDERS: Flower[] = [
   { id: 'p6', name: 'Ranunculus Amarillo', description: 'Ranúnculo en tono amarillo vibrante. Agrega luminosidad y vida a cualquier composición.', images: ['/images/flor-ranunculus.png'], inStock: true, archived: false, createdAt: '', updatedAt: '' },
 ];
 
-export default function CatalogPreview() {
-  const [flowers, setFlowers] = useState<Flower[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function CatalogPreview({ initialFlowers }: { initialFlowers: Flower[] }) {
+  const flowers = initialFlowers.slice(0, 6);
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    getPublicFlowers()
-      .then((data) => setFlowers(data.slice(0, 6)))
-      .catch(() => setFlowers([]))
-      .finally(() => setLoading(false));
-  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -56,25 +47,17 @@ export default function CatalogPreview() {
       </div>
 
       {/* Grid */}
-      {loading ? (
-        <div className="catalog-grid">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-[3/4] skeleton rounded-sm" />
-          ))}
-        </div>
-      ) : (
-        <div className="catalog-grid">
-          {displayFlowers.map((flower, i) => (
-            <div
-              key={flower.id}
-              className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
-              style={{ transitionDelay: `${i * 80}ms` }}
-            >
-              <FlowerCard flower={flower} priority={i < 3} />
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="catalog-grid">
+        {displayFlowers.map((flower, i) => (
+          <div
+            key={flower.id}
+            className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+            style={{ transitionDelay: `${i * 80}ms` }}
+          >
+            <FlowerCard flower={flower} priority={i < 2} />
+          </div>
+        ))}
+      </div>
 
       {/* See more */}
       <div className={`flex flex-col items-center mt-12 md:mt-16 gap-4 transition-all duration-1000 delay-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
