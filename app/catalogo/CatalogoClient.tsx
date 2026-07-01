@@ -88,7 +88,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
                   className="opacity-0 translate-y-4"
                   style={{ animation: `fadeInUp 0.6s ease ${i * 60}ms forwards` }}
                 >
-                  <FlowerCard flower={flower} priority={i < 4} />
+                  <FlowerCard flower={flower} priority={i < 4} detailHref={`/catalogo/${flower.id}`} />
                 </div>
               ))}
             </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useQuote } from '@/context/QuoteContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -10,9 +11,10 @@ import type { Flower } from '@/lib/types';
 interface Props {
   flower: Flower;
   priority?: boolean;
+  detailHref?: string;
 }
 
-export default function FlowerCard({ flower, priority = false }: Props) {
+export default function FlowerCard({ flower, priority = false, detailHref }: Props) {
   const [currentImg, setCurrentImg] = useState(0);
   const [hovered, setHovered] = useState(false);
   const { addToQuote, isInQuote, removeFromQuote } = useQuote();
@@ -160,7 +162,13 @@ export default function FlowerCard({ flower, priority = false }: Props) {
 
       {/* Info */}
       <div className="p-3 md:p-4 border-t border-[#EDE0CE]">
-        <h3 className="font-display text-base md:text-lg text-[#1A130A] font-medium leading-tight">{flower.name}</h3>
+        <h3 className="font-display text-base md:text-lg text-[#1A130A] font-medium leading-tight">
+          {detailHref ? (
+            <Link href={detailHref} className="hover:text-[#8A6A48] transition-colors">{flower.name}</Link>
+          ) : (
+            flower.name
+          )}
+        </h3>
         {flower.description && (
           <p className="text-[#7A6654] text-xs mt-1 leading-relaxed line-clamp-2">{flower.description}</p>
         )}
