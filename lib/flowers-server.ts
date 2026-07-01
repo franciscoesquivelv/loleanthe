@@ -62,3 +62,17 @@ export async function getPublicFlowersServer(): Promise<Flower[]> {
     return [];
   }
 }
+
+export async function getFlowerByIdServer(id: string): Promise<Flower | null> {
+  try {
+    const res = await fetch(`${FIRESTORE_BASE}/flowers/${encodeURIComponent(id)}`, {
+      next: { revalidate: REVALIDATE_SECONDS },
+    });
+    if (!res.ok) return null;
+    const doc: FsDoc = await res.json();
+    if (!doc.fields) return null;
+    return parseFlowerDoc(doc);
+  } catch {
+    return null;
+  }
+}

@@ -54,7 +54,7 @@ export default function CatalogPreview({ initialFlowers }: { initialFlowers: Flo
             className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
             style={{ transitionDelay: `${i * 80}ms` }}
           >
-            <FlowerCard flower={flower} priority={i < 2} />
+            <FlowerCard flower={flower} priority={i < 2} detailHref={flowers.length > 0 ? `/catalogo/${flower.id}` : undefined} />
           </div>
         ))}
       </div>
