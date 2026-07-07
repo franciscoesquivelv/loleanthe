@@ -10,9 +10,9 @@ export default function HeroSection() {
         style={{ background: 'linear-gradient(to bottom, rgba(16,25,19,.72) 0%, rgba(16,25,19,.28) 55%, rgba(16,25,19,0) 100%)' }}
       />
 
-      <div className="grid md:grid-cols-[1.05fr_0.95fr] min-h-[88vh]">
+      <div className="grid md:grid-cols-[1.05fr_0.95fr] md:h-[88vh]">
         {/* Photograph — top on mobile, right on desktop */}
-        <div className="relative order-1 md:order-2 min-h-[44vh] md:min-h-full">
+        <div className="relative order-1 md:order-2 h-[44vh] md:h-full">
           <Image
             src="/images/hero-roses.png"
             alt="Rosa premium de tallo largo — Loleanthe Boutique"
