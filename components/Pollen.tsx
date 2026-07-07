@@ -36,10 +36,10 @@ export default function Pollen() {
         r: rand(0.8, 3),
         vx: rand(-0.14, 0.14),
         vy: rand(-0.34, -0.07),
-        a: rand(0.12, 0.65),
+        a: rand(0.25, 0.8),
         sway: rand(0.3, 1.1),
         phase: Math.random() * Math.PI * 2,
-        hue: rand(38, 50),
+        hue: rand(40, 50),
       }));
     }
 
@@ -65,9 +65,9 @@ export default function Pollen() {
         }
         ctx!.beginPath();
         ctx!.arc(m.x, m.y, m.r, 0, Math.PI * 2);
-        ctx!.fillStyle = `hsla(${m.hue}, 72%, 66%, ${m.a})`;
-        ctx!.shadowColor = `hsla(${m.hue}, 72%, 62%, ${m.a})`;
-        ctx!.shadowBlur = m.r * 2.4;
+        ctx!.fillStyle = `hsla(${m.hue}, 85%, 52%, ${m.a})`;
+        ctx!.shadowColor = `hsla(${m.hue}, 85%, 48%, ${m.a})`;
+        ctx!.shadowBlur = m.r * 2.2;
         ctx!.fill();
       }
       raf = requestAnimationFrame(frame);
