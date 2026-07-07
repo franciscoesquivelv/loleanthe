@@ -13,14 +13,14 @@ export default function HeroSection() {
         sizes="100vw"
         className="object-cover object-[60%_40%] [animation:kenburns_22s_ease-out_forwards]"
       />
-      {/* Botanical-green colour grade */}
-      <div className="absolute inset-0 bg-[#26382C] mix-blend-multiply opacity-30" />
-      {/* Legibility tint (top for nav, bottom-left for type) */}
+      {/* Botanical-green colour grade — subtle, keeps the rose visible */}
+      <div className="absolute inset-0 bg-[#26382C] mix-blend-multiply opacity-[.16]" />
+      {/* Legibility tint — darken the bottom-left (type + nav), reveal the rose top-right */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(103deg, rgba(19,30,24,.92) 0%, rgba(19,30,24,.5) 38%, rgba(19,30,24,.06) 70%), linear-gradient(to bottom, rgba(19,30,24,.5) 0%, rgba(19,30,24,0) 22%, rgba(19,30,24,0) 50%, rgba(15,25,19,.82) 100%)',
+            'linear-gradient(to top right, rgba(13,21,16,.94) 0%, rgba(16,26,20,.58) 30%, rgba(18,28,22,.12) 58%, rgba(18,28,22,0) 100%), linear-gradient(to bottom, rgba(15,24,18,.5) 0%, rgba(15,24,18,0) 15%)',
         }}
       />
 
