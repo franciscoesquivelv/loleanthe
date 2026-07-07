@@ -29,8 +29,8 @@ body {
 }
 
 .font-display {
-  font-family: var(--font-display), var(--font-body), sans-serif;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: 0.01em;
 }
 .font-body {
   font-family: var(--font-body), sans-serif;
@@ -105,6 +105,34 @@ input, textarea, select {
 }
 @keyframes kenburns {
   to { transform: scale(1.1); }
+}
+
+/* Organic morphing "bubble" — two layers at different periods so the loop
+   never obviously repeats (feels random/natural). */
+@keyframes blobMorph {
+  0%,100% { border-radius: 42% 58% 63% 37% / 45% 42% 58% 55%; }
+  20%     { border-radius: 64% 36% 43% 57% / 59% 64% 36% 41%; }
+  40%     { border-radius: 36% 64% 57% 43% / 63% 44% 56% 37%; }
+  60%     { border-radius: 55% 45% 34% 66% / 40% 59% 63% 41%; }
+  80%     { border-radius: 47% 53% 58% 42% / 56% 47% 53% 44%; }
+}
+@keyframes blobDrift {
+  0%,100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  25%     { transform: translate(-46%, -54%) rotate(9deg) scale(1.08); }
+  50%     { transform: translate(-52%, -47%) rotate(-5deg) scale(0.95); }
+  75%     { transform: translate(-49%, -52%) rotate(4deg) scale(1.04); }
+}
+@keyframes blobDrift2 {
+  0%,100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  33%     { transform: translate(-54%, -46%) rotate(-8deg) scale(1.1); }
+  66%     { transform: translate(-47%, -55%) rotate(6deg) scale(0.9); }
+}
+.blob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  will-change: transform, border-radius;
+  pointer-events: none;
 }
 
 /* Catalog grid */
