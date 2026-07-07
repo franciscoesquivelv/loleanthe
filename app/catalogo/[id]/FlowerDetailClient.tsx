@@ -39,16 +39,16 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
       <main className="pt-24 md:pt-32 pb-16 md:pb-24 min-h-screen">
         <div className="max-w-6xl mx-auto px-6">
           {/* Breadcrumb */}
-          <nav className="mb-8 text-xs font-display tracking-widest uppercase text-[#7A6654]">
-            <Link href="/catalogo" className="hover:text-[#8A6A48] transition-colors">Catálogo</Link>
+          <nav className="mb-8 text-xs font-display tracking-widest uppercase text-[#5C6960]">
+            <Link href="/catalogo" className="hover:text-[#8A3B57] transition-colors">Catálogo</Link>
             <span className="mx-2">/</span>
-            <span className="text-[#1A130A]">{flower.name}</span>
+            <span className="text-[#1C2A22]">{flower.name}</span>
           </nav>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
             {/* Gallery */}
             <div>
-              <div className="relative aspect-[3/4] overflow-hidden bg-[#F2EDE4]">
+              <div className="relative aspect-[3/4] overflow-hidden bg-[#E7E8E0]">
                 {flower.images.length > 0 ? (
                   <Image
                     src={flower.images[currentImg]}
@@ -60,11 +60,11 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <span className="font-script text-5xl text-[#B08D6B]">LB</span>
+                    <span className="font-script text-5xl text-[#8A3B57]">LB</span>
                   </div>
                 )}
                 {!flower.inStock && (
-                  <div className="absolute inset-0 bg-[#1A130A]/50 backdrop-blur-[2px] flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[#1C2A22]/50 backdrop-blur-[2px] flex items-center justify-center">
                     <span className="font-display text-white tracking-[0.3em] uppercase text-sm border border-white px-4 py-2">
                       Sin Stock
                     </span>
@@ -77,7 +77,7 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
                     <button
                       key={img}
                       onClick={() => setCurrentImg(i)}
-                      className={`relative w-16 h-20 overflow-hidden border transition-all ${i === currentImg ? 'border-[#B08D6B]' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                      className={`relative w-16 h-20 overflow-hidden border transition-all ${i === currentImg ? 'border-[#8A3B57]' : 'border-transparent opacity-60 hover:opacity-100'}`}
                       aria-label={`Ver imagen ${i + 1} de ${flower.name}`}
                     >
                       <Image src={img} alt="" fill className="object-cover" sizes="64px" />
@@ -90,26 +90,26 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
             {/* Info */}
             <div className="flex flex-col">
               {flower.category && (
-                <p className="font-display text-xs tracking-[0.3em] uppercase text-[#8A6A48] mb-3">
+                <p className="font-display text-xs tracking-[0.3em] uppercase text-[#8A3B57] mb-3">
                   {flower.category}
                 </p>
               )}
-              <h1 className="font-display text-4xl md:text-5xl font-light text-[#1A130A] leading-tight mb-5">
+              <h1 className="font-display text-4xl md:text-5xl font-light text-[#1C2A22] leading-tight mb-5">
                 {flower.name}
               </h1>
 
-              <span className={`text-xs tracking-widest uppercase font-display mb-6 ${flower.inStock ? 'text-[#8A6A48]' : 'text-[#7A6654]'}`}>
+              <span className={`text-xs tracking-widest uppercase font-display mb-6 ${flower.inStock ? 'text-[#8A3B57]' : 'text-[#5C6960]'}`}>
                 {flower.inStock ? 'Disponible' : 'Sin stock'}
               </span>
 
               {flower.description && (
-                <p className="text-[#7A6654] leading-relaxed mb-8">{flower.description}</p>
+                <p className="text-[#5C6960] leading-relaxed mb-8">{flower.description}</p>
               )}
 
               <div className="flex flex-col sm:flex-row gap-3 mt-auto">
                 <button
                   onClick={requestQuote}
-                  className="flex-1 bg-[#1A130A] text-[#FAF7F2] py-4 font-display tracking-widest text-sm uppercase hover:bg-[#B08D6B] transition-all duration-500"
+                  className="flex-1 bg-[#1C2A22] text-[#E7E8E0] py-4 font-display tracking-widest text-sm uppercase hover:bg-[#8A3B57] transition-all duration-500"
                 >
                   Solicitar cotización
                 </button>
@@ -117,8 +117,8 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
                   onClick={toggleQuote}
                   className={`flex-1 py-4 font-display tracking-widest text-sm uppercase border transition-all duration-300 ${
                     inQuote
-                      ? 'border-[#B08D6B] bg-[#B08D6B] text-white'
-                      : 'border-[#B08D6B] text-[#8A6A48] hover:bg-[#B08D6B] hover:text-white'
+                      ? 'border-[#8A3B57] bg-[#8A3B57] text-white'
+                      : 'border-[#8A3B57] text-[#8A3B57] hover:bg-[#8A3B57] hover:text-white'
                   }`}
                 >
                   {inQuote ? '✓ En cotización' : '+ Agregar a cotización'}
@@ -127,7 +127,7 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
 
               <Link
                 href="/catalogo"
-                className="mt-8 font-display text-sm tracking-widest uppercase text-[#7A6654] hover:text-[#8A6A48] transition-colors hover-underline self-start"
+                className="mt-8 font-display text-sm tracking-widest uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors hover-underline self-start"
               >
                 ← Volver al catálogo
               </Link>

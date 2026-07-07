@@ -1,83 +1,52 @@
-'use client';
-
-import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function HeroSection() {
-  const imgRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (imgRef.current) {
-        imgRef.current.style.transform = `translateY(${window.scrollY * 0.2}px)`;
-      }
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background image with parallax */}
-      <div ref={imgRef} className="absolute inset-0 scale-110">
-        <Image
-          src="/images/hero-roses.png"
-          alt="Rosas premium de tallo largo — Loleanthe Boutique"
-          fill
-          sizes="100vw"
-          className="object-cover object-center"
-          priority
-        />
-        {/* Mobile: stronger top-to-bottom + left gradient for readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1A130A]/70 via-[#1A130A]/60 to-[#1A130A]/50 md:hidden" />
-        <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-[#1A130A]/90 via-[#1A130A]/60 to-[#1A130A]/20" />
-      </div>
+    <section className="relative min-h-[94vh] flex items-end overflow-hidden bg-[#1C2A22] text-[#F7F8F4]">
+      {/* Real photograph */}
+      <Image
+        src="/images/hero-roses.png"
+        alt="Rosas premium de tallo largo — Loleanthe Boutique"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-[60%_40%] [animation:kenburns_22s_ease-out_forwards]"
+      />
+      {/* Botanical-green colour grade */}
+      <div className="absolute inset-0 bg-[#26382C] mix-blend-multiply opacity-30" />
+      {/* Legibility tint (top for nav, bottom-left for type) */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(103deg, rgba(19,30,24,.92) 0%, rgba(19,30,24,.5) 38%, rgba(19,30,24,.06) 70%), linear-gradient(to bottom, rgba(19,30,24,.5) 0%, rgba(19,30,24,0) 22%, rgba(19,30,24,0) 50%, rgba(15,25,19,.82) 100%)',
+        }}
+      />
 
-      {/* Content */}
-      <div className="relative z-10 px-6 md:px-16 lg:px-24 max-w-3xl w-full md:w-auto">
-        <p
-          className="font-display text-xs tracking-[0.5em] uppercase text-[#D4B896] mb-4 md:mb-6 opacity-0"
-          style={{ animation: 'fadeInUp 1s ease 0.3s forwards' }}
-        >
-          Luxury Florals
-        </p>
-
-        <h1
-          className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light text-[#FAF7F2] leading-[1.08] mb-5 md:mb-8 opacity-0"
-          style={{
-            animation: 'fadeInUp 1s ease 0.5s forwards',
-            textShadow: '0 2px 40px rgba(0,0,0,0.5), 0 1px 8px rgba(0,0,0,0.4)',
-          }}
-        >
-          Flores premium<br />
-          para arreglos <em className="italic text-[#D4B896]">irrepetibles</em>
-        </h1>
-
-        <p
-          className="text-[#FAF7F2]/80 text-sm md:text-lg max-w-md leading-relaxed mb-8 md:mb-10 opacity-0"
-          style={{ animation: 'fadeInUp 1s ease 0.8s forwards' }}
-        >
-          Selección exclusiva de flores exóticas de alta gama, importadas directamente con los más altos estándares de calidad y frescura.
-        </p>
-
-        <div
-          className="flex flex-col sm:flex-row gap-4 opacity-0"
-          style={{ animation: 'fadeInUp 1s ease 1s forwards' }}
-        >
-          <Link
-            href="#catalogo"
-            className="border border-[#D4B896] text-[#D4B896] px-8 py-4 font-display tracking-widest text-sm uppercase hover:bg-[#D4B896] hover:text-[#1A130A] transition-all duration-500 text-center"
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 md:px-6 pb-[9vh]">
+        <div className="max-w-3xl">
+          <h1
+            className="font-display font-extrabold leading-[0.9] text-[clamp(50px,9vw,132px)] mb-6 opacity-0 animate-fadeInUp"
+            style={{ textShadow: '0 2px 44px rgba(0,0,0,.35)' }}
           >
-            Ver Catálogo
+            Flores que no<br />se repiten
+          </h1>
+          <p
+            className="max-w-md text-[#dde4da] text-base md:text-lg mb-8 opacity-0 animate-fadeInUp"
+            style={{ animationDelay: '.18s', textShadow: '0 1px 22px rgba(0,0,0,.45)' }}
+          >
+            Selección exótica de alta gama, importada directamente. Tallo largo, larga duración, y arreglos diseñados a medida.
+          </p>
+          <Link
+            href="/catalogo"
+            className="group inline-flex items-center gap-3 bg-[#8A3B57] text-[#F7F8F4] px-8 py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#C56E88] hover:text-[#1C2A22] transition-all duration-500 opacity-0 animate-fadeInUp"
+            style={{ animationDelay: '.34s' }}
+          >
+            Ver catálogo
+            <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
           </Link>
         </div>
-      </div>
-
-      {/* Scroll indicator — hidden on small phones */}
-      <div className="hidden sm:flex absolute bottom-10 left-1/2 -translate-x-1/2 flex-col items-center gap-2 opacity-0" style={{ animation: 'fadeInUp 1s ease 1.5s forwards' }}>
-        <span className="font-display text-xs tracking-[0.3em] uppercase text-[#D4B896]/60">Descubrir</span>
-        <div className="w-px h-12 bg-gradient-to-b from-[#D4B896]/60 to-transparent animate-pulse" />
       </div>
     </section>
   );

@@ -1,27 +1,20 @@
 import type { Metadata } from 'next';
-import { DM_Sans, Cormorant_Garamond, Great_Vibes } from 'next/font/google';
+import { Bricolage_Grotesque, Hanken_Grotesk } from 'next/font/google';
 import './globals.css';
 import { QuoteProvider } from '@/context/QuoteContext';
 import { Toaster } from 'react-hot-toast';
 
-// Self-hosted vía next/font: sin request a Google, sin @import bloqueante, sin CLS.
-const dmSans = DM_Sans({
+// Self-hosted vía next/font. Display = grotesca contemporánea; body = grotesca neutra.
+const display = Bricolage_Grotesque({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  variable: '--font-sans',
-  display: 'swap',
-});
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  style: ['normal', 'italic'],
+  weight: ['600', '700', '800'],
   variable: '--font-display',
   display: 'swap',
 });
-const greatVibes = Great_Vibes({
+const body = Hanken_Grotesk({
   subsets: ['latin'],
-  weight: '400',
-  variable: '--font-script',
+  weight: ['400', '500', '700'],
+  variable: '--font-body',
   display: 'swap',
 });
 
@@ -70,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`${dmSans.variable} ${cormorant.variable} ${greatVibes.variable}`}>
+    <html lang="es" className={`${display.variable} ${body.variable}`}>
       <body className="grain">
         <QuoteProvider>
           {children}
@@ -78,12 +71,12 @@ export default function RootLayout({
             position="bottom-center"
             toastOptions={{
               style: {
-                background: '#1A130A',
-                color: '#FAF7F2',
-                fontFamily: 'var(--font-sans), sans-serif',
+                background: '#1C2A22',
+                color: '#F7F8F4',
+                fontFamily: 'var(--font-body), sans-serif',
                 fontSize: '14px',
-                borderRadius: '2px',
-                border: '1px solid #B08D6B',
+                borderRadius: '0px',
+                border: '1px solid #8A3B57',
               },
             }}
           />
