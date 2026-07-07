@@ -31,47 +31,36 @@ export default function CatalogPreview({ initialFlowers }: { initialFlowers: Flo
   const displayFlowers = flowers.length > 0 ? flowers : PLACEHOLDERS;
 
   return (
-    <section id="catalogo" ref={sectionRef} className="py-16 md:py-24 px-6 max-w-7xl mx-auto">
-      {/* Section header */}
-      <div className={`text-center mb-10 md:mb-16 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <p className="font-script text-[#B08D6B] text-2xl md:text-3xl mb-3">Nuestra colección</p>
-        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-light text-[#1A130A]">
-          Catálogo <em className="italic text-[#B08D6B]">Premium</em>
-        </h2>
-        <div className="ornament max-w-xs mx-auto mt-5">
-          <span className="text-[#8A6A48] text-xs tracking-[0.3em] uppercase font-display">Flores de Excepción</span>
-        </div>
-        <p className="mt-5 text-[#7A6654] max-w-xl mx-auto leading-relaxed text-sm md:text-base">
-          Cada variedad es cuidadosamente seleccionada por su belleza, tamaño y durabilidad. Estándares de calidad que van mucho más allá de lo convencional.
-        </p>
-      </div>
-
-      {/* Grid */}
-      <div className="catalog-grid">
-        {displayFlowers.map((flower, i) => (
-          <div
-            key={flower.id}
-            className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
-            style={{ transitionDelay: `${i * 80}ms` }}
-          >
-            <FlowerCard flower={flower} priority={i < 2} detailHref={flowers.length > 0 ? `/catalogo/${flower.id}` : undefined} />
+    <section id="catalogo" ref={sectionRef} className="bg-[#E7E8E0] py-24 md:py-32 px-5 md:px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className={`flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div>
+            <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#8A3B57] mb-4">La colección</p>
+            <h2 className="font-display font-extrabold text-[clamp(38px,5.5vw,74px)] leading-[0.95] text-[#1C2A22]">El catálogo</h2>
           </div>
-        ))}
-      </div>
+          <p className="text-[#5C6960] text-sm max-w-sm">
+            Cada variedad, seleccionada por su belleza, tamaño y durabilidad — mucho más allá de lo convencional.
+          </p>
+        </div>
 
-      {/* See more */}
-      <div className={`flex flex-col items-center mt-12 md:mt-16 gap-4 transition-all duration-1000 delay-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <Link
-          href="/catalogo"
-          className="group flex items-center gap-3 md:gap-4 font-display text-base md:text-lg tracking-widest uppercase text-[#1A130A] hover:text-[#B08D6B] transition-colors duration-300"
-        >
-          <span className="w-8 md:w-12 h-px bg-current transition-all duration-300 group-hover:w-16 md:group-hover:w-20" />
-          Ver todo el catálogo
-          <span className="w-8 md:w-12 h-px bg-current transition-all duration-300 group-hover:w-16 md:group-hover:w-20" />
-        </Link>
-        <p className="text-[#7A6654] font-display tracking-widest uppercase text-xs">
-          {flowers.length > 0 ? `${flowers.length}+ variedades disponibles` : 'Colección completa disponible'}
-        </p>
+        <div className="catalog-grid">
+          {displayFlowers.map((flower, i) => (
+            <div
+              key={flower.id}
+              className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+              style={{ transitionDelay: `${i * 80}ms` }}
+            >
+              <FlowerCard flower={flower} priority={i < 2} detailHref={flowers.length > 0 ? `/catalogo/${flower.id}` : undefined} />
+            </div>
+          ))}
+        </div>
+
+        <div className={`flex justify-center mt-14 transition-all duration-1000 delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <Link href="/catalogo" className="group inline-flex items-center gap-3 font-body font-bold text-sm tracking-wide uppercase text-[#1C2A22] hover:text-[#8A3B57] transition-colors">
+            Ver todo el catálogo
+            <span className="w-10 h-px bg-current transition-all duration-300 group-hover:w-16" />
+          </Link>
+        </div>
       </div>
     </section>
   );

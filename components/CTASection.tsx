@@ -46,124 +46,63 @@ export default function CTASection() {
   };
 
   return (
-    <section id="contacto" ref={sectionRef} className="relative py-16 md:py-24 px-6 bg-[#F2EDE4]">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#B08D6B] to-transparent" />
-
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className={`text-center mb-10 md:mb-12 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <p className="font-script text-[#B08D6B] text-2xl md:text-3xl mb-3">¿Lista para tu arreglo ideal?</p>
-          <h2 className="font-display text-4xl md:text-5xl font-light text-[#1A130A]">
-            Solicita tu <em className="italic text-[#B08D6B]">cotización</em>
-          </h2>
-          <div className="ornament max-w-xs mx-auto mt-5 mb-5">
-            <span className="text-[#8A6A48] text-xs tracking-[0.3em] uppercase font-display">Contacto exclusivo</span>
-          </div>
-          <p className="text-[#7A6654] text-sm leading-relaxed max-w-md mx-auto">
-            Cuéntanos sobre tu ocasión y las flores que te interesaron. Nos pondremos en contacto contigo con una cotización personalizada.
+    <section id="contacto" ref={sectionRef} className="bg-[#8A3B57] text-[#F7F8F4] py-24 md:py-32 px-5 md:px-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+        {/* Left — heading */}
+        <div className={`transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#e8c9d4] mb-4">Contacto exclusivo</p>
+          <h2 className="font-display font-extrabold text-[clamp(40px,5.2vw,74px)] leading-[0.95] mb-5">Solicita tu cotización</h2>
+          <p className="text-[#f1d9df] text-base leading-relaxed max-w-md">
+            Cuéntanos sobre tu ocasión y las flores que te interesan. Te respondemos con una cotización personalizada, hecha a tu medida.
           </p>
+          {count > 0 && (
+            <div className="mt-8">
+              <p className="font-body font-bold text-[10px] tracking-[0.2em] uppercase text-[#e8c9d4] mb-3">En tu cotización</p>
+              <div className="flex flex-wrap gap-2">
+                {items.map((item) => (
+                  <Link key={item.flowerId} href="/cotizacion" className="border border-[#F7F8F4]/40 text-[#F7F8F4] px-3 py-1.5 text-xs font-body tracking-wide hover:bg-[#F7F8F4] hover:text-[#8A3B57] transition-all">
+                    {item.flowerName}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Quote items */}
-        {count > 0 && (
-          <div className={`mb-8 transition-all duration-700 ${visible ? 'opacity-100' : 'opacity-0'}`}>
-            <p className="text-xs tracking-widest uppercase font-display text-[#7A6654] text-center mb-3">
-              Flores en tu cotización
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {items.map((item) => (
-                <Link
-                  key={item.flowerId}
-                  href="/cotizacion"
-                  className="border border-[#B08D6B] text-[#B08D6B] px-3 py-1.5 text-xs font-display tracking-wider hover:bg-[#B08D6B] hover:text-white transition-all"
-                >
-                  {item.flowerName}
-                </Link>
-              ))}
-            </div>
-            <p className="text-center mt-3">
-              <Link href="/cotizacion" className="text-xs text-[#8A6A48] hover-underline font-display tracking-widest uppercase">
-                Ver formulario completo →
-              </Link>
-            </p>
-          </div>
-        )}
-
-        {/* Form */}
+        {/* Right — form */}
         {sent ? (
-          <div className={`text-center py-16 transition-all duration-700 ${visible ? 'opacity-100' : 'opacity-0'}`}>
-            <span className="font-script text-6xl text-[#B08D6B] block mb-4">✓</span>
-            <h3 className="font-display text-3xl text-[#1A130A] mb-3">Mensaje recibido</h3>
-            <p className="text-[#7A6654] text-sm leading-relaxed">
-              Gracias por contactarnos. Nos pondremos en contacto contigo en las próximas 24 horas con tu cotización personalizada.
+          <div className="bg-[#F7F8F4] text-[#26302A] p-10 text-center">
+            <p className="font-display font-extrabold text-3xl text-[#8A3B57] mb-3">Mensaje recibido</p>
+            <p className="text-[#5C6960] text-sm leading-relaxed">
+              Gracias por contactarnos. Te responderemos en las próximas 24 horas con tu cotización personalizada.
             </p>
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit}
-            className={`space-y-4 transition-all duration-1000 delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs tracking-widest uppercase font-display text-[#7A6654] mb-2">Nombre *</label>
-                <input
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                  placeholder="Tu nombre completo"
-                  className="w-full border border-[#D4B896] bg-transparent px-4 py-3 font-display text-[#1A130A] placeholder:text-[#B08D6B]/40 text-sm"
-                />
+          <form onSubmit={handleSubmit} className={`bg-[#F7F8F4] p-8 md:p-9 transition-all duration-1000 delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="mb-[18px]">
+                <label htmlFor="cta-name" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#5C6960] mb-2">Nombre *</label>
+                <input id="cta-name" type="text" required value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="Tu nombre" className="w-full bg-[#E7E8E0] border border-transparent focus:border-[#8A3B57] px-4 py-3.5 text-sm text-[#26302A] transition-colors" />
               </div>
-              <div>
-                <label className="block text-xs tracking-widest uppercase font-display text-[#7A6654] mb-2">Email *</label>
-                <input
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                  placeholder="tu@correo.com"
-                  className="w-full border border-[#D4B896] bg-transparent px-4 py-3 font-display text-[#1A130A] placeholder:text-[#B08D6B]/40 text-sm"
-                />
+              <div className="mb-[18px]">
+                <label htmlFor="cta-email" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#5C6960] mb-2">Email *</label>
+                <input id="cta-email" type="email" required value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="tu@correo.com" className="w-full bg-[#E7E8E0] border border-transparent focus:border-[#8A3B57] px-4 py-3.5 text-sm text-[#26302A] transition-colors" />
               </div>
             </div>
-            <div>
-              <label className="block text-xs tracking-widest uppercase font-display text-[#7A6654] mb-2">Teléfono / WhatsApp</label>
-              <input
-                type="tel"
-                value={form.phone}
-                onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                placeholder="+503 0000 0000"
-                className="w-full border border-[#D4B896] bg-transparent px-4 py-3 font-display text-[#1A130A] placeholder:text-[#B08D6B]/40 text-sm"
-              />
+            <div className="mb-[18px]">
+              <label htmlFor="cta-phone" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#5C6960] mb-2">WhatsApp / Teléfono</label>
+              <input id="cta-phone" type="tel" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} placeholder="+506 0000 0000" className="w-full bg-[#E7E8E0] border border-transparent focus:border-[#8A3B57] px-4 py-3.5 text-sm text-[#26302A] transition-colors" />
             </div>
-            <div>
-              <label className="block text-xs tracking-widest uppercase font-display text-[#7A6654] mb-2">Cuéntanos sobre tu ocasión</label>
-              <textarea
-                rows={4}
-                value={form.message}
-                onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
-                placeholder="¿Para qué ocasión es? ¿Tienes colores o estilo en mente?"
-                className="w-full border border-[#D4B896] bg-transparent px-4 py-3 font-display text-[#1A130A] placeholder:text-[#B08D6B]/40 text-sm resize-none"
-              />
+            <div className="mb-5">
+              <label htmlFor="cta-msg" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#5C6960] mb-2">Tu mensaje</label>
+              <textarea id="cta-msg" rows={4} value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} placeholder="¿Para qué ocasión? ¿Colores o estilo en mente?" className="w-full bg-[#E7E8E0] border border-transparent focus:border-[#8A3B57] px-4 py-3.5 text-sm text-[#26302A] transition-colors resize-none" />
             </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full sm:w-auto bg-[#1A130A] text-[#FAF7F2] px-10 py-4 font-display tracking-widest text-sm uppercase hover:bg-[#B08D6B] transition-all duration-500 disabled:opacity-60 active:bg-[#B08D6B]"
-              >
-                {loading ? 'Enviando...' : 'Enviar solicitud'}
-              </button>
-              <Link href="/cotizacion" className="text-[#7A6654] text-xs font-display tracking-widest uppercase hover:text-[#B08D6B] transition-colors text-center sm:text-left">
-                {count > 0 ? `Agregar flores (${count} en lista)` : 'Agregar flores al formulario'}
-              </Link>
-            </div>
+            <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-[#1C2A22] text-[#F7F8F4] py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#C56E88] hover:text-[#1C2A22] transition-all duration-500 disabled:opacity-60">
+              {loading ? 'Enviando...' : 'Enviar solicitud'}
+            </button>
           </form>
         )}
       </div>
-
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#B08D6B] to-transparent" />
     </section>
   );
 }

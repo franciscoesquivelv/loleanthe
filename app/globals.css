@@ -1,16 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --cream: #FAF7F2;
-  --cream-dark: #F2EDE4;
-  --gold: #B08D6B;
-  --gold-light: #D4B896;
-  --gold-pale: #EDE0CE;
-  --deep: #1A130A;
-  --deep-green: #253830;
-  --blush: #EDD5C5;
-  --text: #2C1E10;
-  --text-muted: #7A6654;
+  --pine: #1C2A22;
+  --pine-2: #24342A;
+  --stone: #E7E8E0;
+  --chalk: #F7F8F4;
+  --plum: #8A3B57;
+  --plum-lt: #C56E88;
+  --sage: #8E9C88;
+  --ink: #26302A;
+  --mute: #5C6960;
 }
 
 * {
@@ -22,90 +21,61 @@ html {
 }
 
 body {
-  background-color: var(--cream);
-  color: var(--text);
-  font-family: var(--font-sans), 'DM Sans', sans-serif;
+  background-color: var(--stone);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .font-display {
-  font-family: var(--font-display), 'Cormorant Garamond', serif;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  letter-spacing: -0.02em;
 }
-
+.font-body {
+  font-family: var(--font-body), sans-serif;
+}
+/* legacy alias — any leftover .font-script still renders in the display face */
 .font-script {
-  font-family: var(--font-script), 'Great Vibes', cursive;
+  font-family: var(--font-display), sans-serif;
 }
 
-/* Ornamental divider */
+/* Subtle film grain overlay */
+.grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-size: 180px 180px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Accessible keyboard focus */
+:focus-visible {
+  outline: 2px solid var(--plum);
+  outline-offset: 2px;
+}
+
+/* Divider */
 .ornament {
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: var(--gold);
 }
-
 .ornament::before,
 .ornament::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(to right, transparent, var(--gold-light), transparent);
+  background: linear-gradient(to right, transparent, var(--sage), transparent);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--cream);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--gold-light);
-  border-radius: 3px;
-}
-
-/* Marquee animation */
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.marquee-track {
-  animation: marquee 40s linear infinite;
-}
-
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-
-/* Grain texture overlay */
-.grain::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-}
-
-/* Card hover */
-.flower-card {
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
-}
-
-.flower-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 30px 60px rgba(26,19,10,0.15);
-}
-
-/* Subtle underline animation */
+/* Hover underline */
 .hover-underline {
   position: relative;
 }
-
 .hover-underline::after {
   content: '';
   position: absolute;
@@ -113,53 +83,28 @@ body {
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--gold);
+  background: currentColor;
   transition: width 0.3s ease;
 }
-
 .hover-underline:hover::after {
   width: 100%;
 }
 
-/* Input styles */
+/* Inputs */
 input, textarea, select {
   outline: none;
 }
 
-input:focus, textarea:focus, select:focus {
-  border-color: var(--gold) !important;
-}
-
-/* Foco visible accesible para navegación por teclado (a11y) */
-:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-/* Respeta la preferencia del sistema de movimiento reducido (a11y) */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Fade-in animation */
+/* Animations */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
 }
-
 .animate-fadeInUp {
-  animation: fadeInUp 0.8s ease forwards;
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes kenburns {
+  to { transform: scale(1.1); }
 }
 
 /* Catalog grid */
@@ -168,29 +113,26 @@ input:focus, textarea:focus, select:focus {
   grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 1rem;
 }
-
 @media (min-width: 640px) {
-  .catalog-grid {
-    gap: 1.5rem;
-  }
+  .catalog-grid { gap: 1.25rem; }
 }
 
-/* Disable hover lift on touch devices */
-@media (hover: none) {
-  .flower-card:hover {
-    transform: none;
-    box-shadow: none;
-  }
-}
-
-/* Image carousel */
+/* Skeleton loader */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
 .skeleton {
-  background: linear-gradient(90deg, var(--cream-dark) 25%, var(--cream) 50%, var(--cream-dark) 75%);
+  background: linear-gradient(90deg, #dcded4 25%, #eceee5 50%, #dcded4 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -213,24 +213,24 @@ export default function AdminDashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#1A130A] flex items-center justify-center">
-        <div className="font-script text-4xl text-[#B08D6B] animate-pulse">Loleanthe</div>
+      <div className="min-h-screen bg-[#1C2A22] flex items-center justify-center">
+        <div className="font-script text-4xl text-[#8A3B57] animate-pulse">Loleanthe</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] flex flex-col">
+    <div className="min-h-screen bg-[#E7E8E0] flex flex-col">
       {/* Admin Header */}
-      <header className="bg-[#1A130A] border-b border-[#B08D6B]/20 px-6 py-4">
+      <header className="bg-[#1C2A22] border-b border-[#8A3B57]/20 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Image src="/logo.png" alt="LB" width={120} height={40} className="h-8 w-auto object-contain invert opacity-70" />
-            <span className="text-[#B08D6B] text-xs tracking-widest uppercase font-display hidden sm:block">Panel de Administración</span>
+            <span className="text-[#8A3B57] text-xs tracking-widest uppercase font-display hidden sm:block">Panel de Administración</span>
           </div>
           <button
             onClick={handleLogout}
-            className="font-display text-xs tracking-widest uppercase text-[#7A6654] hover:text-[#B08D6B] transition-colors"
+            className="font-display text-xs tracking-widest uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors"
           >
             Cerrar sesión
           </button>
@@ -238,13 +238,13 @@ export default function AdminDashboard() {
       </header>
 
       {/* Tabs */}
-      <div className="bg-[#1A130A] border-b border-[#B08D6B]/10 px-6">
+      <div className="bg-[#1C2A22] border-b border-[#8A3B57]/10 px-6">
         <div className="max-w-7xl mx-auto flex gap-6">
           {([['catalog', 'Catálogo'], ['inquiries', 'Solicitudes']] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => { setTab(key); setMode('list'); }}
-              className={`font-display text-xs tracking-widest uppercase py-4 border-b-2 transition-all ${tab === key ? 'border-[#B08D6B] text-[#B08D6B]' : 'border-transparent text-[#7A6654] hover:text-[#B08D6B]'}`}
+              className={`font-display text-xs tracking-widest uppercase py-4 border-b-2 transition-all ${tab === key ? 'border-[#8A3B57] text-[#8A3B57]' : 'border-transparent text-[#5C6960] hover:text-[#8A3B57]'}`}
             >
               {label}
             </button>
@@ -271,18 +271,18 @@ export default function AdminDashboard() {
 
       {/* Storage usage bar (subtle, always visible) */}
       {storageInfo && !storageInfo.nearLimit && (
-        <div className="bg-[#1A130A]/5 border-b border-[#EDE0CE] px-6 py-2">
+        <div className="bg-[#1C2A22]/5 border-b border-[#DADCD1] px-6 py-2">
           <div className="max-w-7xl mx-auto flex items-center gap-3">
-            <span className="text-[#7A6654] text-xs font-display shrink-0">
+            <span className="text-[#5C6960] text-xs font-display shrink-0">
               Almacenamiento: {(storageInfo.usedBytes / (1024 * 1024 * 1024)).toFixed(2)} GB / 4.5 GB
             </span>
-            <div className="flex-1 h-1 bg-[#EDE0CE] rounded-full overflow-hidden">
+            <div className="flex-1 h-1 bg-[#DADCD1] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#B08D6B] rounded-full transition-all"
+                className="h-full bg-[#8A3B57] rounded-full transition-all"
                 style={{ width: `${Math.min((storageInfo.usedBytes / storageInfo.limitBytes) * 100, 100)}%` }}
               />
             </div>
-            <span className="text-[#7A6654] text-xs font-display shrink-0">
+            <span className="text-[#5C6960] text-xs font-display shrink-0">
               {Math.round((storageInfo.usedBytes / storageInfo.limitBytes) * 100)}%
             </span>
           </div>
@@ -297,22 +297,22 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex items-center justify-between mb-8">
                   <div>
-                    <h1 className="font-display text-3xl text-[#1A130A]">Flores del catálogo</h1>
-                    <p className="text-[#7A6654] text-sm mt-1">{flowers.filter(f => !f.archived).length} activas · {flowers.filter(f => f.archived).length} archivadas</p>
+                    <h1 className="font-display text-3xl text-[#1C2A22]">Flores del catálogo</h1>
+                    <p className="text-[#5C6960] text-sm mt-1">{flowers.filter(f => !f.archived).length} activas · {flowers.filter(f => f.archived).length} archivadas</p>
                   </div>
                   <button
                     onClick={openCreate}
-                    className="bg-[#1A130A] text-[#FAF7F2] px-6 py-3 font-display text-xs tracking-widest uppercase hover:bg-[#B08D6B] transition-all duration-300"
+                    className="bg-[#1C2A22] text-[#E7E8E0] px-6 py-3 font-display text-xs tracking-widest uppercase hover:bg-[#8A3B57] transition-all duration-300"
                   >
                     + Nueva flor
                   </button>
                 </div>
 
                 {flowers.length === 0 ? (
-                  <div className="text-center py-20 border border-dashed border-[#D4B896]">
-                    <p className="font-script text-4xl text-[#B08D6B] mb-4">Vacío</p>
-                    <p className="text-[#7A6654] text-sm mb-6">No hay flores en el catálogo aún.</p>
-                    <button onClick={openCreate} className="border border-[#B08D6B] text-[#8A6A48] px-6 py-2 font-display text-xs tracking-widest uppercase hover:bg-[#B08D6B] hover:text-white transition-all">
+                  <div className="text-center py-20 border border-dashed border-[#8E9C88]">
+                    <p className="font-script text-4xl text-[#8A3B57] mb-4">Vacío</p>
+                    <p className="text-[#5C6960] text-sm mb-6">No hay flores en el catálogo aún.</p>
+                    <button onClick={openCreate} className="border border-[#8A3B57] text-[#8A3B57] px-6 py-2 font-display text-xs tracking-widest uppercase hover:bg-[#8A3B57] hover:text-white transition-all">
                       Agregar primera flor
                     </button>
                   </div>
@@ -320,34 +320,34 @@ export default function AdminDashboard() {
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
                       <thead>
-                        <tr className="border-b border-[#EDE0CE]">
+                        <tr className="border-b border-[#DADCD1]">
                           {['Imagen', 'Nombre', 'Estado', 'Stock', 'Visibilidad', 'Acciones'].map((h) => (
-                            <th key={h} className="text-left font-display text-xs tracking-widest uppercase text-[#7A6654] pb-4 pr-4">{h}</th>
+                            <th key={h} className="text-left font-display text-xs tracking-widest uppercase text-[#5C6960] pb-4 pr-4">{h}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
                         {flowers.map((flower) => (
-                          <tr key={flower.id} className={`border-b border-[#EDE0CE] group hover:bg-[#F2EDE4] transition-colors ${flower.archived ? 'opacity-50' : ''}`}>
+                          <tr key={flower.id} className={`border-b border-[#DADCD1] group hover:bg-[#E7E8E0] transition-colors ${flower.archived ? 'opacity-50' : ''}`}>
                             {/* Image */}
                             <td className="py-4 pr-4">
-                              <div className="w-14 h-14 relative overflow-hidden bg-[#EDE0CE] flex-shrink-0">
+                              <div className="w-14 h-14 relative overflow-hidden bg-[#DADCD1] flex-shrink-0">
                                 {flower.images[0] ? (
                                   <Image src={flower.images[0]} alt={flower.name} fill className="object-cover" />
                                 ) : (
-                                  <span className="font-script text-lg text-[#B08D6B] flex items-center justify-center h-full">LB</span>
+                                  <span className="font-script text-lg text-[#8A3B57] flex items-center justify-center h-full">LB</span>
                                 )}
                               </div>
                             </td>
                             {/* Name */}
                             <td className="py-4 pr-4">
-                              <p className="font-display text-[#1A130A] font-medium">{flower.name}</p>
-                              {flower.category && <p className="text-xs text-[#7A6654] mt-0.5">{flower.category}</p>}
-                              <p className="text-xs text-[#7A6654] mt-0.5 line-clamp-1 max-w-xs">{flower.description}</p>
+                              <p className="font-display text-[#1C2A22] font-medium">{flower.name}</p>
+                              {flower.category && <p className="text-xs text-[#5C6960] mt-0.5">{flower.category}</p>}
+                              <p className="text-xs text-[#5C6960] mt-0.5 line-clamp-1 max-w-xs">{flower.description}</p>
                             </td>
                             {/* State */}
                             <td className="py-4 pr-4">
-                              <span className={`text-xs tracking-wider font-display uppercase px-2 py-1 ${flower.archived ? 'bg-[#EDE0CE] text-[#7A6654]' : 'bg-[#1A130A] text-[#FAF7F2]'}`}>
+                              <span className={`text-xs tracking-wider font-display uppercase px-2 py-1 ${flower.archived ? 'bg-[#DADCD1] text-[#5C6960]' : 'bg-[#1C2A22] text-[#E7E8E0]'}`}>
                                 {flower.archived ? 'Archivada' : 'Activa'}
                               </span>
                             </td>
@@ -364,7 +364,7 @@ export default function AdminDashboard() {
                             <td className="py-4 pr-4">
                               <button
                                 onClick={() => toggleArchive(flower)}
-                                className="text-xs tracking-wider font-display uppercase text-[#7A6654] hover:text-[#B08D6B] transition-colors"
+                                className="text-xs tracking-wider font-display uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors"
                               >
                                 {flower.archived ? 'Restaurar' : 'Archivar'}
                               </button>
@@ -374,13 +374,13 @@ export default function AdminDashboard() {
                               <div className="flex items-center gap-3">
                                 <button
                                   onClick={() => openEdit(flower)}
-                                  className="font-display text-xs tracking-wider uppercase text-[#1A130A] hover:text-[#B08D6B] transition-colors"
+                                  className="font-display text-xs tracking-wider uppercase text-[#1C2A22] hover:text-[#8A3B57] transition-colors"
                                 >
                                   Editar
                                 </button>
                                 <button
                                   onClick={() => handleDelete(flower)}
-                                  className={`font-display text-xs tracking-wider uppercase transition-colors ${deleteConfirm === flower.id ? 'text-red-500 font-semibold' : 'text-[#7A6654] hover:text-red-500'}`}
+                                  className={`font-display text-xs tracking-wider uppercase transition-colors ${deleteConfirm === flower.id ? 'text-red-500 font-semibold' : 'text-[#5C6960] hover:text-red-500'}`}
                                 >
                                   {deleteConfirm === flower.id ? '¿Confirmar?' : 'Eliminar'}
                                 </button>
@@ -401,11 +401,11 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-4 mb-8">
                   <button
                     onClick={() => setMode('list')}
-                    className="font-display text-xs tracking-widest uppercase text-[#7A6654] hover:text-[#B08D6B] transition-colors"
+                    className="font-display text-xs tracking-widest uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors"
                   >
                     ← Volver
                   </button>
-                  <h1 className="font-display text-3xl text-[#1A130A]">
+                  <h1 className="font-display text-3xl text-[#1C2A22]">
                     {mode === 'create' ? 'Nueva flor' : `Editando: ${editingFlower?.name}`}
                   </h1>
                 </div>
@@ -413,38 +413,38 @@ export default function AdminDashboard() {
                 <form onSubmit={handleSave} className="max-w-2xl space-y-6">
                   {/* Name */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#7A6654] mb-2">Nombre de la flor *</label>
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Nombre de la flor *</label>
                     <input
                       type="text"
                       required
                       value={form.name}
                       onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                       placeholder="Ej: Rosa Garden Spirit"
-                      className="w-full border border-[#D4B896] bg-transparent px-4 py-3 font-display text-[#1A130A] placeholder:text-[#B08D6B]/40 text-sm"
+                      className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm"
                     />
                   </div>
 
                   {/* Category */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#7A6654] mb-2">Categoría (opcional)</label>
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Categoría (opcional)</label>
                     <input
                       type="text"
                       value={form.category}
                       onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
                       placeholder="Ej: Rosas, Exóticas, Silvestres..."
-                      className="w-full border border-[#D4B896] bg-transparent px-4 py-3 font-display text-[#1A130A] placeholder:text-[#B08D6B]/40 text-sm"
+                      className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm"
                     />
                   </div>
 
                   {/* Description */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#7A6654] mb-2">Descripción</label>
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Descripción</label>
                     <textarea
                       rows={4}
                       value={form.description}
                       onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
                       placeholder="Describe la flor: color, tamaño, características especiales, duración estimada..."
-                      className="w-full border border-[#D4B896] bg-transparent px-4 py-3 font-display text-[#1A130A] placeholder:text-[#B08D6B]/40 text-sm resize-none"
+                      className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm resize-none"
                     />
                   </div>
 
@@ -458,11 +458,11 @@ export default function AdminDashboard() {
                       className="flex items-center gap-3 cursor-pointer group"
                     >
                       <span
-                        className={`relative w-12 h-6 rounded-full transition-colors ${form.inStock ? 'bg-[#B08D6B]' : 'bg-[#D4B896]'}`}
+                        className={`relative w-12 h-6 rounded-full transition-colors ${form.inStock ? 'bg-[#8A3B57]' : 'bg-[#8E9C88]'}`}
                       >
                         <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.inStock ? 'left-7' : 'left-1'}`} />
                       </span>
-                      <span className="font-display text-sm text-[#1A130A]">
+                      <span className="font-display text-sm text-[#1C2A22]">
                         {form.inStock ? 'En stock' : 'Sin stock'}
                       </span>
                     </button>
@@ -475,11 +475,11 @@ export default function AdminDashboard() {
                       className="flex items-center gap-3 cursor-pointer group"
                     >
                       <span
-                        className={`relative w-12 h-6 rounded-full transition-colors ${form.archived ? 'bg-[#B08D6B]' : 'bg-[#D4B896]'}`}
+                        className={`relative w-12 h-6 rounded-full transition-colors ${form.archived ? 'bg-[#8A3B57]' : 'bg-[#8E9C88]'}`}
                       >
                         <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.archived ? 'left-7' : 'left-1'}`} />
                       </span>
-                      <span className="font-display text-sm text-[#1A130A]">
+                      <span className="font-display text-sm text-[#1C2A22]">
                         {form.archived ? 'Archivada (oculta)' : 'Visible en catálogo'}
                       </span>
                     </button>
@@ -488,7 +488,7 @@ export default function AdminDashboard() {
                   {/* Existing images */}
                   {existingImages.length > 0 && (
                     <div>
-                      <label className="block text-xs tracking-widest uppercase font-display text-[#7A6654] mb-3">
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-3">
                         Imágenes actuales
                       </label>
                       <div className="flex flex-wrap gap-3">
@@ -510,15 +510,15 @@ export default function AdminDashboard() {
 
                   {/* New images upload */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#7A6654] mb-3">
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-3">
                       {existingImages.length > 0 ? 'Agregar más imágenes' : 'Imágenes'}
                     </label>
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="border-2 border-dashed border-[#D4B896] p-8 text-center cursor-pointer hover:border-[#B08D6B] transition-colors"
+                      className="border-2 border-dashed border-[#8E9C88] p-8 text-center cursor-pointer hover:border-[#8A3B57] transition-colors"
                     >
-                      <p className="font-display text-[#7A6654] text-sm">Haz clic para subir imágenes</p>
-                      <p className="text-xs text-[#8A6A48] mt-1">JPG, PNG, WebP · Máximo {MAX_MB} MB por imagen</p>
+                      <p className="font-display text-[#5C6960] text-sm">Haz clic para subir imágenes</p>
+                      <p className="text-xs text-[#8A3B57] mt-1">JPG, PNG, WebP · Máximo {MAX_MB} MB por imagen</p>
                     </div>
                     <input
                       ref={fileInputRef}
@@ -540,7 +540,7 @@ export default function AdminDashboard() {
                             >
                               ×
                             </button>
-                            <span className="absolute bottom-1 left-1 bg-[#B08D6B] text-white text-[9px] px-1">Nueva</span>
+                            <span className="absolute bottom-1 left-1 bg-[#8A3B57] text-white text-[9px] px-1">Nueva</span>
                           </div>
                         ))}
                       </div>
@@ -552,14 +552,14 @@ export default function AdminDashboard() {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="bg-[#1A130A] text-[#FAF7F2] px-8 py-4 font-display tracking-widest text-sm uppercase hover:bg-[#B08D6B] transition-all duration-500 disabled:opacity-60"
+                      className="bg-[#1C2A22] text-[#E7E8E0] px-8 py-4 font-display tracking-widest text-sm uppercase hover:bg-[#8A3B57] transition-all duration-500 disabled:opacity-60"
                     >
                       {saving ? 'Guardando...' : mode === 'create' ? 'Crear flor' : 'Guardar cambios'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setMode('list')}
-                      className="font-display text-sm tracking-widest uppercase text-[#7A6654] hover:text-[#B08D6B] transition-colors"
+                      className="font-display text-sm tracking-widest uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors"
                     >
                       Cancelar
                     </button>
@@ -610,15 +610,15 @@ function InquiriesPanel() {
     })();
   }, []);
 
-  if (loading) return <div className="text-center py-16 font-display text-[#7A6654]">Cargando solicitudes...</div>;
+  if (loading) return <div className="text-center py-16 font-display text-[#5C6960]">Cargando solicitudes...</div>;
 
-  if (error) return <div className="text-center py-16 font-display text-[#7A6654]">No se pudieron cargar las solicitudes. Recarga la página e intenta de nuevo.</div>;
+  if (error) return <div className="text-center py-16 font-display text-[#5C6960]">No se pudieron cargar las solicitudes. Recarga la página e intenta de nuevo.</div>;
 
   if (inquiries.length === 0) {
     return (
       <div className="text-center py-20">
-        <p className="font-script text-4xl text-[#B08D6B] mb-4">Vacío</p>
-        <p className="text-[#7A6654] text-sm">Aún no hay solicitudes de cotización.</p>
+        <p className="font-script text-4xl text-[#8A3B57] mb-4">Vacío</p>
+        <p className="text-[#5C6960] text-sm">Aún no hay solicitudes de cotización.</p>
       </div>
     );
   }
@@ -626,24 +626,24 @@ function InquiriesPanel() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="font-display text-3xl text-[#1A130A]">Solicitudes de cotización</h1>
-        <p className="text-[#7A6654] text-sm mt-1">{inquiries.length} solicitudes recibidas</p>
+        <h1 className="font-display text-3xl text-[#1C2A22]">Solicitudes de cotización</h1>
+        <p className="text-[#5C6960] text-sm mt-1">{inquiries.length} solicitudes recibidas</p>
       </div>
       <div className="space-y-4">
         {inquiries.map((inq) => (
-          <div key={inq.id} className="border border-[#EDE0CE] p-6 hover:border-[#B08D6B] transition-colors">
+          <div key={inq.id} className="border border-[#DADCD1] p-6 hover:border-[#8A3B57] transition-colors">
             <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
               <div>
-                <h3 className="font-display text-lg text-[#1A130A]">{inq.name}</h3>
-                <div className="flex flex-wrap gap-4 mt-1 text-sm text-[#7A6654]">
-                  <a href={`mailto:${inq.email}`} className="hover:text-[#B08D6B] transition-colors">
+                <h3 className="font-display text-lg text-[#1C2A22]">{inq.name}</h3>
+                <div className="flex flex-wrap gap-4 mt-1 text-sm text-[#5C6960]">
+                  <a href={`mailto:${inq.email}`} className="hover:text-[#8A3B57] transition-colors">
                     {inq.email}
                   </a>
-                  {inq.phone && <a href={`tel:${inq.phone}`} className="hover:text-[#B08D6B] transition-colors">{inq.phone}</a>}
+                  {inq.phone && <a href={`tel:${inq.phone}`} className="hover:text-[#8A3B57] transition-colors">{inq.phone}</a>}
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-[#7A6654] font-display">
+                <span className="text-xs text-[#5C6960] font-display">
                   {inq.createdAt?.seconds
                     ? new Date(inq.createdAt.seconds * 1000).toLocaleDateString('es-SV', { day: 'numeric', month: 'long', year: 'numeric' })
                     : 'Fecha no disponible'}
@@ -653,10 +653,10 @@ function InquiriesPanel() {
 
             {inq.flowers && inq.flowers.length > 0 && (
               <div className="mb-3">
-                <p className="text-xs font-display tracking-widest uppercase text-[#7A6654] mb-2">Flores de interés:</p>
+                <p className="text-xs font-display tracking-widest uppercase text-[#5C6960] mb-2">Flores de interés:</p>
                 <div className="flex flex-wrap gap-2">
                   {inq.flowers.map((f, i) => (
-                    <span key={i} className="bg-[#EDE0CE] text-[#1A130A] text-xs font-display px-3 py-1">
+                    <span key={i} className="bg-[#DADCD1] text-[#1C2A22] text-xs font-display px-3 py-1">
                       {f.flowerName}
                     </span>
                   ))}
@@ -665,7 +665,7 @@ function InquiriesPanel() {
             )}
 
             {inq.message && (
-              <p className="text-sm text-[#7A6654] leading-relaxed border-l-2 border-[#EDE0CE] pl-4 mt-3">
+              <p className="text-sm text-[#5C6960] leading-relaxed border-l-2 border-[#DADCD1] pl-4 mt-3">
                 {inq.message}
               </p>
             )}
