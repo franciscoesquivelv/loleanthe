@@ -1,19 +1,22 @@
 import type { Metadata } from 'next';
-import { Bricolage_Grotesque, Hanken_Grotesk } from 'next/font/google';
+import localFont from 'next/font/local';
+import { DM_Sans } from 'next/font/google';
 import './globals.css';
 import { QuoteProvider } from '@/context/QuoteContext';
 import { Toaster } from 'react-hot-toast';
 
-// Self-hosted vía next/font. Display = grotesca contemporánea; body = grotesca neutra.
-const display = Bricolage_Grotesque({
-  subsets: ['latin'],
-  weight: ['600', '700', '800'],
+// Títulos: Locatro (display western, self-hosted). Cuerpo: DM Sans (sans neutra).
+const display = localFont({
+  src: [
+    { path: './fonts/Locatro.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/LocatroItalic.woff2', weight: '400', style: 'italic' },
+  ],
   variable: '--font-display',
   display: 'swap',
 });
-const body = Hanken_Grotesk({
+const body = DM_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '700'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-body',
   display: 'swap',
 });
