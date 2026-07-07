@@ -63,6 +63,11 @@ export async function getPublicFlowersServer(): Promise<Flower[]> {
   }
 }
 
+export async function getFlowersByCategoryServer(categoryLabel: string): Promise<Flower[]> {
+  const flowers = await getPublicFlowersServer();
+  return flowers.filter((f) => (f.category ?? '').toLowerCase() === categoryLabel.toLowerCase());
+}
+
 export async function getFlowerByIdServer(id: string): Promise<Flower | null> {
   try {
     const res = await fetch(`${FIRESTORE_BASE}/flowers/${encodeURIComponent(id)}`, {

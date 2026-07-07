@@ -9,9 +9,11 @@ import { useQuote } from '@/context/QuoteContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import type { Flower } from '@/lib/types';
+import { getCategoryByLabel } from '@/lib/categories';
 
 export default function FlowerDetailClient({ flower }: { flower: Flower }) {
   const [currentImg, setCurrentImg] = useState(0);
+  const category = getCategoryByLabel(flower.category);
   const { addToQuote, isInQuote, removeFromQuote } = useQuote();
   const router = useRouter();
   const inQuote = isInQuote(flower.id);
@@ -42,6 +44,12 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
           <nav className="mb-8 text-xs font-display tracking-widest uppercase text-[#5C6960]">
             <Link href="/catalogo" className="hover:text-[#8A3B57] transition-colors">Catálogo</Link>
             <span className="mx-2">/</span>
+            {category && (
+              <>
+                <Link href={`/catalogo/${category.slug}`} className="hover:text-[#8A3B57] transition-colors">{category.label}</Link>
+                <span className="mx-2">/</span>
+              </>
+            )}
             <span className="text-[#1C2A22]">{flower.name}</span>
           </nav>
 
