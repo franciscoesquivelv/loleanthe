@@ -12,7 +12,7 @@ export default function HeroSection() {
 
       <div className="grid md:grid-cols-[1.05fr_0.95fr] md:h-[88vh]">
         {/* Photograph — top on mobile, right on desktop */}
-        <div className="relative order-1 md:order-2 h-[44vh] md:h-full">
+        <div className="relative order-1 md:order-2 h-[44vh] md:h-[88vh]">
           <Image
             src="/images/hero-roses.png"
             alt="Rosa premium de tallo largo — Loleanthe Boutique"
