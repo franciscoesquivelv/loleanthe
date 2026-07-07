@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function HeroSection() {
@@ -12,16 +11,12 @@ export default function HeroSection() {
 
       <div className="grid md:grid-cols-[1.05fr_0.95fr] md:h-[88vh]">
         {/* Photograph — top on mobile, right on desktop */}
-        <div className="relative order-1 md:order-2 h-[44vh] md:h-[88vh]">
-          <Image
-            src="/images/hero-roses.png"
-            alt="Rosa premium de tallo largo — Loleanthe Boutique"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 48vw"
-            className="object-cover object-center [animation:kenburns_24s_ease-out_forwards]"
-          />
-        </div>
+        <div
+          role="img"
+          aria-label="Rosa premium de tallo largo — Loleanthe Boutique"
+          className="order-1 md:order-2 h-[44vh] md:h-[88vh] bg-cover bg-center [animation:kenburns_24s_ease-out_forwards]"
+          style={{ backgroundImage: "url('/images/hero-web.jpg')" }}
+        />
 
         {/* Content on the pine panel */}
         <div className="relative order-2 md:order-1 flex items-center px-5 sm:px-8 md:px-12 lg:px-20 py-16 md:py-0">
