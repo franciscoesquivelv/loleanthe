@@ -13,7 +13,9 @@ export default function Header() {
   const pathname = usePathname();
 
   const isHome = pathname === '/';
-  const isDark = isHome && !scrolled;
+  const atTop = isHome && !scrolled;
+  // Hero is light now → always use the dark-on-light nav scheme.
+  const isDark = false;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -39,7 +41,7 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isDark ? 'bg-transparent py-5 md:py-6' : 'bg-[#E7E8E0]/95 backdrop-blur-md border-b border-[#8E9C88]/25 py-3'
+        atTop ? 'bg-transparent py-5 md:py-6' : 'bg-[#E7E8E0]/95 backdrop-blur-md border-b border-[#8E9C88]/25 py-3'
       }`}
     >
       <div className="max-w-7xl mx-auto px-5 md:px-6 flex items-center justify-between">

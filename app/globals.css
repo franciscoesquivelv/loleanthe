@@ -117,15 +117,15 @@ input, textarea, select {
   80%     { border-radius: 47% 53% 58% 42% / 56% 47% 53% 44%; }
 }
 @keyframes blobDrift {
-  0%,100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
-  25%     { transform: translate(-46%, -54%) rotate(9deg) scale(1.08); }
-  50%     { transform: translate(-52%, -47%) rotate(-5deg) scale(0.95); }
-  75%     { transform: translate(-49%, -52%) rotate(4deg) scale(1.04); }
+  0%,100% { transform: translate(-62%, -58%) rotate(0deg) scale(1); }
+  25%     { transform: translate(-38%, -66%) rotate(14deg) scale(1.14); }
+  50%     { transform: translate(-58%, -34%) rotate(-10deg) scale(0.9); }
+  75%     { transform: translate(-42%, -52%) rotate(7deg) scale(1.06); }
 }
 @keyframes blobDrift2 {
-  0%,100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
-  33%     { transform: translate(-54%, -46%) rotate(-8deg) scale(1.1); }
-  66%     { transform: translate(-47%, -55%) rotate(6deg) scale(0.9); }
+  0%,100% { transform: translate(-38%, -44%) rotate(0deg) scale(1); }
+  33%     { transform: translate(-64%, -34%) rotate(-14deg) scale(1.18); }
+  66%     { transform: translate(-34%, -62%) rotate(11deg) scale(0.86); }
 }
 .blob {
   position: absolute;
@@ -157,9 +157,8 @@ input, textarea, select {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Reduce jarring scroll/entrance motion, but keep the slow ambient blob. */
   *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
