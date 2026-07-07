@@ -17,6 +17,7 @@ import {
 } from '@/lib/flowers';
 import Image from 'next/image';
 import type { Flower } from '@/lib/types';
+import { CATEGORIES } from '@/lib/categories';
 import toast from 'react-hot-toast';
 
 const MAX_MB = 2;
@@ -146,6 +147,7 @@ export default function AdminDashboard() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name) { toast.error('El nombre es requerido'); return; }
+    if (!form.category) { toast.error('Selecciona una categoría'); return; }
     if (storageInfo?.nearLimit && imageFiles.length > 0) {
       toast.error('El almacenamiento está lleno. Elimina imágenes antes de subir nuevas.', { duration: 6000 });
       return;
@@ -426,14 +428,21 @@ export default function AdminDashboard() {
 
                   {/* Category */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Categoría (opcional)</label>
-                    <input
-                      type="text"
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Categoría *</label>
+                    <select
+                      required
                       value={form.category}
                       onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
-                      placeholder="Ej: Rosas, Exóticas, Silvestres..."
-                      className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm"
-                    />
+                      className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] text-sm"
+                    >
+                      <option value="" disabled>Selecciona una categoría</option>
+                      {CATEGORIES.map((c) => (
+                        <option key={c.slug} value={c.label}>{c.label}</option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-[#5C6960] mt-2">
+                      Define en qué página del catálogo aparecerá esta flor.
+                    </p>
                   </div>
 
                   {/* Description */}
