@@ -1,67 +1,60 @@
 import Link from 'next/link';
+import Pollen from './Pollen';
 
 export default function HeroSection() {
   return (
-    <section className="relative flex items-center justify-center min-h-[92vh] overflow-hidden bg-[#E7E8E0] text-[#1C2A22]">
-      {/* Background photograph */}
+    <section className="relative overflow-hidden bg-[#1C2A22] text-[#F7F8F4]">
+      {/* Top scrim keeps the white nav legible over the photo side */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/flor-filler-web.jpg')" }}
-        aria-hidden="true"
-      />
-      {/* Soft stone wash — unifies the photo with the palette and keeps text legible */}
-      <div
-        className="absolute inset-0"
-        style={{ background: 'linear-gradient(rgba(231,232,224,0.52) 0%, rgba(228,230,221,0.68) 100%)' }}
+        className="absolute top-0 inset-x-0 h-28 md:h-32 z-20 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, rgba(16,25,19,.78) 0%, rgba(16,25,19,0) 100%)' }}
         aria-hidden="true"
       />
 
-      {/* Moving organic "bubbles" */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div
-          className="blob"
-          style={{
-            width: 'clamp(320px, 44vw, 640px)',
-            height: 'clamp(320px, 44vw, 640px)',
-            background: '#8A3B57',
-            opacity: 0.26,
-            filter: 'blur(60px)',
-            animation: 'blobMorph 14s ease-in-out infinite, blobDrift 18s ease-in-out infinite',
-          }}
-        />
-        <div
-          className="blob"
-          style={{
-            width: 'clamp(240px, 34vw, 500px)',
-            height: 'clamp(240px, 34vw, 500px)',
-            background: '#47654F',
-            opacity: 0.24,
-            filter: 'blur(70px)',
-            animation: 'blobMorph 19s ease-in-out infinite reverse, blobDrift2 23s ease-in-out infinite',
-          }}
-        />
+      <div className="grid md:grid-cols-2 md:h-[90vh]">
+        {/* Photo side — top on mobile, right on desktop */}
+        <div className="relative order-1 md:order-2 h-[38vh] sm:h-[46vh] md:h-[90vh]">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: "url('/images/flor-filler-web.jpg')" }}
+          />
+          {/* Seam: fade the photo into the pine panel (bottom on mobile, left on desktop) */}
+          <div
+            className="absolute inset-0 md:hidden"
+            style={{ background: 'linear-gradient(to bottom, transparent 55%, #1C2A22 100%)' }}
+          />
+          <div
+            className="absolute inset-0 hidden md:block"
+            style={{ background: 'linear-gradient(to right, #1C2A22 0%, transparent 26%)' }}
+          />
+        </div>
+
+        {/* Text side — bottom on mobile, left on desktop */}
+        <div className="relative z-10 order-2 md:order-1 flex items-center px-6 sm:px-10 md:px-14 lg:px-20 py-14 sm:py-16 md:py-0">
+          <div className="max-w-xl">
+            <h1 className="font-display text-[#F7F8F4] leading-[0.98] text-[clamp(42px,8vw,104px)] mb-5 md:mb-7 opacity-0 animate-fadeInUp">
+              Flores fuera de serie
+            </h1>
+            <p
+              className="text-[#c3ccc0] text-[15px] sm:text-base md:text-lg max-w-md mb-8 md:mb-10 opacity-0 animate-fadeInUp"
+              style={{ animationDelay: '.16s' }}
+            >
+              Variedades exóticas importadas directamente: tallos largos, larga duración y tamaños que no vas a encontrar en otro lugar. Cada arreglo, hecho a tu medida.
+            </p>
+            <Link
+              href="/catalogo"
+              className="group inline-flex items-center gap-3 bg-[#8A3B57] text-[#F7F8F4] px-8 py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#C56E88] hover:text-[#1C2A22] transition-all duration-500 opacity-0 animate-fadeInUp"
+              style={{ animationDelay: '.3s' }}
+            >
+              Ver catálogo
+              <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
+            </Link>
+          </div>
+        </div>
       </div>
 
-      {/* Centered content */}
-      <div className="relative z-10 max-w-4xl mx-auto px-5 text-center">
-        <h1 className="font-display text-[#1C2A22] leading-[0.98] text-[clamp(50px,9.5vw,144px)] mb-7 opacity-0 animate-fadeInUp">
-          Flores que no se repiten
-        </h1>
-        <p
-          className="text-[#3B4A41] text-base md:text-lg max-w-lg mx-auto mb-10 opacity-0 animate-fadeInUp"
-          style={{ animationDelay: '.16s' }}
-        >
-          Selección exótica de alta gama, importada directamente. Tallo largo, larga duración, y arreglos diseñados a medida.
-        </p>
-        <Link
-          href="/catalogo"
-          className="group inline-flex items-center gap-3 bg-[#8A3B57] text-[#F7F8F4] px-9 py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#1C2A22] transition-all duration-500 opacity-0 animate-fadeInUp"
-          style={{ animationDelay: '.3s' }}
-        >
-          Ver catálogo
-          <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
-        </Link>
-      </div>
+      {/* Living pollen field over the whole hero, behind the text */}
+      <Pollen />
     </section>
   );
 }
