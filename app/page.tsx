@@ -7,18 +7,20 @@ import Footer from '@/components/Footer';
 import { getPublicFlowersServer } from '@/lib/flowers-server';
 
 // Datos estructurados para Google + motores de IA (GEO/AEO).
-// NOTA: completar telephone, address y openingHours con los datos reales del
-// negocio para habilitar rich results de negocio local y Google Business Profile.
-const floristJsonLd = {
+// Organization (no LocalBusiness/Florist): mayorista B2B sin tienda física,
+// sirve a Costa Rica y Guatemala — no aplica el schema de negocio local.
+const organizationJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Florist',
+  '@type': 'Organization',
   name: 'Loleanthe Boutique',
   description:
     'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración, ideales para arreglos únicos e irrepetibles.',
   url: 'https://loleanthe.com',
-  image: 'https://loleanthe.com/images/hero-roses.png',
-  priceRange: '$$$',
-  areaServed: { '@type': 'Country', name: 'El Salvador' },
+  image: 'https://loleanthe.com/images/hero-roses.jpg',
+  areaServed: [
+    { '@type': 'Country', name: 'Costa Rica' },
+    { '@type': 'Country', name: 'Guatemala' },
+  ],
 };
 
 export default async function Home() {
@@ -27,7 +29,7 @@ export default async function Home() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(floristJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
       <Header />
       <main>

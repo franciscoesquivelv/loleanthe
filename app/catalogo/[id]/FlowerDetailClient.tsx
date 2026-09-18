@@ -5,13 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import FlowerCard from '@/components/FlowerCard';
 import { useQuote } from '@/context/QuoteContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import type { Flower } from '@/lib/types';
 import { getCategoryByLabel } from '@/lib/categories';
 
-export default function FlowerDetailClient({ flower }: { flower: Flower }) {
+export default function FlowerDetailClient({ flower, related = [] }: { flower: Flower; related?: Flower[] }) {
   const [currentImg, setCurrentImg] = useState(0);
   const category = getCategoryByLabel(flower.category);
   const { addToQuote, isInQuote, removeFromQuote } = useQuote();
@@ -99,7 +100,7 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
             <div className="flex flex-col">
               {flower.category && (
                 <p className="font-display text-xs tracking-[0.3em] uppercase text-[#8A3B57] mb-3">
-                  {flower.category}
+                  {flower.category}{flower.tier ? ` · ${flower.tier}` : ''}
                 </p>
               )}
               <h1 className="font-display text-4xl md:text-5xl font-light text-[#1C2A22] leading-tight mb-5">
@@ -110,8 +111,40 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
                 {flower.inStock ? 'Disponible' : 'Sin stock'}
               </span>
 
+              {(flower.apertura || flower.stemLength || flower.vaseLifeDays != null) && (
+                <div className="flex flex-wrap gap-6 mt-6 pb-6 border-b border-[#DADCD1]">
+                  {flower.apertura && (
+                    <div>
+                      <p className="text-[10px] tracking-widest uppercase text-[#5C6960] mb-1">Apertura</p>
+                      <p className="font-display text-sm text-[#1C2A22]">{flower.apertura}</p>
+                    </div>
+                  )}
+                  {flower.stemLength && (
+                    <div>
+                      <p className="text-[10px] tracking-widest uppercase text-[#5C6960] mb-1">Largo del tallo</p>
+                      <p className="font-display text-sm text-[#1C2A22]">{flower.stemLength}</p>
+                    </div>
+                  )}
+                  {flower.vaseLifeDays != null && (
+                    <div>
+                      <p className="text-[10px] tracking-widest uppercase text-[#5C6960] mb-1">Vida en florero</p>
+                      <p className="font-display text-sm text-[#1C2A22]">{flower.vaseLifeDays} días</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {flower.description && (
-                <p className="text-[#5C6960] leading-relaxed mb-8">{flower.description}</p>
+                <p className="text-[#5C6960] leading-relaxed mt-6 mb-2">{flower.description}</p>
+              )}
+
+              {flower.colors && flower.colors.length > 0 && (
+                <div className="flex items-center gap-2 mb-8">
+                  <span className="text-[10px] tracking-widest uppercase text-[#5C6960] mr-1">Colores</span>
+                  {flower.colors.map((c, i) => (
+                    <span key={i} className="w-5 h-5 rounded-full border border-[#DADCD1]" style={{ backgroundColor: c }} />
+                  ))}
+                </div>
               )}
 
               <div className="flex flex-col sm:flex-row gap-3 mt-auto">
@@ -141,6 +174,20 @@ export default function FlowerDetailClient({ flower }: { flower: Flower }) {
               </Link>
             </div>
           </div>
+
+          {related.length > 0 && (
+            <div className="mt-16 md:mt-24 pt-12 md:pt-16 border-t border-[#DADCD1]">
+              <div className="text-center mb-8 md:mb-10">
+                <p className="font-display italic text-[#8A3B57] text-xl md:text-2xl mb-2">Combina bien con</p>
+                <h2 className="font-display text-2xl md:text-3xl text-[#1C2A22]">Completa tu arreglo</h2>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                {related.map((f) => (
+                  <FlowerCard key={f.id} flower={f} detailHref={`/catalogo/${f.id}`} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </main>
       <Footer />

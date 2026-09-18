@@ -163,3 +163,39 @@ input, textarea, select {
     scroll-behavior: auto !important;
   }
 }
+
+@page {
+  size: letter;
+  margin: 12mm;
+}
+
+@media print {
+  .grain::before { display: none; }
+  /* .ornament's own unlayered rule (display:flex) beats a plain `print:hidden`
+     Tailwind utility (layered), so this needs an equally-unlayered override. */
+  .price-ornament { display: none !important; }
+  .price-card,
+  .price-footer {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Chrome fragments a CSS Grid across printed pages very poorly (often pushes the
+     whole grid to the next page instead of breaking between rows) — flexbox wrap
+     fragments cleanly, so print uses that instead of the on-screen grid. The header
+     is trimmed to logo+title only so all 8 cards fit on one sheet. */
+  .price-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  /* Force final entrance-animation state so a PDF snapshot never lands mid-fade,
+     and size each card for a 4-per-row print layout (generous slack vs. an exact
+     percentage fit, which Chrome's print engine rounds just enough to wrap early). */
+  .price-reveal {
+    width: calc(25% - 12px);
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

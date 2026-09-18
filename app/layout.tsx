@@ -38,10 +38,11 @@ export const metadata: Metadata = {
     url: 'https://loleanthe.com',
     siteName: 'Loleanthe Boutique',
     type: 'website',
-    locale: 'es_SV',
+    locale: 'es_CR',
+    alternateLocale: ['es_GT'],
     images: [
       {
-        url: '/images/hero-roses.png',
+        url: '/images/hero-roses.jpg',
         width: 1200,
         height: 630,
         alt: 'Loleanthe Boutique — Flores de lujo',
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Loleanthe Boutique — Flores de Lujo',
     description: 'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración.',
-    images: ['/images/hero-roses.png'],
+    images: ['/images/hero-roses.jpg'],
   },
   icons: {
     icon: '/favicon-black.png',

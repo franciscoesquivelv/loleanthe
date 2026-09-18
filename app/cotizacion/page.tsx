@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 
 export default function CotizacionPage() {
   const { items, removeFromQuote, clearQuote, count } = useQuote();
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', buyerType: '', volume: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -189,19 +189,50 @@ export default function CotizacionPage() {
                     type="tel"
                     value={form.phone}
                     onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                    placeholder="+503 0000 0000"
+                    placeholder="+506 0000 0000"
                     className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 transition-colors text-sm"
                   />
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Tipo de negocio</label>
+                  <select
+                    value={form.buyerType}
+                    onChange={(e) => setForm((p) => ({ ...p, buyerType: e.target.value }))}
+                    className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] text-sm"
+                  >
+                    <option value="">Selecciona una opción</option>
+                    <option value="Floristería">Floristería</option>
+                    <option value="Decorador de eventos">Decorador de eventos</option>
+                    <option value="Hotel">Hotel</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Volumen o frecuencia</label>
+                  <select
+                    value={form.volume}
+                    onChange={(e) => setForm((p) => ({ ...p, volume: e.target.value }))}
+                    className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] text-sm"
+                  >
+                    <option value="">Selecciona una opción</option>
+                    <option value="Pedido único">Pedido único</option>
+                    <option value="Semanal">Semanal</option>
+                    <option value="Mensual">Mensual</option>
+                    <option value="Para un evento con fecha">Para un evento con fecha</option>
+                  </select>
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Mensaje / Detalles de tu ocasión</label>
+                <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Mensaje / Detalles de tu pedido</label>
                 <textarea
                   rows={5}
                   value={form.message}
                   onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
-                  placeholder="Cuéntanos más sobre lo que buscas: ocasión, colores preferidos, cantidad aproximada de flores, fecha de entrega deseada..."
+                  placeholder="Cantidad aproximada de tallos, fecha de entrega deseada, colores preferidos... ¿Buscas una variedad que no ves en el catálogo? También cuéntanos aquí."
                   className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 transition-colors text-sm resize-none"
                 />
               </div>

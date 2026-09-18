@@ -14,6 +14,7 @@ interface FsValue {
   stringValue?: string;
   booleanValue?: boolean;
   timestampValue?: string;
+  integerValue?: string;
   arrayValue?: { values?: FsValue[] };
 }
 interface FsDoc {
@@ -27,12 +28,16 @@ function str(v?: FsValue): string {
 function bool(v?: FsValue): boolean {
   return v?.booleanValue ?? false;
 }
+function int(v?: FsValue): number | undefined {
+  return v?.integerValue !== undefined ? Number(v.integerValue) : undefined;
+}
 function strArray(v?: FsValue): string[] {
   return (v?.arrayValue?.values ?? []).map((x) => x.stringValue ?? '');
 }
 
 function parseFlowerDoc(doc: FsDoc): Flower {
   const f = doc.fields ?? {};
+  const colors = strArray(f.colors);
   return {
     id: doc.name.split('/').pop() ?? '',
     name: str(f.name),
@@ -43,6 +48,11 @@ function parseFlowerDoc(doc: FsDoc): Flower {
     category: f.category?.stringValue,
     createdAt: f.createdAt?.timestampValue ?? '',
     updatedAt: f.updatedAt?.timestampValue ?? '',
+    tier: f.tier?.stringValue as Flower['tier'],
+    apertura: f.apertura?.stringValue as Flower['apertura'],
+    stemLength: f.stemLength?.stringValue,
+    vaseLifeDays: int(f.vaseLifeDays),
+    colors: colors.length > 0 ? colors : undefined,
   };
 }
 
