@@ -11,13 +11,13 @@ export const CATEGORIES: Category[] = [
     slug: 'rosas',
     label: 'Rosas',
     blurb: 'Tallos largos, cabezas grandes, para el arreglo que impone.',
-    fallbackImage: '/images/flor-portada.png',
+    fallbackImage: '/images/flor-portada.jpg',
   },
   {
     slug: 'ranunculus',
     label: 'Ranunculus',
     blurb: 'Pétalos en capas, colores imposibles de replicar.',
-    fallbackImage: '/images/ranunculus-hestia.png',
+    fallbackImage: '/images/ranunculus-hestia.jpg',
   },
   {
     slug: 'fillers',
