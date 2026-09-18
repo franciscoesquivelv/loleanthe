@@ -15,12 +15,12 @@ import {
   getStorageInfo,
   validateImageFiles,
 } from '@/lib/flowers';
+import { compressImage } from '@/lib/image-compress';
 import Image from 'next/image';
 import type { Flower } from '@/lib/types';
+import { APERTURAS, ROSE_TIERS } from '@/lib/types';
 import { CATEGORIES } from '@/lib/categories';
 import toast from 'react-hot-toast';
-
-const MAX_MB = 2;
 
 type Tab = 'catalog' | 'inquiries';
 type Mode = 'list' | 'create' | 'edit';
@@ -31,6 +31,11 @@ const emptyForm = {
   inStock: true,
   archived: false,
   category: '',
+  tier: '',
+  apertura: '',
+  stemLength: '',
+  vaseLifeDays: '',
+  colors: [] as string[],
 };
 
 export default function AdminDashboard() {
@@ -97,6 +102,11 @@ export default function AdminDashboard() {
       inStock: flower.inStock,
       archived: flower.archived,
       category: flower.category || '',
+      tier: flower.tier || '',
+      apertura: flower.apertura || '',
+      stemLength: flower.stemLength || '',
+      vaseLifeDays: flower.vaseLifeDays?.toString() || '',
+      colors: flower.colors || [],
     });
     setExistingImages([...flower.images]);
     setImageFiles([]);
@@ -104,20 +114,23 @@ export default function AdminDashboard() {
     setMode('edit');
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    // Validate size limit (2 MB per image)
-    const error = validateImageFiles(files);
+    // Downscale + re-encode client-side first, then enforce the size limit on
+    // the result — so a large photo straight off a phone still goes through.
+    const compressed = await Promise.all(files.map(compressImage));
+
+    const error = validateImageFiles(compressed);
     if (error) {
       toast.error(error, { duration: 5000 });
       e.target.value = '';
       return;
     }
 
-    setImageFiles((prev) => [...prev, ...files]);
-    const newPreviews = files.map((f) => URL.createObjectURL(f));
+    setImageFiles((prev) => [...prev, ...compressed]);
+    const newPreviews = compressed.map((f) => URL.createObjectURL(f));
     setImagePreviews((prev) => [...prev, ...newPreviews]);
   };
 
@@ -128,6 +141,12 @@ export default function AdminDashboard() {
       return prev.filter((_, i) => i !== idx);
     });
   };
+
+  const addColor = () => setForm((p) => ({ ...p, colors: [...p.colors, '#8A3B57'] }));
+  const updateColor = (idx: number, value: string) =>
+    setForm((p) => ({ ...p, colors: p.colors.map((c, i) => (i === idx ? value : c)) }));
+  const removeColor = (idx: number) =>
+    setForm((p) => ({ ...p, colors: p.colors.filter((_, i) => i !== idx) }));
 
   const removeExistingImage = async (url: string) => {
     if (!editingFlower) return;
@@ -154,16 +173,24 @@ export default function AdminDashboard() {
     }
     setSaving(true);
     try {
+      // Firestore rechaza `undefined` explícito — solo se incluyen los atributos con valor.
+      const attributes = {
+        ...(form.tier && { tier: form.tier as Flower['tier'] }),
+        ...(form.apertura && { apertura: form.apertura as Flower['apertura'] }),
+        ...(form.stemLength && { stemLength: form.stemLength }),
+        ...(form.vaseLifeDays && { vaseLifeDays: Number(form.vaseLifeDays) }),
+        ...(form.colors.length > 0 && { colors: form.colors }),
+      };
       if (mode === 'create') {
         await createFlower(
-          { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: [] },
+          { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: [], ...attributes },
           imageFiles
         );
         toast.success('Flor creada exitosamente');
       } else if (editingFlower) {
         await updateFlower(
           editingFlower.id,
-          { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: existingImages },
+          { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: existingImages, ...attributes },
           imageFiles
         );
         toast.success('Flor actualizada');
@@ -457,6 +484,97 @@ export default function AdminDashboard() {
                     />
                   </div>
 
+                  {/* Atributos de catálogo */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Tier (solo Rosas)</label>
+                      <select
+                        value={form.tier}
+                        onChange={(e) => setForm((p) => ({ ...p, tier: e.target.value }))}
+                        className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] text-sm"
+                      >
+                        <option value="">— Sin especificar —</option>
+                        {ROSE_TIERS.map((t) => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Apertura</label>
+                      <select
+                        value={form.apertura}
+                        onChange={(e) => setForm((p) => ({ ...p, apertura: e.target.value }))}
+                        className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] text-sm"
+                      >
+                        <option value="">— Sin especificar —</option>
+                        {APERTURAS.map((a) => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Largo del tallo</label>
+                      <input
+                        type="text"
+                        value={form.stemLength}
+                        onChange={(e) => setForm((p) => ({ ...p, stemLength: e.target.value }))}
+                        placeholder="Ej: 50-70cm"
+                        className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Vida en florero (días)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={form.vaseLifeDays}
+                        onChange={(e) => setForm((p) => ({ ...p, vaseLifeDays: e.target.value }))}
+                        placeholder="Ej: 13"
+                        className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Colores disponibles */}
+                  <div>
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Colores disponibles</label>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {form.colors.map((color, idx) => (
+                        <div key={idx} className="relative">
+                          <input
+                            type="color"
+                            value={color}
+                            onChange={(e) => updateColor(idx, e.target.value)}
+                            className="w-10 h-10 border border-[#8E9C88] cursor-pointer p-0"
+                            aria-label={`Color ${idx + 1}`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeColor(idx)}
+                            className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center leading-none"
+                            aria-label="Quitar color"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={addColor}
+                        className="w-10 h-10 border border-dashed border-[#8E9C88] text-[#8A3B57] text-lg flex items-center justify-center hover:border-[#8A3B57] transition-colors"
+                        aria-label="Agregar color"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <p className="text-xs text-[#5C6960] mt-2">
+                      Algunas variedades vienen en varios colores (ej. ranunculus, lisianthus) — agrega uno por cada opción disponible.
+                    </p>
+                  </div>
+
                   {/* Toggles */}
                   <div className="flex items-center gap-8">
                     <button
@@ -527,7 +645,7 @@ export default function AdminDashboard() {
                       className="border-2 border-dashed border-[#8E9C88] p-8 text-center cursor-pointer hover:border-[#8A3B57] transition-colors"
                     >
                       <p className="font-display text-[#5C6960] text-sm">Haz clic para subir imágenes</p>
-                      <p className="text-xs text-[#8A3B57] mt-1">JPG, PNG, WebP · Máximo {MAX_MB} MB por imagen</p>
+                      <p className="text-xs text-[#8A3B57] mt-1">JPG, PNG, WebP · Se optimizan automáticamente al subir</p>
                     </div>
                     <input
                       ref={fileInputRef}
