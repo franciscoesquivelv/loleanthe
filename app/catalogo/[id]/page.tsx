@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getPublicFlowersServer, getFlowerByIdServer } from '@/lib/flowers-server';
+import { getCrossSell } from '@/lib/cross-sell';
 import FlowerDetailClient from './FlowerDetailClient';
 
 // Pre-genera una página estática por cada flor del catálogo (ISR). Con 0 flores
@@ -46,6 +47,9 @@ export default async function FlowerDetailPage({
   const flower = await getFlowerByIdServer(id);
   if (!flower || flower.archived) notFound();
 
+  const allFlowers = await getPublicFlowersServer();
+  const related = getCrossSell(flower, allFlowers);
+
   const productJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -72,7 +76,7 @@ export default async function FlowerDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
-      <FlowerDetailClient flower={flower} />
+      <FlowerDetailClient flower={flower} related={related} />
     </>
   );
 }
