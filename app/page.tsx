@@ -12,7 +12,7 @@ import { getPublicFlowersServer } from '@/lib/flowers-server';
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'Loleanthe Boutique',
+  name: 'Loleanthe',
   description:
     'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración, ideales para arreglos únicos e irrepetibles.',
   url: 'https://loleanthe.com',

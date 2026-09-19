@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --pine: #1C2A22;
-  --pine-2: #24342A;
-  --stone: #E7E8E0;
-  --chalk: #F7F8F4;
-  --plum: #8A3B57;
-  --sage: #8E9C88;
-  --ink: #26302A;
-  --mute: #5C6960;
+  --pine: #2B1620;
+  --pine-2: #3A2129;
+  --stone: #EDE4D8;
+  --chalk: #FBF7F0;
+  --plum: #9C7A3C;
+  --sage: #A69485;
+  --ink: #2A211C;
+  --mute: #6B5D50;
 }
 
 * {
@@ -150,7 +150,7 @@ input, textarea, select {
   100% { background-position: 200% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #dcded4 25%, #eceee5 50%, #dcded4 75%);
+  background: linear-gradient(90deg, #E3D9CC 25%, #F0EAE0 50%, #E3D9CC 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }

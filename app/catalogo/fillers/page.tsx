@@ -7,10 +7,10 @@ const category = getCategoryBySlug('fillers')!;
 
 export const metadata: Metadata = {
   title: category.label,
-  description: `${category.blurb} Flores de relleno exóticas, disponibles para cotización en Loleanthe Boutique.`,
+  description: `${category.blurb} Flores de relleno exóticas, disponibles para cotización en Loleanthe.`,
   alternates: { canonical: '/catalogo/fillers' },
   openGraph: {
-    title: `${category.label} | Loleanthe Boutique`,
+    title: `${category.label} | Loleanthe`,
     description: category.blurb,
     url: '/catalogo/fillers',
   },

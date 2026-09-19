@@ -39,14 +39,14 @@ export default function CatalogPreview({ initialFlowers }: { initialFlowers: Flo
     : featured;
 
   return (
-    <section id="catalogo" ref={sectionRef} className="bg-[#E7E8E0] py-20 md:py-32 px-5 md:px-6">
+    <section id="catalogo" ref={sectionRef} className="bg-[#EDE4D8] py-20 md:py-32 px-5 md:px-6">
       <div className="max-w-7xl mx-auto">
         <div className={`flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-10 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div>
-            <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#8A3B57] mb-4">La colección</p>
-            <h2 className="font-display text-[clamp(34px,5.5vw,74px)] leading-[0.95] text-[#1C2A22]">El catálogo</h2>
+            <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#9C7A3C] mb-4">La colección</p>
+            <h2 className="font-display text-[clamp(34px,5.5vw,74px)] leading-[0.95] text-[#2B1620]">El catálogo</h2>
           </div>
-          <p className="text-[#5C6960] text-sm max-w-sm">
+          <p className="text-[#6B5D50] text-sm max-w-sm">
             Variedades reales, disponibles hoy para pedido. Agrega las que te interesen y solicita cotización.
           </p>
         </div>
@@ -54,7 +54,7 @@ export default function CatalogPreview({ initialFlowers }: { initialFlowers: Flo
         <div className={`flex flex-wrap gap-2 mb-8 md:mb-10 transition-all duration-1000 delay-100 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <button
             onClick={() => setCategoryFilter('')}
-            className={`font-body text-xs tracking-wide uppercase px-4 py-2 border transition-all ${categoryFilter === '' ? 'bg-[#1C2A22] text-[#E7E8E0] border-[#1C2A22]' : 'border-[#8E9C88] text-[#5C6960] hover:border-[#8A3B57]'}`}
+            className={`font-body text-xs tracking-wide uppercase px-4 py-2 border transition-all ${categoryFilter === '' ? 'bg-[#2B1620] text-[#EDE4D8] border-[#2B1620]' : 'border-[#A69485] text-[#6B5D50] hover:border-[#9C7A3C]'}`}
           >
             Todas
           </button>
@@ -62,7 +62,7 @@ export default function CatalogPreview({ initialFlowers }: { initialFlowers: Flo
             <button
               key={c.slug}
               onClick={() => setCategoryFilter(c.label)}
-              className={`font-body text-xs tracking-wide uppercase px-4 py-2 border transition-all ${categoryFilter === c.label ? 'bg-[#1C2A22] text-[#E7E8E0] border-[#1C2A22]' : 'border-[#8E9C88] text-[#5C6960] hover:border-[#8A3B57]'}`}
+              className={`font-body text-xs tracking-wide uppercase px-4 py-2 border transition-all ${categoryFilter === c.label ? 'bg-[#2B1620] text-[#EDE4D8] border-[#2B1620]' : 'border-[#A69485] text-[#6B5D50] hover:border-[#9C7A3C]'}`}
             >
               {c.label}
             </button>
@@ -76,7 +76,7 @@ export default function CatalogPreview({ initialFlowers }: { initialFlowers: Flo
         </div>
 
         <div className={`flex justify-center mt-12 md:mt-14 transition-all duration-1000 delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <Link href="/catalogo" className="group inline-flex items-center gap-3 font-body font-bold text-sm tracking-wide uppercase text-[#1C2A22] hover:text-[#8A3B57] transition-colors">
+          <Link href="/catalogo" className="group inline-flex items-center gap-3 font-body font-bold text-sm tracking-wide uppercase text-[#2B1620] hover:text-[#9C7A3C] transition-colors">
             Ver todo el catálogo
             <span className="w-10 h-px bg-current transition-all duration-300 group-hover:w-16" />
           </Link>

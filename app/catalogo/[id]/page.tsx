@@ -23,13 +23,13 @@ export async function generateMetadata({
   }
   const description =
     flower.description ||
-    `${flower.name} — flor premium de Loleanthe Boutique, disponible para cotización.`;
+    `${flower.name} — flor premium de Loleanthe, disponible para cotización.`;
   return {
     title: flower.name,
     description,
     alternates: { canonical: `/catalogo/${flower.id}` },
     openGraph: {
-      title: `${flower.name} | Loleanthe Boutique`,
+      title: `${flower.name} | Loleanthe`,
       description,
       url: `/catalogo/${flower.id}`,
       type: 'website',
@@ -57,7 +57,7 @@ export default async function FlowerDetailPage({
     description: flower.description || undefined,
     image: flower.images.length > 0 ? flower.images : undefined,
     category: flower.category || undefined,
-    brand: { '@type': 'Brand', name: 'Loleanthe Boutique' },
+    brand: { '@type': 'Brand', name: 'Loleanthe' },
     // Modelo por cotización: se expone disponibilidad y URL, sin precio público.
     offers: {
       '@type': 'Offer',
@@ -66,7 +66,7 @@ export default async function FlowerDetailPage({
         : 'https://schema.org/OutOfStock',
       url: `https://loleanthe.com/catalogo/${flower.id}`,
       priceCurrency: 'USD',
-      seller: { '@type': 'Organization', name: 'Loleanthe Boutique' },
+      seller: { '@type': 'Organization', name: 'Loleanthe' },
     },
   };
 

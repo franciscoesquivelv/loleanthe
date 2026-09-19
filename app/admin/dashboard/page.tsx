@@ -142,7 +142,7 @@ export default function AdminDashboard() {
     });
   };
 
-  const addColor = () => setForm((p) => ({ ...p, colors: [...p.colors, '#8A3B57'] }));
+  const addColor = () => setForm((p) => ({ ...p, colors: [...p.colors, '#9C7A3C'] }));
   const updateColor = (idx: number, value: string) =>
     setForm((p) => ({ ...p, colors: p.colors.map((c, i) => (i === idx ? value : c)) }));
   const removeColor = (idx: number) =>
@@ -242,24 +242,24 @@ export default function AdminDashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#1C2A22] flex items-center justify-center">
-        <div className="font-script text-4xl text-[#8A3B57] animate-pulse">Loleanthe</div>
+      <div className="min-h-screen bg-[#2B1620] flex items-center justify-center">
+        <div className="font-script text-4xl text-[#9C7A3C] animate-pulse">Loleanthe</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#E7E8E0] flex flex-col">
+    <div className="min-h-screen bg-[#EDE4D8] flex flex-col">
       {/* Admin Header */}
-      <header className="bg-[#1C2A22] border-b border-[#8A3B57]/20 px-6 py-4">
+      <header className="bg-[#2B1620] border-b border-[#9C7A3C]/20 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-6 w-auto object-contain opacity-70" style={{ width: 'auto' }} />
-            <span className="text-[#8A3B57] text-xs tracking-widest uppercase font-display hidden sm:block">Panel de Administración</span>
+            <span className="text-[#9C7A3C] text-xs tracking-widest uppercase font-display hidden sm:block">Panel de Administración</span>
           </div>
           <button
             onClick={handleLogout}
-            className="font-display text-xs tracking-widest uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors"
+            className="font-display text-xs tracking-widest uppercase text-[#6B5D50] hover:text-[#9C7A3C] transition-colors"
           >
             Cerrar sesión
           </button>
@@ -267,13 +267,13 @@ export default function AdminDashboard() {
       </header>
 
       {/* Tabs */}
-      <div className="bg-[#1C2A22] border-b border-[#8A3B57]/10 px-6">
+      <div className="bg-[#2B1620] border-b border-[#9C7A3C]/10 px-6">
         <div className="max-w-7xl mx-auto flex gap-6">
           {([['catalog', 'Catálogo'], ['inquiries', 'Solicitudes']] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => { setTab(key); setMode('list'); }}
-              className={`font-display text-xs tracking-widest uppercase py-4 border-b-2 transition-all ${tab === key ? 'border-[#8A3B57] text-[#8A3B57]' : 'border-transparent text-[#5C6960] hover:text-[#8A3B57]'}`}
+              className={`font-display text-xs tracking-widest uppercase py-4 border-b-2 transition-all ${tab === key ? 'border-[#9C7A3C] text-[#9C7A3C]' : 'border-transparent text-[#6B5D50] hover:text-[#9C7A3C]'}`}
             >
               {label}
             </button>
@@ -300,18 +300,18 @@ export default function AdminDashboard() {
 
       {/* Storage usage bar (subtle, always visible) */}
       {storageInfo && !storageInfo.nearLimit && (
-        <div className="bg-[#1C2A22]/5 border-b border-[#DADCD1] px-6 py-2">
+        <div className="bg-[#2B1620]/5 border-b border-[#DDD2C2] px-6 py-2">
           <div className="max-w-7xl mx-auto flex items-center gap-3">
-            <span className="text-[#5C6960] text-xs font-display shrink-0">
+            <span className="text-[#6B5D50] text-xs font-display shrink-0">
               Almacenamiento: {(storageInfo.usedBytes / (1024 * 1024 * 1024)).toFixed(2)} GB / 4.5 GB
             </span>
-            <div className="flex-1 h-1 bg-[#DADCD1] rounded-full overflow-hidden">
+            <div className="flex-1 h-1 bg-[#DDD2C2] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#8A3B57] rounded-full transition-all"
+                className="h-full bg-[#9C7A3C] rounded-full transition-all"
                 style={{ width: `${Math.min((storageInfo.usedBytes / storageInfo.limitBytes) * 100, 100)}%` }}
               />
             </div>
-            <span className="text-[#5C6960] text-xs font-display shrink-0">
+            <span className="text-[#6B5D50] text-xs font-display shrink-0">
               {Math.round((storageInfo.usedBytes / storageInfo.limitBytes) * 100)}%
             </span>
           </div>
@@ -326,22 +326,22 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex items-center justify-between mb-8">
                   <div>
-                    <h1 className="font-display text-3xl text-[#1C2A22]">Flores del catálogo</h1>
-                    <p className="text-[#5C6960] text-sm mt-1">{flowers.filter(f => !f.archived).length} activas · {flowers.filter(f => f.archived).length} archivadas</p>
+                    <h1 className="font-display text-3xl text-[#2B1620]">Flores del catálogo</h1>
+                    <p className="text-[#6B5D50] text-sm mt-1">{flowers.filter(f => !f.archived).length} activas · {flowers.filter(f => f.archived).length} archivadas</p>
                   </div>
                   <button
                     onClick={openCreate}
-                    className="bg-[#1C2A22] text-[#E7E8E0] px-6 py-3 font-display text-xs tracking-widest uppercase hover:bg-[#8A3B57] transition-all duration-300"
+                    className="bg-[#2B1620] text-[#EDE4D8] px-6 py-3 font-display text-xs tracking-widest uppercase hover:bg-[#9C7A3C] transition-all duration-300"
                   >
                     + Nueva flor
                   </button>
                 </div>
 
                 {flowers.length === 0 ? (
-                  <div className="text-center py-20 border border-dashed border-[#8E9C88]">
-                    <p className="font-script text-4xl text-[#8A3B57] mb-4">Vacío</p>
-                    <p className="text-[#5C6960] text-sm mb-6">No hay flores en el catálogo aún.</p>
-                    <button onClick={openCreate} className="border border-[#8A3B57] text-[#8A3B57] px-6 py-2 font-display text-xs tracking-widest uppercase hover:bg-[#8A3B57] hover:text-white transition-all">
+                  <div className="text-center py-20 border border-dashed border-[#A69485]">
+                    <p className="font-script text-4xl text-[#9C7A3C] mb-4">Vacío</p>
+                    <p className="text-[#6B5D50] text-sm mb-6">No hay flores en el catálogo aún.</p>
+                    <button onClick={openCreate} className="border border-[#9C7A3C] text-[#9C7A3C] px-6 py-2 font-display text-xs tracking-widest uppercase hover:bg-[#9C7A3C] hover:text-white transition-all">
                       Agregar primera flor
                     </button>
                   </div>
@@ -349,34 +349,34 @@ export default function AdminDashboard() {
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
                       <thead>
-                        <tr className="border-b border-[#DADCD1]">
+                        <tr className="border-b border-[#DDD2C2]">
                           {['Imagen', 'Nombre', 'Estado', 'Stock', 'Visibilidad', 'Acciones'].map((h) => (
-                            <th key={h} className="text-left font-display text-xs tracking-widest uppercase text-[#5C6960] pb-4 pr-4">{h}</th>
+                            <th key={h} className="text-left font-display text-xs tracking-widest uppercase text-[#6B5D50] pb-4 pr-4">{h}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
                         {flowers.map((flower) => (
-                          <tr key={flower.id} className={`border-b border-[#DADCD1] group hover:bg-[#E7E8E0] transition-colors ${flower.archived ? 'opacity-50' : ''}`}>
+                          <tr key={flower.id} className={`border-b border-[#DDD2C2] group hover:bg-[#EDE4D8] transition-colors ${flower.archived ? 'opacity-50' : ''}`}>
                             {/* Image */}
                             <td className="py-4 pr-4">
-                              <div className="w-14 h-14 relative overflow-hidden bg-[#DADCD1] flex-shrink-0">
+                              <div className="w-14 h-14 relative overflow-hidden bg-[#DDD2C2] flex-shrink-0">
                                 {flower.images[0] ? (
                                   <Image src={flower.images[0]} alt={flower.name} fill className="object-cover" />
                                 ) : (
-                                  <span className="font-script text-lg text-[#8A3B57] flex items-center justify-center h-full">LB</span>
+                                  <span className="font-script text-lg text-[#9C7A3C] flex items-center justify-center h-full">LB</span>
                                 )}
                               </div>
                             </td>
                             {/* Name */}
                             <td className="py-4 pr-4">
-                              <p className="font-display text-[#1C2A22] font-medium">{flower.name}</p>
-                              {flower.category && <p className="text-xs text-[#5C6960] mt-0.5">{flower.category}</p>}
-                              <p className="text-xs text-[#5C6960] mt-0.5 line-clamp-1 max-w-xs">{flower.description}</p>
+                              <p className="font-display text-[#2B1620] font-medium">{flower.name}</p>
+                              {flower.category && <p className="text-xs text-[#6B5D50] mt-0.5">{flower.category}</p>}
+                              <p className="text-xs text-[#6B5D50] mt-0.5 line-clamp-1 max-w-xs">{flower.description}</p>
                             </td>
                             {/* State */}
                             <td className="py-4 pr-4">
-                              <span className={`text-xs tracking-wider font-display uppercase px-2 py-1 ${flower.archived ? 'bg-[#DADCD1] text-[#5C6960]' : 'bg-[#1C2A22] text-[#E7E8E0]'}`}>
+                              <span className={`text-xs tracking-wider font-display uppercase px-2 py-1 ${flower.archived ? 'bg-[#DDD2C2] text-[#6B5D50]' : 'bg-[#2B1620] text-[#EDE4D8]'}`}>
                                 {flower.archived ? 'Archivada' : 'Activa'}
                               </span>
                             </td>
@@ -393,7 +393,7 @@ export default function AdminDashboard() {
                             <td className="py-4 pr-4">
                               <button
                                 onClick={() => toggleArchive(flower)}
-                                className="text-xs tracking-wider font-display uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors"
+                                className="text-xs tracking-wider font-display uppercase text-[#6B5D50] hover:text-[#9C7A3C] transition-colors"
                               >
                                 {flower.archived ? 'Restaurar' : 'Archivar'}
                               </button>
@@ -403,13 +403,13 @@ export default function AdminDashboard() {
                               <div className="flex items-center gap-3">
                                 <button
                                   onClick={() => openEdit(flower)}
-                                  className="font-display text-xs tracking-wider uppercase text-[#1C2A22] hover:text-[#8A3B57] transition-colors"
+                                  className="font-display text-xs tracking-wider uppercase text-[#2B1620] hover:text-[#9C7A3C] transition-colors"
                                 >
                                   Editar
                                 </button>
                                 <button
                                   onClick={() => handleDelete(flower)}
-                                  className={`font-display text-xs tracking-wider uppercase transition-colors ${deleteConfirm === flower.id ? 'text-red-500 font-semibold' : 'text-[#5C6960] hover:text-red-500'}`}
+                                  className={`font-display text-xs tracking-wider uppercase transition-colors ${deleteConfirm === flower.id ? 'text-red-500 font-semibold' : 'text-[#6B5D50] hover:text-red-500'}`}
                                 >
                                   {deleteConfirm === flower.id ? '¿Confirmar?' : 'Eliminar'}
                                 </button>
@@ -430,11 +430,11 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-4 mb-8">
                   <button
                     onClick={() => setMode('list')}
-                    className="font-display text-xs tracking-widest uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors"
+                    className="font-display text-xs tracking-widest uppercase text-[#6B5D50] hover:text-[#9C7A3C] transition-colors"
                   >
                     ← Volver
                   </button>
-                  <h1 className="font-display text-3xl text-[#1C2A22]">
+                  <h1 className="font-display text-3xl text-[#2B1620]">
                     {mode === 'create' ? 'Nueva flor' : `Editando: ${editingFlower?.name}`}
                   </h1>
                 </div>
@@ -442,56 +442,56 @@ export default function AdminDashboard() {
                 <form onSubmit={handleSave} className="max-w-2xl space-y-6">
                   {/* Name */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Nombre de la flor *</label>
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">Nombre de la flor *</label>
                     <input
                       type="text"
                       required
                       value={form.name}
                       onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                       placeholder="Ej: Rosa Garden Spirit"
-                      className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm"
+                      className="w-full border border-[#A69485] bg-transparent px-4 py-3 font-display text-[#2B1620] placeholder:text-[#9C7A3C]/40 text-sm"
                     />
                   </div>
 
                   {/* Category */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Categoría *</label>
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">Categoría *</label>
                     <select
                       required
                       value={form.category}
                       onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
-                      className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] text-sm"
+                      className="w-full border border-[#A69485] bg-transparent px-4 py-3 font-display text-[#2B1620] text-sm"
                     >
                       <option value="" disabled>Selecciona una categoría</option>
                       {CATEGORIES.map((c) => (
                         <option key={c.slug} value={c.label}>{c.label}</option>
                       ))}
                     </select>
-                    <p className="text-xs text-[#5C6960] mt-2">
+                    <p className="text-xs text-[#6B5D50] mt-2">
                       Define en qué página del catálogo aparecerá esta flor.
                     </p>
                   </div>
 
                   {/* Description */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Descripción</label>
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">Descripción</label>
                     <textarea
                       rows={4}
                       value={form.description}
                       onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
                       placeholder="Describe la flor: color, tamaño, características especiales, duración estimada..."
-                      className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm resize-none"
+                      className="w-full border border-[#A69485] bg-transparent px-4 py-3 font-display text-[#2B1620] placeholder:text-[#9C7A3C]/40 text-sm resize-none"
                     />
                   </div>
 
                   {/* Atributos de catálogo */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Tier (solo Rosas)</label>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">Tier (solo Rosas)</label>
                       <select
                         value={form.tier}
                         onChange={(e) => setForm((p) => ({ ...p, tier: e.target.value }))}
-                        className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] text-sm"
+                        className="w-full border border-[#A69485] bg-transparent px-4 py-3 font-display text-[#2B1620] text-sm"
                       >
                         <option value="">— Sin especificar —</option>
                         {ROSE_TIERS.map((t) => (
@@ -501,11 +501,11 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Apertura</label>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">Apertura</label>
                       <select
                         value={form.apertura}
                         onChange={(e) => setForm((p) => ({ ...p, apertura: e.target.value }))}
-                        className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] text-sm"
+                        className="w-full border border-[#A69485] bg-transparent px-4 py-3 font-display text-[#2B1620] text-sm"
                       >
                         <option value="">— Sin especificar —</option>
                         {APERTURAS.map((a) => (
@@ -515,32 +515,32 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Largo del tallo</label>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">Largo del tallo</label>
                       <input
                         type="text"
                         value={form.stemLength}
                         onChange={(e) => setForm((p) => ({ ...p, stemLength: e.target.value }))}
                         placeholder="Ej: 50-70cm"
-                        className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm"
+                        className="w-full border border-[#A69485] bg-transparent px-4 py-3 font-display text-[#2B1620] placeholder:text-[#9C7A3C]/40 text-sm"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Vida en florero (días)</label>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">Vida en florero (días)</label>
                       <input
                         type="number"
                         min={0}
                         value={form.vaseLifeDays}
                         onChange={(e) => setForm((p) => ({ ...p, vaseLifeDays: e.target.value }))}
                         placeholder="Ej: 13"
-                        className="w-full border border-[#8E9C88] bg-transparent px-4 py-3 font-display text-[#1C2A22] placeholder:text-[#8A3B57]/40 text-sm"
+                        className="w-full border border-[#A69485] bg-transparent px-4 py-3 font-display text-[#2B1620] placeholder:text-[#9C7A3C]/40 text-sm"
                       />
                     </div>
                   </div>
 
                   {/* Colores disponibles */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-2">Colores disponibles</label>
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">Colores disponibles</label>
                     <div className="flex flex-wrap items-center gap-3">
                       {form.colors.map((color, idx) => (
                         <div key={idx} className="relative">
@@ -548,7 +548,7 @@ export default function AdminDashboard() {
                             type="color"
                             value={color}
                             onChange={(e) => updateColor(idx, e.target.value)}
-                            className="w-10 h-10 border border-[#8E9C88] cursor-pointer p-0"
+                            className="w-10 h-10 border border-[#A69485] cursor-pointer p-0"
                             aria-label={`Color ${idx + 1}`}
                           />
                           <button
@@ -564,13 +564,13 @@ export default function AdminDashboard() {
                       <button
                         type="button"
                         onClick={addColor}
-                        className="w-10 h-10 border border-dashed border-[#8E9C88] text-[#8A3B57] text-lg flex items-center justify-center hover:border-[#8A3B57] transition-colors"
+                        className="w-10 h-10 border border-dashed border-[#A69485] text-[#9C7A3C] text-lg flex items-center justify-center hover:border-[#9C7A3C] transition-colors"
                         aria-label="Agregar color"
                       >
                         +
                       </button>
                     </div>
-                    <p className="text-xs text-[#5C6960] mt-2">
+                    <p className="text-xs text-[#6B5D50] mt-2">
                       Algunas variedades vienen en varios colores (ej. ranunculus, lisianthus) — agrega uno por cada opción disponible.
                     </p>
                   </div>
@@ -585,11 +585,11 @@ export default function AdminDashboard() {
                       className="flex items-center gap-3 cursor-pointer group"
                     >
                       <span
-                        className={`relative w-12 h-6 rounded-full transition-colors ${form.inStock ? 'bg-[#8A3B57]' : 'bg-[#8E9C88]'}`}
+                        className={`relative w-12 h-6 rounded-full transition-colors ${form.inStock ? 'bg-[#9C7A3C]' : 'bg-[#A69485]'}`}
                       >
                         <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.inStock ? 'left-7' : 'left-1'}`} />
                       </span>
-                      <span className="font-display text-sm text-[#1C2A22]">
+                      <span className="font-display text-sm text-[#2B1620]">
                         {form.inStock ? 'En stock' : 'Sin stock'}
                       </span>
                     </button>
@@ -602,11 +602,11 @@ export default function AdminDashboard() {
                       className="flex items-center gap-3 cursor-pointer group"
                     >
                       <span
-                        className={`relative w-12 h-6 rounded-full transition-colors ${form.archived ? 'bg-[#8A3B57]' : 'bg-[#8E9C88]'}`}
+                        className={`relative w-12 h-6 rounded-full transition-colors ${form.archived ? 'bg-[#9C7A3C]' : 'bg-[#A69485]'}`}
                       >
                         <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.archived ? 'left-7' : 'left-1'}`} />
                       </span>
-                      <span className="font-display text-sm text-[#1C2A22]">
+                      <span className="font-display text-sm text-[#2B1620]">
                         {form.archived ? 'Archivada (oculta)' : 'Visible en catálogo'}
                       </span>
                     </button>
@@ -615,7 +615,7 @@ export default function AdminDashboard() {
                   {/* Existing images */}
                   {existingImages.length > 0 && (
                     <div>
-                      <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-3">
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-3">
                         Imágenes actuales
                       </label>
                       <div className="flex flex-wrap gap-3">
@@ -637,15 +637,15 @@ export default function AdminDashboard() {
 
                   {/* New images upload */}
                   <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#5C6960] mb-3">
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-3">
                       {existingImages.length > 0 ? 'Agregar más imágenes' : 'Imágenes'}
                     </label>
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="border-2 border-dashed border-[#8E9C88] p-8 text-center cursor-pointer hover:border-[#8A3B57] transition-colors"
+                      className="border-2 border-dashed border-[#A69485] p-8 text-center cursor-pointer hover:border-[#9C7A3C] transition-colors"
                     >
-                      <p className="font-display text-[#5C6960] text-sm">Haz clic para subir imágenes</p>
-                      <p className="text-xs text-[#8A3B57] mt-1">JPG, PNG, WebP · Se optimizan automáticamente al subir</p>
+                      <p className="font-display text-[#6B5D50] text-sm">Haz clic para subir imágenes</p>
+                      <p className="text-xs text-[#9C7A3C] mt-1">JPG, PNG, WebP · Se optimizan automáticamente al subir</p>
                     </div>
                     <input
                       ref={fileInputRef}
@@ -667,7 +667,7 @@ export default function AdminDashboard() {
                             >
                               ×
                             </button>
-                            <span className="absolute bottom-1 left-1 bg-[#8A3B57] text-white text-[9px] px-1">Nueva</span>
+                            <span className="absolute bottom-1 left-1 bg-[#9C7A3C] text-white text-[9px] px-1">Nueva</span>
                           </div>
                         ))}
                       </div>
@@ -679,14 +679,14 @@ export default function AdminDashboard() {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="bg-[#1C2A22] text-[#E7E8E0] px-8 py-4 font-display tracking-widest text-sm uppercase hover:bg-[#8A3B57] transition-all duration-500 disabled:opacity-60"
+                      className="bg-[#2B1620] text-[#EDE4D8] px-8 py-4 font-display tracking-widest text-sm uppercase hover:bg-[#9C7A3C] transition-all duration-500 disabled:opacity-60"
                     >
                       {saving ? 'Guardando...' : mode === 'create' ? 'Crear flor' : 'Guardar cambios'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setMode('list')}
-                      className="font-display text-sm tracking-widest uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors"
+                      className="font-display text-sm tracking-widest uppercase text-[#6B5D50] hover:text-[#9C7A3C] transition-colors"
                     >
                       Cancelar
                     </button>
@@ -737,15 +737,15 @@ function InquiriesPanel() {
     })();
   }, []);
 
-  if (loading) return <div className="text-center py-16 font-display text-[#5C6960]">Cargando solicitudes...</div>;
+  if (loading) return <div className="text-center py-16 font-display text-[#6B5D50]">Cargando solicitudes...</div>;
 
-  if (error) return <div className="text-center py-16 font-display text-[#5C6960]">No se pudieron cargar las solicitudes. Recarga la página e intenta de nuevo.</div>;
+  if (error) return <div className="text-center py-16 font-display text-[#6B5D50]">No se pudieron cargar las solicitudes. Recarga la página e intenta de nuevo.</div>;
 
   if (inquiries.length === 0) {
     return (
       <div className="text-center py-20">
-        <p className="font-script text-4xl text-[#8A3B57] mb-4">Vacío</p>
-        <p className="text-[#5C6960] text-sm">Aún no hay solicitudes de cotización.</p>
+        <p className="font-script text-4xl text-[#9C7A3C] mb-4">Vacío</p>
+        <p className="text-[#6B5D50] text-sm">Aún no hay solicitudes de cotización.</p>
       </div>
     );
   }
@@ -753,24 +753,24 @@ function InquiriesPanel() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="font-display text-3xl text-[#1C2A22]">Solicitudes de cotización</h1>
-        <p className="text-[#5C6960] text-sm mt-1">{inquiries.length} solicitudes recibidas</p>
+        <h1 className="font-display text-3xl text-[#2B1620]">Solicitudes de cotización</h1>
+        <p className="text-[#6B5D50] text-sm mt-1">{inquiries.length} solicitudes recibidas</p>
       </div>
       <div className="space-y-4">
         {inquiries.map((inq) => (
-          <div key={inq.id} className="border border-[#DADCD1] p-6 hover:border-[#8A3B57] transition-colors">
+          <div key={inq.id} className="border border-[#DDD2C2] p-6 hover:border-[#9C7A3C] transition-colors">
             <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
               <div>
-                <h3 className="font-display text-lg text-[#1C2A22]">{inq.name}</h3>
-                <div className="flex flex-wrap gap-4 mt-1 text-sm text-[#5C6960]">
-                  <a href={`mailto:${inq.email}`} className="hover:text-[#8A3B57] transition-colors">
+                <h3 className="font-display text-lg text-[#2B1620]">{inq.name}</h3>
+                <div className="flex flex-wrap gap-4 mt-1 text-sm text-[#6B5D50]">
+                  <a href={`mailto:${inq.email}`} className="hover:text-[#9C7A3C] transition-colors">
                     {inq.email}
                   </a>
-                  {inq.phone && <a href={`tel:${inq.phone}`} className="hover:text-[#8A3B57] transition-colors">{inq.phone}</a>}
+                  {inq.phone && <a href={`tel:${inq.phone}`} className="hover:text-[#9C7A3C] transition-colors">{inq.phone}</a>}
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-[#5C6960] font-display">
+                <span className="text-xs text-[#6B5D50] font-display">
                   {inq.createdAt?.seconds
                     ? new Date(inq.createdAt.seconds * 1000).toLocaleDateString('es-SV', { day: 'numeric', month: 'long', year: 'numeric' })
                     : 'Fecha no disponible'}
@@ -780,10 +780,10 @@ function InquiriesPanel() {
 
             {inq.flowers && inq.flowers.length > 0 && (
               <div className="mb-3">
-                <p className="text-xs font-display tracking-widest uppercase text-[#5C6960] mb-2">Flores de interés:</p>
+                <p className="text-xs font-display tracking-widest uppercase text-[#6B5D50] mb-2">Flores de interés:</p>
                 <div className="flex flex-wrap gap-2">
                   {inq.flowers.map((f, i) => (
-                    <span key={i} className="bg-[#DADCD1] text-[#1C2A22] text-xs font-display px-3 py-1">
+                    <span key={i} className="bg-[#DDD2C2] text-[#2B1620] text-xs font-display px-3 py-1">
                       {f.flowerName}
                     </span>
                   ))}
@@ -792,7 +792,7 @@ function InquiriesPanel() {
             )}
 
             {inq.message && (
-              <p className="text-sm text-[#5C6960] leading-relaxed border-l-2 border-[#DADCD1] pl-4 mt-3">
+              <p className="text-sm text-[#6B5D50] leading-relaxed border-l-2 border-[#DDD2C2] pl-4 mt-3">
                 {inq.message}
               </p>
             )}

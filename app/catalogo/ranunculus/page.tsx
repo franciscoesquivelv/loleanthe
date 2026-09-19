@@ -7,10 +7,10 @@ const category = getCategoryBySlug('ranunculus')!;
 
 export const metadata: Metadata = {
   title: category.label,
-  description: `${category.blurb} Ranunculus importados, disponibles para cotización en Loleanthe Boutique.`,
+  description: `${category.blurb} Ranunculus importados, disponibles para cotización en Loleanthe.`,
   alternates: { canonical: '/catalogo/ranunculus' },
   openGraph: {
-    title: `${category.label} | Loleanthe Boutique`,
+    title: `${category.label} | Loleanthe`,
     description: category.blurb,
     url: '/catalogo/ranunculus',
   },

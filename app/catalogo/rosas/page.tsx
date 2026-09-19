@@ -7,10 +7,10 @@ const category = getCategoryBySlug('rosas')!;
 
 export const metadata: Metadata = {
   title: category.label,
-  description: `${category.blurb} Rosas premium importadas, disponibles para cotización en Loleanthe Boutique.`,
+  description: `${category.blurb} Rosas premium importadas, disponibles para cotización en Loleanthe.`,
   alternates: { canonical: '/catalogo/rosas' },
   openGraph: {
-    title: `${category.label} | Loleanthe Boutique`,
+    title: `${category.label} | Loleanthe`,
     description: category.blurb,
     url: '/catalogo/rosas',
   },

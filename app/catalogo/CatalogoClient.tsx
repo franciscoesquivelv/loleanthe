@@ -25,7 +25,7 @@ const BUCKET_SWATCH: Record<ColorBucket, string> = {
 
 const chip = (active: boolean) =>
   `font-display text-xs tracking-widest uppercase px-4 py-2 border transition-all ${
-    active ? 'bg-[#1C2A22] text-[#E7E8E0] border-[#1C2A22]' : 'border-[#8E9C88] text-[#5C6960] hover:border-[#8A3B57]'
+    active ? 'bg-[#2B1620] text-[#EDE4D8] border-[#2B1620]' : 'border-[#A69485] text-[#6B5D50] hover:border-[#9C7A3C]'
   }`;
 
 export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flower[] }) {
@@ -69,20 +69,20 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
         <div className="max-w-7xl mx-auto px-6">
           {/* Page header */}
           <div className="text-center mb-10 md:mb-16">
-            <p className="font-script text-[#8A3B57] text-2xl md:text-3xl mb-3">Explora</p>
-            <h1 className="font-display text-4xl md:text-5xl lg:text-7xl font-light text-[#1C2A22]">
-              Catálogo <em className="italic text-[#8A3B57]">Completo</em>
+            <p className="font-script text-[#9C7A3C] text-2xl md:text-3xl mb-3">Explora</p>
+            <h1 className="font-display text-4xl md:text-5xl lg:text-7xl font-light text-[#2B1620]">
+              Catálogo <em className="italic text-[#9C7A3C]">Completo</em>
             </h1>
             <div className="ornament max-w-xs mx-auto mt-5 mb-5">
-              <span className="text-[#8A3B57] text-xs tracking-[0.3em] uppercase font-display">Loleanthe Boutique</span>
+              <span className="text-[#9C7A3C] text-xs tracking-[0.3em] uppercase font-display">Loleanthe</span>
             </div>
-            <p className="text-[#5C6960] max-w-xl mx-auto text-sm leading-relaxed">
+            <p className="text-[#6B5D50] max-w-xl mx-auto text-sm leading-relaxed">
               Toda nuestra selección de flores exóticas de alta gama, disponibles para arreglos personalizados y cotizaciones exclusivas.
             </p>
           </div>
 
           {/* Stock filter & CTA bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-5 pb-5 border-b border-[#DADCD1]">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-5 pb-5 border-b border-[#DDD2C2]">
             <div className="flex gap-2">
               <button onClick={() => setFilter('all')} className={chip(filter === 'all')}>
                 Todas ({flowers.length})
@@ -94,10 +94,10 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
             {count > 0 && (
               <button
                 onClick={() => router.push('/cotizacion')}
-                className="flex items-center gap-2 bg-[#8A3B57] text-[#E7E8E0] px-6 py-2 font-display text-sm tracking-widest uppercase hover:bg-[#1C2A22] transition-all"
+                className="flex items-center gap-2 bg-[#9C7A3C] text-[#EDE4D8] px-6 py-2 font-display text-sm tracking-widest uppercase hover:bg-[#2B1620] transition-all"
               >
                 Solicitar cotización
-                <span className="bg-[#E7E8E0] text-[#8A3B57] rounded-full w-5 h-5 text-xs flex items-center justify-center font-sans font-bold">
+                <span className="bg-[#EDE4D8] text-[#9C7A3C] rounded-full w-5 h-5 text-xs flex items-center justify-center font-sans font-bold">
                   {count}
                 </span>
               </button>
@@ -105,7 +105,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
           </div>
 
           {/* Technical filters: categoría, apertura, color */}
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-8 pb-5 border-b border-[#DADCD1]">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-8 pb-5 border-b border-[#DDD2C2]">
             <div className="flex flex-wrap gap-2">
               <button onClick={() => setCategoryFilter('')} className={chip(categoryFilter === '')}>
                 Toda categoría
@@ -121,7 +121,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
               <select
                 value={aperturaFilter}
                 onChange={(e) => setAperturaFilter(e.target.value)}
-                className="border border-[#8E9C88] bg-transparent px-3 py-2 font-display text-xs tracking-widest uppercase text-[#5C6960]"
+                className="border border-[#A69485] bg-transparent px-3 py-2 font-display text-xs tracking-widest uppercase text-[#6B5D50]"
               >
                 <option value="">Apertura: todas</option>
                 {availableAperturas.map((a) => (
@@ -132,7 +132,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
 
             {availableColors.length > 0 && (
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] tracking-widest uppercase text-[#5C6960] mr-0.5">Color</span>
+                <span className="text-[10px] tracking-widest uppercase text-[#6B5D50] mr-0.5">Color</span>
                 {availableColors.map((bucket) => (
                   <button
                     key={bucket}
@@ -140,7 +140,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
                     title={bucket}
                     aria-label={`Filtrar por color ${bucket}`}
                     className={`w-6 h-6 rounded-full transition-all ${
-                      colorFilter === bucket ? 'ring-2 ring-offset-2 ring-[#8A3B57]' : 'ring-1 ring-[#DADCD1]'
+                      colorFilter === bucket ? 'ring-2 ring-offset-2 ring-[#9C7A3C]' : 'ring-1 ring-[#DDD2C2]'
                     }`}
                     style={{ backgroundColor: BUCKET_SWATCH[bucket] }}
                   />
@@ -151,7 +151,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
             {hasExtraFilters && (
               <button
                 onClick={clearExtraFilters}
-                className="font-display text-xs tracking-widest uppercase text-[#8A3B57] hover-underline"
+                className="font-display text-xs tracking-widest uppercase text-[#9C7A3C] hover-underline"
               >
                 Limpiar filtros
               </button>
@@ -161,27 +161,27 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
           {/* Grid */}
           {flowers.length === 0 ? (
             <div className="text-center py-24">
-              <p className="font-script text-4xl text-[#8A3B57] mb-4">Próximamente</p>
-              <p className="font-display text-2xl text-[#1C2A22] mb-3">El catálogo está en preparación</p>
-              <p className="text-[#5C6960] text-sm max-w-sm mx-auto mb-8">
+              <p className="font-script text-4xl text-[#9C7A3C] mb-4">Próximamente</p>
+              <p className="font-display text-2xl text-[#2B1620] mb-3">El catálogo está en preparación</p>
+              <p className="text-[#6B5D50] text-sm max-w-sm mx-auto mb-8">
                 Estamos cargando nuestra selección exclusiva. Mientras tanto, puedes contactarnos directamente.
               </p>
               <Link
                 href="/#contacto"
-                className="border border-[#8A3B57] text-[#8A3B57] px-6 py-3 font-display text-sm tracking-widest uppercase hover:bg-[#8A3B57] hover:text-white transition-all"
+                className="border border-[#9C7A3C] text-[#9C7A3C] px-6 py-3 font-display text-sm tracking-widest uppercase hover:bg-[#9C7A3C] hover:text-white transition-all"
               >
                 Contactar
               </Link>
             </div>
           ) : displayed.length === 0 ? (
             <div className="text-center py-24">
-              <p className="font-display text-2xl text-[#1C2A22] mb-3">Ninguna flor coincide con estos filtros</p>
-              <p className="text-[#5C6960] text-sm max-w-sm mx-auto mb-8">
+              <p className="font-display text-2xl text-[#2B1620] mb-3">Ninguna flor coincide con estos filtros</p>
+              <p className="text-[#6B5D50] text-sm max-w-sm mx-auto mb-8">
                 Prueba con otra combinación, o contáctanos directamente para variedades fuera del catálogo.
               </p>
               <button
                 onClick={() => { setFilter('all'); clearExtraFilters(); }}
-                className="border border-[#8A3B57] text-[#8A3B57] px-6 py-3 font-display text-sm tracking-widest uppercase hover:bg-[#8A3B57] hover:text-white transition-all"
+                className="border border-[#9C7A3C] text-[#9C7A3C] px-6 py-3 font-display text-sm tracking-widest uppercase hover:bg-[#9C7A3C] hover:text-white transition-all"
               >
                 Limpiar filtros
               </button>
@@ -202,7 +202,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
 
           {/* Back */}
           <div className="text-center mt-12 md:mt-16">
-            <Link href="/" className="font-display text-sm tracking-widest uppercase text-[#5C6960] hover:text-[#8A3B57] transition-colors hover-underline">
+            <Link href="/" className="font-display text-sm tracking-widest uppercase text-[#6B5D50] hover:text-[#9C7A3C] transition-colors hover-underline">
               ← Volver al inicio
             </Link>
           </div>
