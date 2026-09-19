@@ -27,7 +27,7 @@ export default function PreciosPage() {
             src="/logo.png"
             alt="Loleanthe Boutique"
             width={160}
-            height={64}
+            height={74}
             className="h-9 w-auto object-contain"
             style={{ width: 'auto' }}
           />
@@ -46,7 +46,7 @@ export default function PreciosPage() {
             src="/logo.png"
             alt="Loleanthe Boutique"
             width={160}
-            height={64}
+            height={74}
             className="h-10 w-auto object-contain"
             style={{ width: 'auto' }}
           />
@@ -107,11 +107,11 @@ export default function PreciosPage() {
       </div>
 
       <footer className="price-footer print:hidden bg-[#1C2A22] text-[#F7F8F4] py-14 md:py-16 px-6 text-center">
-        <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#C56E88] mb-3">¿Hacemos tu pedido?</p>
+        <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#8A3B57] mb-3">¿Hacemos tu pedido?</p>
         <p className="font-display text-2xl md:text-3xl mb-7">Escríbenos por WhatsApp</p>
         <a
           href={whatsappHref}
-          className="inline-block bg-[#8A3B57] text-[#F7F8F4] px-8 py-4 font-body font-bold tracking-wide text-sm uppercase hover:bg-[#C56E88] transition-colors"
+          className="inline-block bg-[#8A3B57] text-[#F7F8F4] px-8 py-4 font-body font-bold tracking-wide text-sm uppercase hover:bg-[#8A3B57] transition-colors"
         >
           Escribir por WhatsApp
         </a>

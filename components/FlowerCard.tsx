@@ -99,7 +99,7 @@ export default function FlowerCard({ flower, priority = false, detailHref }: Pro
             <button onClick={handleQuoteNav} className="w-full bg-[#F7F8F4] text-[#1C2A22] font-body font-bold tracking-wide text-xs uppercase py-3 hover:bg-[#8A3B57] hover:text-white transition-all duration-300">
               Solicitar Cotización
             </button>
-            <button onClick={handleQuote} className={`w-full font-body font-bold tracking-wide text-xs uppercase py-3 border transition-all duration-300 ${inQuote ? 'border-[#8A3B57] bg-[#8A3B57] text-white' : 'border-white/70 text-white hover:border-[#C56E88] hover:text-[#C56E88]'}`}>
+            <button onClick={handleQuote} className={`w-full font-body font-bold tracking-wide text-xs uppercase py-3 border transition-all duration-300 ${inQuote ? 'border-[#8A3B57] bg-[#8A3B57] text-white' : 'border-white/70 text-white hover:border-[#8A3B57] hover:text-[#8A3B57]'}`}>
               {inQuote ? '✓ En cotización' : '+ Agregar a cotización'}
             </button>
           </div>

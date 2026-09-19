@@ -97,7 +97,7 @@ export default function CTASection() {
               <label htmlFor="cta-msg" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#5C6960] mb-2">Tu mensaje</label>
               <textarea id="cta-msg" rows={4} value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} placeholder="¿Para qué ocasión? ¿Colores o estilo en mente?" className="w-full bg-[#E7E8E0] border border-transparent focus:border-[#8A3B57] px-4 py-3.5 text-sm text-[#26302A] transition-colors resize-none" />
             </div>
-            <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-[#1C2A22] text-[#F7F8F4] py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#C56E88] hover:text-[#1C2A22] transition-all duration-500 disabled:opacity-60">
+            <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-[#1C2A22] text-[#F7F8F4] py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#8A3B57] hover:text-[#1C2A22] transition-all duration-500 disabled:opacity-60">
               {loading ? 'Enviando...' : 'Enviar solicitud'}
             </button>
           </form>

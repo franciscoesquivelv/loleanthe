@@ -1,16 +1,14 @@
 import type { Metadata } from 'next';
-import localFont from 'next/font/local';
-import { DM_Sans } from 'next/font/google';
+import { Playfair_Display, DM_Sans } from 'next/font/google';
 import './globals.css';
 import { QuoteProvider } from '@/context/QuoteContext';
 import { Toaster } from 'react-hot-toast';
 
-// Títulos: Locatro (display western, self-hosted). Cuerpo: DM Sans (sans neutra).
-const display = localFont({
-  src: [
-    { path: './fonts/Locatro.woff2', weight: '400', style: 'normal' },
-    { path: './fonts/LocatroItalic.woff2', weight: '400', style: 'italic' },
-  ],
+// Títulos: Playfair Display (serif alto contraste, a tono con el logo). Cuerpo: DM Sans (sans sobria).
+const display = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
   variable: '--font-display',
   display: 'swap',
 });

@@ -33,7 +33,7 @@ export default function Header() {
   }, [menuOpen]);
 
   const linkClass = isDark
-    ? 'text-[#E7E8E0]/85 hover:text-[#C56E88]'
+    ? 'text-[#E7E8E0]/85 hover:text-[#8A3B57]'
     : 'text-[#26302A]/75 hover:text-[#8A3B57]';
   const hamburger = isDark ? 'bg-[#F7F8F4]' : 'bg-[#26302A]';
   const anchor = (hash: string) => (isHome ? hash : `/${hash}`);
@@ -48,16 +48,12 @@ export default function Header() {
         {/* Logo left */}
         <Link href="/" className="shrink-0 leading-none" aria-label="Loleanthe Boutique — inicio">
           <Image
-            src="/logo.png"
-            alt="Loleanthe Boutique"
+            src={isDark ? '/logo-wordmark-white.png' : '/logo-wordmark.png'}
+            alt="Loleanthe"
             width={200}
-            height={84}
+            height={73}
             priority
-            className={`w-auto object-contain transition-all duration-500 ${
-              isDark
-                ? 'h-11 md:h-12 [filter:brightness(0)_invert(1)_drop-shadow(0_1px_5px_rgba(0,0,0,.45))]'
-                : 'h-9 md:h-10'
-            }`}
+            className="w-auto h-8 md:h-9 object-contain transition-all duration-500"
             style={{ width: 'auto' }}
           />
         </Link>
@@ -65,11 +61,11 @@ export default function Header() {
         {/* Desktop nav right */}
         <nav className="hidden md:flex items-center gap-8">
           <Link href="/catalogo" className={`font-body font-medium text-sm tracking-wide transition-colors ${linkClass}`}>Catálogo</Link>
-          <Link href={anchor('#nosotros')} className={`font-body font-medium text-sm tracking-wide transition-colors ${linkClass}`}>La Casa</Link>
+          <Link href={anchor('#nosotros')} className={`font-body font-medium text-sm tracking-wide transition-colors ${linkClass}`}>La Diferencia</Link>
           <Link href={anchor('#contacto')} className={`font-body font-medium text-sm tracking-wide transition-colors ${linkClass}`}>Contacto</Link>
           <Link
             href="/cotizacion"
-            className="relative flex items-center gap-2 bg-[#8A3B57] text-[#F7F8F4] px-5 py-2.5 font-body font-bold text-sm tracking-wide hover:bg-[#C56E88] hover:text-[#1C2A22] transition-all duration-300"
+            className="relative flex items-center gap-2 bg-[#8A3B57] text-[#F7F8F4] px-5 py-2.5 font-body font-bold text-sm tracking-wide hover:bg-[#8A3B57] hover:text-[#1C2A22] transition-all duration-300"
           >
             Cotizar
             {count > 0 && (
@@ -107,14 +103,7 @@ export default function Header() {
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#8E9C88]/20">
           <Link href="/" onClick={() => setMenuOpen(false)}>
-            <Image
-              src="/logo.png"
-              alt="Loleanthe Boutique"
-              width={160}
-              height={68}
-              className="h-9 w-auto object-contain [filter:brightness(0)_invert(1)]"
-              style={{ width: 'auto' }}
-            />
+            <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-8 w-auto object-contain" style={{ width: 'auto' }} />
           </Link>
           <button onClick={() => setMenuOpen(false)} className="flex flex-col gap-[5px] p-2 -mr-1" aria-label="Cerrar menú">
             <span className="block w-6 h-[1.5px] bg-[#F7F8F4] rotate-45 translate-y-[6.5px]" />
@@ -126,10 +115,10 @@ export default function Header() {
         <nav className="flex flex-col flex-1 justify-center items-center gap-8 px-6">
           {[
             { href: '/catalogo', label: 'Catálogo' },
-            { href: anchor('#nosotros'), label: 'La Casa' },
+            { href: anchor('#nosotros'), label: 'La Diferencia' },
             { href: anchor('#contacto'), label: 'Contacto' },
           ].map(({ href, label }) => (
-            <Link key={label} href={href} onClick={() => setMenuOpen(false)} className="font-display font-bold text-3xl text-[#F7F8F4] hover:text-[#C56E88] transition-colors">
+            <Link key={label} href={href} onClick={() => setMenuOpen(false)} className="font-display font-bold text-3xl text-[#F7F8F4] hover:text-[#8A3B57] transition-colors">
               {label}
             </Link>
           ))}
@@ -137,7 +126,7 @@ export default function Header() {
           <Link
             href="/cotizacion"
             onClick={() => setMenuOpen(false)}
-            className="bg-[#8A3B57] text-[#F7F8F4] px-10 py-4 font-body font-bold tracking-wide text-sm hover:bg-[#C56E88] hover:text-[#1C2A22] transition-all duration-300 w-full text-center max-w-xs"
+            className="bg-[#8A3B57] text-[#F7F8F4] px-10 py-4 font-body font-bold tracking-wide text-sm hover:bg-[#8A3B57] hover:text-[#1C2A22] transition-all duration-300 w-full text-center max-w-xs"
           >
             Cotizar{count > 0 ? ` (${count})` : ''}
           </Link>
