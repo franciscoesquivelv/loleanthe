@@ -7,23 +7,16 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-8 border-b border-[#8E9C88]/20 pb-10">
           <Link href="/" aria-label="Loleanthe Boutique — inicio">
-            <Image
-              src="/logo.png"
-              alt="Loleanthe Boutique"
-              width={240}
-              height={100}
-              className="h-14 w-auto object-contain [filter:brightness(0)_invert(1)] opacity-95"
-              style={{ width: 'auto' }}
-            />
+            <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-10 w-auto object-contain opacity-95" style={{ width: 'auto' }} />
           </Link>
           <nav className="flex flex-wrap justify-center gap-6 md:gap-7">
             {[
               { href: '/catalogo', label: 'Catálogo' },
-              { href: '/#nosotros', label: 'La Casa' },
+              { href: '/#nosotros', label: 'La Diferencia' },
               { href: '/#contacto', label: 'Contacto' },
               { href: '/cotizacion', label: 'Cotizar' },
             ].map(({ href, label }) => (
-              <Link key={label} href={href} className="font-body font-medium text-sm text-[#93a08c] hover:text-[#C56E88] transition-colors">
+              <Link key={label} href={href} className="font-body font-medium text-sm text-[#93a08c] hover:text-[#8A3B57] transition-colors">
                 {label}
               </Link>
             ))}

@@ -36,7 +36,7 @@ export default function HeroSection() {
             </p>
             <Link
               href="/catalogo"
-              className="group inline-flex items-center gap-3 bg-[#8A3B57] text-[#F7F8F4] px-8 py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#C56E88] hover:text-[#1C2A22] transition-all duration-500 opacity-0 animate-fadeInUp"
+              className="group inline-flex items-center gap-3 bg-[#8A3B57] text-[#F7F8F4] px-8 py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#8A3B57] hover:text-[#1C2A22] transition-all duration-500 opacity-0 animate-fadeInUp"
               style={{ animationDelay: '.3s' }}
             >
               Ver catálogo

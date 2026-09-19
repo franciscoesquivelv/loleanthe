@@ -254,7 +254,7 @@ export default function AdminDashboard() {
       <header className="bg-[#1C2A22] border-b border-[#8A3B57]/20 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Image src="/logo.png" alt="LB" width={120} height={40} className="h-8 w-auto object-contain invert opacity-70" />
+            <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-6 w-auto object-contain opacity-70" style={{ width: 'auto' }} />
             <span className="text-[#8A3B57] text-xs tracking-widest uppercase font-display hidden sm:block">Panel de Administración</span>
           </div>
           <button

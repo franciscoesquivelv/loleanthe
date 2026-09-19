@@ -32,14 +32,8 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-10">
-          <Image
-            src="/logo.png"
-            alt="Loleanthe Boutique"
-            width={200}
-            height={70}
-            className="h-16 w-auto object-contain invert opacity-70 mx-auto mb-4"
-          />
-          <p className="font-display text-xs tracking-[0.4em] uppercase text-[#8A3B57]">Panel de Administración</p>
+          <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-12 w-auto object-contain opacity-70 mx-auto" style={{ width: 'auto' }} />
+          <p className="font-display text-xs tracking-[0.4em] uppercase text-[#8A3B57] mt-3">Panel de Administración</p>
         </div>
 
         {/* Card */}
