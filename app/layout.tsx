@@ -22,17 +22,17 @@ const body = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL('https://loleanthe.com'),
   title: {
-    default: 'Loleanthe — Flores de Lujo y Rosas Premium',
+    default: 'Loleanthe — Flor ecuatoriana para floristas y decoradores',
     template: '%s | Loleanthe',
   },
-  description: 'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración, ideales para arreglos únicos e irrepetibles.',
-  keywords: 'flores de lujo, rosas premium, flores exóticas, arreglos florales, floristería mayorista',
+  description: 'Consolidamos flor ecuatoriana de varias fincas y la importamos bajo pedido para floristas, decoradores y hoteles en Costa Rica y Guatemala.',
+  keywords: 'flor ecuatoriana, rosas de tallo largo, flores al por mayor, importador de flores Costa Rica, flores Guatemala, ranunculus',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Loleanthe — Flores de Lujo',
-    description: 'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración.',
+    title: 'Loleanthe — Flor ecuatoriana consolidada',
+    description: 'Flor ecuatoriana de varias fincas, importada bajo pedido para floristas, decoradores y hoteles en Costa Rica y Guatemala.',
     url: 'https://loleanthe.com',
     siteName: 'Loleanthe',
     type: 'website',
@@ -40,18 +40,18 @@ export const metadata: Metadata = {
     alternateLocale: ['es_GT'],
     images: [
       {
-        url: '/images/hero-roses.jpg',
+        url: '/images/hero-dark.jpg',
         width: 1200,
         height: 630,
-        alt: 'Loleanthe — Flores de lujo',
+        alt: 'Loleanthe — flor ecuatoriana',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Loleanthe — Flores de Lujo',
-    description: 'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración.',
-    images: ['/images/hero-roses.jpg'],
+    title: 'Loleanthe — Flor ecuatoriana consolidada',
+    description: 'Flor ecuatoriana de varias fincas, importada bajo pedido para floristas, decoradores y hoteles.',
+    images: ['/images/hero-dark.jpg'],
   },
   icons: {
     icon: '/favicon-black.png',
@@ -66,19 +66,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${display.variable} ${body.variable}`}>
-      <body className="grain">
+      <body>
         <QuoteProvider>
           {children}
           <Toaster
             position="bottom-center"
             toastOptions={{
               style: {
-                background: '#2B1620',
-                color: '#FBF7F0',
+                background: '#12100E',
+                color: '#FBF9F5',
                 fontFamily: 'var(--font-body), sans-serif',
                 fontSize: '14px',
                 borderRadius: '0px',
-                border: '1px solid #9C7A3C',
+                border: '1px solid #7B7369',
               },
             }}
           />

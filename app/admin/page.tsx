@@ -28,23 +28,23 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#2B1620] flex items-center justify-center px-6">
+    <div className="min-h-screen bg-[#12100E] flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-10">
           <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-12 w-auto object-contain opacity-70 mx-auto" style={{ width: 'auto' }} />
-          <p className="font-display text-xs tracking-[0.4em] uppercase text-[#9C7A3C] mt-3">Panel de Administración</p>
+          <p className="font-display text-xs tracking-[0.4em] uppercase text-[#7B7369] mt-3">Panel de Administración</p>
         </div>
 
         {/* Card */}
-        <div className="border border-[#9C7A3C]/20 p-8">
-          <h1 className="font-display text-2xl text-[#EDE4D8] font-light mb-8 text-center">
-            Iniciar <em className="italic text-[#9C7A3C]">sesión</em>
+        <div className="border border-[#7B7369]/20 p-8">
+          <h1 className="font-display text-2xl text-[#F2EFE8] font-light mb-8 text-center">
+            Iniciar <em className="italic text-[#7B7369]">sesión</em>
           </h1>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">
+              <label className="block text-xs tracking-widest uppercase font-display text-[#7B7369] mb-2">
                 Email
               </label>
               <input
@@ -53,11 +53,11 @@ export default function AdminLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@loleanthe.com"
-                className="w-full border border-[#9C7A3C]/30 bg-[#2A211C]/50 px-4 py-3 font-display text-[#EDE4D8] placeholder:text-[#6B5D50]/50 transition-colors text-sm"
+                className="w-full border border-[#7B7369]/30 bg-[#1E1A16]/50 px-4 py-3 font-display text-[#F2EFE8] placeholder:text-[#7B7369]/50 transition-colors text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs tracking-widest uppercase font-display text-[#6B5D50] mb-2">
+              <label className="block text-xs tracking-widest uppercase font-display text-[#7B7369] mb-2">
                 Contraseña
               </label>
               <input
@@ -66,20 +66,20 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full border border-[#9C7A3C]/30 bg-[#2A211C]/50 px-4 py-3 font-display text-[#EDE4D8] placeholder:text-[#6B5D50]/50 transition-colors text-sm"
+                className="w-full border border-[#7B7369]/30 bg-[#1E1A16]/50 px-4 py-3 font-display text-[#F2EFE8] placeholder:text-[#7B7369]/50 transition-colors text-sm"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#9C7A3C] text-[#EDE4D8] py-4 font-display tracking-widest text-sm uppercase hover:bg-[#A69485] hover:text-[#2B1620] transition-all duration-500 disabled:opacity-60 mt-4"
+              className="w-full bg-[#7B7369] text-[#F2EFE8] py-4 font-display tracking-widest text-sm uppercase hover:bg-[#A39C92] hover:text-[#12100E] transition-all duration-500 disabled:opacity-60 mt-4"
             >
               {loading ? 'Ingresando...' : 'Ingresar'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-[#6B5D50]/30 text-xs mt-8 font-display tracking-wider">
+        <p className="text-center text-[#7B7369]/30 text-xs mt-8 font-display tracking-wider">
           Acceso exclusivo para el equipo de Loleanthe
         </p>
       </div>
