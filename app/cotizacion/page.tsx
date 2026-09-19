@@ -74,6 +74,20 @@ export default function CotizacionPage() {
             </div>
           </div>
 
+          <div className="relative w-full aspect-[21/9] md:aspect-[3/1] mb-12 md:mb-16 overflow-hidden">
+            <Image
+              src="/images/florista-tallos.jpg"
+              alt="Preparación artesanal de los tallos antes del envío"
+              fill
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1C2A22]/60 via-transparent to-transparent" />
+            <p className="absolute bottom-4 left-4 md:bottom-6 md:left-6 font-display italic text-[#F7F8F4] text-sm md:text-lg max-w-xs md:max-w-sm leading-snug">
+              Cada tallo se revisa y prepara a mano antes de salir.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
             {/* Left: flowers selected */}
             <div className="lg:col-span-2">
