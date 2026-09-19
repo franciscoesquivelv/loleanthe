@@ -41,12 +41,12 @@ export default function BenefitsSection() {
         <div
           className={`transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         >
-          <div className="relative aspect-[4/5] max-w-xs sm:max-w-sm mx-auto lg:mx-0 bg-[#F7F8F4] border border-[#8E9C88]/25">
+          <div className="relative aspect-[4/5] max-w-xs sm:max-w-sm mx-auto lg:mx-0 overflow-hidden">
             <Image
               src="/images/flor-portada.jpg"
               alt="Rosa Loleanthe de tallo largo"
               fill
-              className="object-contain p-6"
+              className="object-cover scale-125"
               sizes="(max-width: 1024px) 320px, 360px"
             />
           </div>

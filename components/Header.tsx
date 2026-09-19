@@ -53,7 +53,7 @@ export default function Header() {
             width={200}
             height={73}
             priority
-            className="w-auto h-8 md:h-9 object-contain transition-all duration-500"
+            className="w-auto h-11 md:h-14 object-contain transition-all duration-500"
             style={{ width: 'auto' }}
           />
         </Link>
@@ -103,7 +103,7 @@ export default function Header() {
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#8E9C88]/20">
           <Link href="/" onClick={() => setMenuOpen(false)}>
-            <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-8 w-auto object-contain" style={{ width: 'auto' }} />
+            <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-11 w-auto object-contain" style={{ width: 'auto' }} />
           </Link>
           <button onClick={() => setMenuOpen(false)} className="flex flex-col gap-[5px] p-2 -mr-1" aria-label="Cerrar menú">
             <span className="block w-6 h-[1.5px] bg-[#F7F8F4] rotate-45 translate-y-[6.5px]" />
