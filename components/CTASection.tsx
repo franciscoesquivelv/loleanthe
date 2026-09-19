@@ -46,21 +46,21 @@ export default function CTASection() {
   };
 
   return (
-    <section id="contacto" ref={sectionRef} className="bg-[#8A3B57] text-[#F7F8F4] py-24 md:py-32 px-5 md:px-6">
+    <section id="contacto" ref={sectionRef} className="bg-[#9C7A3C] text-[#FBF7F0] py-24 md:py-32 px-5 md:px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
         {/* Left — heading */}
         <div className={`transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#e8c9d4] mb-4">Contacto exclusivo</p>
+          <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#E8D4A8] mb-4">Contacto exclusivo</p>
           <h2 className="font-display font-extrabold text-[clamp(40px,5.2vw,74px)] leading-[0.95] mb-5">Solicita tu cotización</h2>
-          <p className="text-[#f1d9df] text-base leading-relaxed max-w-md">
+          <p className="text-[#F1E3C4] text-base leading-relaxed max-w-md">
             Cuéntanos sobre tu ocasión y las flores que te interesan. Te respondemos con una cotización personalizada, hecha a tu medida.
           </p>
           {count > 0 && (
             <div className="mt-8">
-              <p className="font-body font-bold text-[10px] tracking-[0.2em] uppercase text-[#e8c9d4] mb-3">En tu cotización</p>
+              <p className="font-body font-bold text-[10px] tracking-[0.2em] uppercase text-[#E8D4A8] mb-3">En tu cotización</p>
               <div className="flex flex-wrap gap-2">
                 {items.map((item) => (
-                  <Link key={item.flowerId} href="/cotizacion" className="border border-[#F7F8F4]/40 text-[#F7F8F4] px-3 py-1.5 text-xs font-body tracking-wide hover:bg-[#F7F8F4] hover:text-[#8A3B57] transition-all">
+                  <Link key={item.flowerId} href="/cotizacion" className="border border-[#FBF7F0]/40 text-[#FBF7F0] px-3 py-1.5 text-xs font-body tracking-wide hover:bg-[#FBF7F0] hover:text-[#9C7A3C] transition-all">
                     {item.flowerName}
                   </Link>
                 ))}
@@ -71,33 +71,33 @@ export default function CTASection() {
 
         {/* Right — form */}
         {sent ? (
-          <div className="bg-[#F7F8F4] text-[#26302A] p-10 text-center">
-            <p className="font-display font-extrabold text-3xl text-[#8A3B57] mb-3">Mensaje recibido</p>
-            <p className="text-[#5C6960] text-sm leading-relaxed">
+          <div className="bg-[#FBF7F0] text-[#2A211C] p-10 text-center">
+            <p className="font-display font-extrabold text-3xl text-[#9C7A3C] mb-3">Mensaje recibido</p>
+            <p className="text-[#6B5D50] text-sm leading-relaxed">
               Gracias por contactarnos. Te responderemos en las próximas 24 horas con tu cotización personalizada.
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className={`bg-[#F7F8F4] p-8 md:p-9 transition-all duration-1000 delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <form onSubmit={handleSubmit} className={`bg-[#FBF7F0] p-8 md:p-9 transition-all duration-1000 delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="mb-[18px]">
-                <label htmlFor="cta-name" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#5C6960] mb-2">Nombre *</label>
-                <input id="cta-name" type="text" required value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="Tu nombre" className="w-full bg-[#E7E8E0] border border-transparent focus:border-[#8A3B57] px-4 py-3.5 text-sm text-[#26302A] transition-colors" />
+                <label htmlFor="cta-name" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#6B5D50] mb-2">Nombre *</label>
+                <input id="cta-name" type="text" required value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="Tu nombre" className="w-full bg-[#EDE4D8] border border-transparent focus:border-[#9C7A3C] px-4 py-3.5 text-sm text-[#2A211C] transition-colors" />
               </div>
               <div className="mb-[18px]">
-                <label htmlFor="cta-email" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#5C6960] mb-2">Email *</label>
-                <input id="cta-email" type="email" required value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="tu@correo.com" className="w-full bg-[#E7E8E0] border border-transparent focus:border-[#8A3B57] px-4 py-3.5 text-sm text-[#26302A] transition-colors" />
+                <label htmlFor="cta-email" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#6B5D50] mb-2">Email *</label>
+                <input id="cta-email" type="email" required value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="tu@correo.com" className="w-full bg-[#EDE4D8] border border-transparent focus:border-[#9C7A3C] px-4 py-3.5 text-sm text-[#2A211C] transition-colors" />
               </div>
             </div>
             <div className="mb-[18px]">
-              <label htmlFor="cta-phone" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#5C6960] mb-2">WhatsApp / Teléfono</label>
-              <input id="cta-phone" type="tel" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} placeholder="+506 0000 0000" className="w-full bg-[#E7E8E0] border border-transparent focus:border-[#8A3B57] px-4 py-3.5 text-sm text-[#26302A] transition-colors" />
+              <label htmlFor="cta-phone" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#6B5D50] mb-2">WhatsApp / Teléfono</label>
+              <input id="cta-phone" type="tel" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} placeholder="+506 0000 0000" className="w-full bg-[#EDE4D8] border border-transparent focus:border-[#9C7A3C] px-4 py-3.5 text-sm text-[#2A211C] transition-colors" />
             </div>
             <div className="mb-5">
-              <label htmlFor="cta-msg" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#5C6960] mb-2">Tu mensaje</label>
-              <textarea id="cta-msg" rows={4} value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} placeholder="¿Para qué ocasión? ¿Colores o estilo en mente?" className="w-full bg-[#E7E8E0] border border-transparent focus:border-[#8A3B57] px-4 py-3.5 text-sm text-[#26302A] transition-colors resize-none" />
+              <label htmlFor="cta-msg" className="block font-body font-bold text-[11px] tracking-[0.12em] uppercase text-[#6B5D50] mb-2">Tu mensaje</label>
+              <textarea id="cta-msg" rows={4} value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} placeholder="¿Para qué ocasión? ¿Colores o estilo en mente?" className="w-full bg-[#EDE4D8] border border-transparent focus:border-[#9C7A3C] px-4 py-3.5 text-sm text-[#2A211C] transition-colors resize-none" />
             </div>
-            <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-[#1C2A22] text-[#F7F8F4] py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#8A3B57] hover:text-[#1C2A22] transition-all duration-500 disabled:opacity-60">
+            <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-[#2B1620] text-[#FBF7F0] py-4 font-body font-bold text-sm tracking-wide uppercase hover:bg-[#9C7A3C] hover:text-[#2B1620] transition-all duration-500 disabled:opacity-60">
               {loading ? 'Enviando...' : 'Enviar solicitud'}
             </button>
           </form>

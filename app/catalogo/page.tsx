@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     'Explora nuestra selección completa de flores exóticas de alta gama: rosas, ranúnculos y variedades exclusivas para arreglos personalizados e irrepetibles.',
   alternates: { canonical: '/catalogo' },
   openGraph: {
-    title: 'Catálogo de Flores Premium | Loleanthe Boutique',
+    title: 'Catálogo de Flores Premium | Loleanthe',
     description:
       'Toda nuestra selección de flores exóticas de alta gama, disponibles para arreglos personalizados y cotizaciones exclusivas.',
     url: '/catalogo',

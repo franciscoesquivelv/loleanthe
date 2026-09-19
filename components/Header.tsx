@@ -33,20 +33,20 @@ export default function Header() {
   }, [menuOpen]);
 
   const linkClass = isDark
-    ? 'text-[#E7E8E0]/85 hover:text-[#8A3B57]'
-    : 'text-[#26302A]/75 hover:text-[#8A3B57]';
-  const hamburger = isDark ? 'bg-[#F7F8F4]' : 'bg-[#26302A]';
+    ? 'text-[#EDE4D8]/85 hover:text-[#9C7A3C]'
+    : 'text-[#2A211C]/75 hover:text-[#9C7A3C]';
+  const hamburger = isDark ? 'bg-[#FBF7F0]' : 'bg-[#2A211C]';
   const anchor = (hash: string) => (isHome ? hash : `/${hash}`);
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        atTop ? 'bg-transparent py-5 md:py-6' : 'bg-[#F4F4EF]/95 backdrop-blur-md border-b border-[#8E9C88]/25 py-3'
+        atTop ? 'bg-transparent py-5 md:py-6' : 'bg-[#F7F1E8]/95 backdrop-blur-md border-b border-[#A69485]/25 py-3'
       }`}
     >
       <div className="max-w-7xl mx-auto px-5 md:px-6 flex items-center justify-between">
         {/* Logo left */}
-        <Link href="/" className="shrink-0 leading-none" aria-label="Loleanthe Boutique — inicio">
+        <Link href="/" className="shrink-0 leading-none" aria-label="Loleanthe — inicio">
           <Image
             src={isDark ? '/logo-wordmark-white.png' : '/logo-wordmark.png'}
             alt="Loleanthe"
@@ -65,11 +65,11 @@ export default function Header() {
           <Link href={anchor('#contacto')} className={`font-body font-medium text-sm tracking-wide transition-colors ${linkClass}`}>Contacto</Link>
           <Link
             href="/cotizacion"
-            className="relative flex items-center gap-2 bg-[#8A3B57] text-[#F7F8F4] px-5 py-2.5 font-body font-bold text-sm tracking-wide hover:bg-[#8A3B57] hover:text-[#1C2A22] transition-all duration-300"
+            className="relative flex items-center gap-2 bg-[#9C7A3C] text-[#FBF7F0] px-5 py-2.5 font-body font-bold text-sm tracking-wide hover:bg-[#9C7A3C] hover:text-[#2B1620] transition-all duration-300"
           >
             Cotizar
             {count > 0 && (
-              <span className="bg-[#F7F8F4] text-[#8A3B57] text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{count}</span>
+              <span className="bg-[#FBF7F0] text-[#9C7A3C] text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{count}</span>
             )}
           </Link>
         </nav>
@@ -77,9 +77,9 @@ export default function Header() {
         {/* Mobile: cotizar + hamburger */}
         <div className="md:hidden flex items-center gap-3">
           {count > 0 && (
-            <Link href="/cotizacion" className="relative flex items-center bg-[#8A3B57] text-[#F7F8F4] font-body font-bold text-xs tracking-wide py-2 px-3">
+            <Link href="/cotizacion" className="relative flex items-center bg-[#9C7A3C] text-[#FBF7F0] font-body font-bold text-xs tracking-wide py-2 px-3">
               Cotizar
-              <span className="absolute -top-1.5 -right-1.5 bg-[#F7F8F4] text-[#8A3B57] text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{count}</span>
+              <span className="absolute -top-1.5 -right-1.5 bg-[#FBF7F0] text-[#9C7A3C] text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{count}</span>
             </Link>
           )}
           <button
@@ -97,18 +97,18 @@ export default function Header() {
 
       {/* Mobile menu — full-screen pine overlay */}
       <div
-        className={`md:hidden fixed inset-0 top-0 bg-[#1C2A22] z-40 flex flex-col transition-all duration-300 ${
+        className={`md:hidden fixed inset-0 top-0 bg-[#2B1620] z-40 flex flex-col transition-all duration-300 ${
           menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#8E9C88]/20">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#A69485]/20">
           <Link href="/" onClick={() => setMenuOpen(false)}>
             <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-11 w-auto object-contain" style={{ width: 'auto' }} />
           </Link>
           <button onClick={() => setMenuOpen(false)} className="flex flex-col gap-[5px] p-2 -mr-1" aria-label="Cerrar menú">
-            <span className="block w-6 h-[1.5px] bg-[#F7F8F4] rotate-45 translate-y-[6.5px]" />
-            <span className="block w-6 h-[1.5px] bg-[#F7F8F4] opacity-0" />
-            <span className="block w-6 h-[1.5px] bg-[#F7F8F4] -rotate-45 -translate-y-[6.5px]" />
+            <span className="block w-6 h-[1.5px] bg-[#FBF7F0] rotate-45 translate-y-[6.5px]" />
+            <span className="block w-6 h-[1.5px] bg-[#FBF7F0] opacity-0" />
+            <span className="block w-6 h-[1.5px] bg-[#FBF7F0] -rotate-45 -translate-y-[6.5px]" />
           </button>
         </div>
 
@@ -118,15 +118,15 @@ export default function Header() {
             { href: anchor('#nosotros'), label: 'La Diferencia' },
             { href: anchor('#contacto'), label: 'Contacto' },
           ].map(({ href, label }) => (
-            <Link key={label} href={href} onClick={() => setMenuOpen(false)} className="font-display font-bold text-3xl text-[#F7F8F4] hover:text-[#8A3B57] transition-colors">
+            <Link key={label} href={href} onClick={() => setMenuOpen(false)} className="font-display font-bold text-3xl text-[#FBF7F0] hover:text-[#9C7A3C] transition-colors">
               {label}
             </Link>
           ))}
-          <div className="w-16 h-px bg-[#8E9C88]/40 my-2" />
+          <div className="w-16 h-px bg-[#A69485]/40 my-2" />
           <Link
             href="/cotizacion"
             onClick={() => setMenuOpen(false)}
-            className="bg-[#8A3B57] text-[#F7F8F4] px-10 py-4 font-body font-bold tracking-wide text-sm hover:bg-[#8A3B57] hover:text-[#1C2A22] transition-all duration-300 w-full text-center max-w-xs"
+            className="bg-[#9C7A3C] text-[#FBF7F0] px-10 py-4 font-body font-bold tracking-wide text-sm hover:bg-[#9C7A3C] hover:text-[#2B1620] transition-all duration-300 w-full text-center max-w-xs"
           >
             Cotizar{count > 0 ? ` (${count})` : ''}
           </Link>
