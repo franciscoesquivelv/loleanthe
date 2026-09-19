@@ -1,41 +1,38 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FlowerCard from '@/components/FlowerCard';
+import { MaskLines, Reveal } from '@/components/motion';
 import type { Flower } from '@/lib/types';
 import { APERTURAS } from '@/lib/types';
 import { CATEGORIES } from '@/lib/categories';
 import { bucketsForColors, type ColorBucket } from '@/lib/colors';
-import Link from 'next/link';
-import { useQuote } from '@/context/QuoteContext';
-import { useRouter } from 'next/navigation';
 
 const BUCKET_SWATCH: Record<ColorBucket, string> = {
-  Rojo: '#C62828',
-  Rosa: '#EC407A',
-  Naranja: '#FB8C00',
-  Amarillo: '#FDD835',
-  Verde: '#7CB342',
-  Azul: '#3F51B5',
-  Morado: '#8E24AA',
-  Blanco: '#F5F5F0',
+  Rojo: '#B33A3A',
+  Rosa: '#D4708C',
+  Naranja: '#D98842',
+  Amarillo: '#D9B441',
+  Verde: '#7E9464',
+  Azul: '#5B6E9C',
+  Morado: '#8A6A9E',
+  Blanco: '#EFEBE3',
 };
 
 const chip = (active: boolean) =>
-  `font-display text-xs tracking-widest uppercase px-4 py-2 border transition-all ${
-    active ? 'bg-[#2B1620] text-[#EDE4D8] border-[#2B1620]' : 'border-[#A69485] text-[#6B5D50] hover:border-[#9C7A3C]'
+  `label border-b pb-1 transition-colors duration-300 ${
+    active ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'
   }`;
 
 export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flower[] }) {
   const flowers = initialFlowers;
-  const [filter, setFilter] = useState<'all' | 'inStock'>('all');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [aperturaFilter, setAperturaFilter] = useState('');
-  const [colorFilter, setColorFilter] = useState<ColorBucket | ''>('');
-  const { count } = useQuote();
-  const router = useRouter();
+  const [stock, setStock] = useState<'all' | 'inStock'>('all');
+  const [category, setCategory] = useState('');
+  const [apertura, setApertura] = useState('');
+  const [color, setColor] = useState<ColorBucket | ''>('');
 
   const availableAperturas = useMemo(
     () => APERTURAS.filter((a) => flowers.some((f) => f.apertura === a)),
@@ -47,165 +44,130 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
     return Array.from(present);
   }, [flowers]);
 
-  const hasExtraFilters = categoryFilter !== '' || aperturaFilter !== '' || colorFilter !== '';
-  const clearExtraFilters = () => {
-    setCategoryFilter('');
-    setAperturaFilter('');
-    setColorFilter('');
+  const hasFilters = stock !== 'all' || category !== '' || apertura !== '' || color !== '';
+  const clearAll = () => {
+    setStock('all');
+    setCategory('');
+    setApertura('');
+    setColor('');
   };
 
   const displayed = flowers.filter((f) => {
-    if (filter === 'inStock' && !f.inStock) return false;
-    if (categoryFilter && (f.category ?? '').toLowerCase() !== categoryFilter.toLowerCase()) return false;
-    if (aperturaFilter && f.apertura !== aperturaFilter) return false;
-    if (colorFilter && !bucketsForColors(f.colors).includes(colorFilter)) return false;
+    if (stock === 'inStock' && !f.inStock) return false;
+    if (category && (f.category ?? '').toLowerCase() !== category.toLowerCase()) return false;
+    if (apertura && f.apertura !== apertura) return false;
+    if (color && !bucketsForColors(f.colors).includes(color)) return false;
     return true;
   });
 
   return (
     <>
       <Header />
-      <main className="pt-24 md:pt-32 pb-16 md:pb-24 min-h-screen">
-        <div className="max-w-7xl mx-auto px-6">
-          {/* Page header */}
-          <div className="text-center mb-10 md:mb-16">
-            <p className="font-script text-[#9C7A3C] text-2xl md:text-3xl mb-3">Explora</p>
-            <h1 className="font-display text-4xl md:text-5xl lg:text-7xl font-light text-[#2B1620]">
-              Catálogo <em className="italic text-[#9C7A3C]">Completo</em>
-            </h1>
-            <div className="ornament max-w-xs mx-auto mt-5 mb-5">
-              <span className="text-[#9C7A3C] text-xs tracking-[0.3em] uppercase font-display">Loleanthe</span>
-            </div>
-            <p className="text-[#6B5D50] max-w-xl mx-auto text-sm leading-relaxed">
-              Toda nuestra selección de flores exóticas de alta gama, disponibles para arreglos personalizados y cotizaciones exclusivas.
-            </p>
+      <main className="min-h-screen bg-bone px-6 pb-24 pt-36 md:px-10 md:pb-40 md:pt-44">
+        <div className="mx-auto max-w-[1500px]">
+          <div className="mb-14 md:mb-20">
+            <Reveal>
+              <p className="label mb-6 text-muted">
+                {flowers.length} variedades · Costa Rica y Guatemala
+              </p>
+            </Reveal>
+            <MaskLines
+              lines={['Catálogo']}
+              className="font-serif text-ink"
+              lineClassName="text-[clamp(44px,7vw,104px)] font-light leading-[1] tracking-[-0.02em]"
+            />
+            <Reveal delay={200}>
+              <p className="mt-8 max-w-lg text-[15px] leading-relaxed text-muted">
+                Lo que normalmente manejamos. Agrega lo que te interese y pide cotización —
+                si buscas algo que no está aquí, también lo conseguimos.
+              </p>
+            </Reveal>
           </div>
 
-          {/* Stock filter & CTA bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-5 pb-5 border-b border-[#DDD2C2]">
-            <div className="flex gap-2">
-              <button onClick={() => setFilter('all')} className={chip(filter === 'all')}>
-                Todas ({flowers.length})
-              </button>
-              <button onClick={() => setFilter('inStock')} className={chip(filter === 'inStock')}>
-                Disponibles ({flowers.filter((f) => f.inStock).length})
-              </button>
-            </div>
-            {count > 0 && (
-              <button
-                onClick={() => router.push('/cotizacion')}
-                className="flex items-center gap-2 bg-[#9C7A3C] text-[#EDE4D8] px-6 py-2 font-display text-sm tracking-widest uppercase hover:bg-[#2B1620] transition-all"
-              >
-                Solicitar cotización
-                <span className="bg-[#EDE4D8] text-[#9C7A3C] rounded-full w-5 h-5 text-xs flex items-center justify-center font-sans font-bold">
-                  {count}
-                </span>
-              </button>
-            )}
-          </div>
-
-          {/* Technical filters: categoría, apertura, color */}
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-8 pb-5 border-b border-[#DDD2C2]">
-            <div className="flex flex-wrap gap-2">
-              <button onClick={() => setCategoryFilter('')} className={chip(categoryFilter === '')}>
-                Toda categoría
-              </button>
-              {CATEGORIES.map((c) => (
-                <button key={c.slug} onClick={() => setCategoryFilter(c.label)} className={chip(categoryFilter === c.label)}>
-                  {c.label}
+          {/* Filtros */}
+          <Reveal delay={120}>
+            <div className="flex flex-col gap-6 border-y border-line py-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+                <button onClick={() => setStock(stock === 'inStock' ? 'all' : 'inStock')} className={chip(stock === 'inStock')}>
+                  Solo disponibles
                 </button>
-              ))}
-            </div>
 
-            {availableAperturas.length > 0 && (
-              <select
-                value={aperturaFilter}
-                onChange={(e) => setAperturaFilter(e.target.value)}
-                className="border border-[#A69485] bg-transparent px-3 py-2 font-display text-xs tracking-widest uppercase text-[#6B5D50]"
-              >
-                <option value="">Apertura: todas</option>
-                {availableAperturas.map((a) => (
-                  <option key={a} value={a}>{a}</option>
-                ))}
-              </select>
-            )}
+                <span className="h-4 w-px bg-line" aria-hidden />
 
-            {availableColors.length > 0 && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] tracking-widest uppercase text-[#6B5D50] mr-0.5">Color</span>
-                {availableColors.map((bucket) => (
-                  <button
-                    key={bucket}
-                    onClick={() => setColorFilter((prev) => (prev === bucket ? '' : bucket))}
-                    title={bucket}
-                    aria-label={`Filtrar por color ${bucket}`}
-                    className={`w-6 h-6 rounded-full transition-all ${
-                      colorFilter === bucket ? 'ring-2 ring-offset-2 ring-[#9C7A3C]' : 'ring-1 ring-[#DDD2C2]'
-                    }`}
-                    style={{ backgroundColor: BUCKET_SWATCH[bucket] }}
-                  />
+                <button onClick={() => setCategory('')} className={chip(category === '')}>
+                  Todas
+                </button>
+                {CATEGORIES.map((c) => (
+                  <button key={c.slug} onClick={() => setCategory(c.label)} className={chip(category === c.label)}>
+                    {c.label}
+                  </button>
                 ))}
               </div>
-            )}
 
-            {hasExtraFilters && (
-              <button
-                onClick={clearExtraFilters}
-                className="font-display text-xs tracking-widest uppercase text-[#9C7A3C] hover-underline"
-              >
-                Limpiar filtros
-              </button>
-            )}
-          </div>
+              <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+                {availableAperturas.length > 0 && (
+                  <select
+                    value={apertura}
+                    onChange={(e) => setApertura(e.target.value)}
+                    className="label border-b border-line bg-transparent pb-1 text-muted focus:border-ink focus:text-ink"
+                  >
+                    <option value="">Apertura</option>
+                    {availableAperturas.map((a) => (
+                      <option key={a} value={a}>{a}</option>
+                    ))}
+                  </select>
+                )}
 
-          {/* Grid */}
+                {availableColors.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    {availableColors.map((bucket) => (
+                      <button
+                        key={bucket}
+                        onClick={() => setColor((prev) => (prev === bucket ? '' : bucket))}
+                        title={bucket}
+                        aria-label={`Filtrar por ${bucket}`}
+                        className={`h-4 w-4 rounded-full transition-all duration-300 ${
+                          color === bucket ? 'ring-1 ring-ink ring-offset-4 ring-offset-bone' : 'opacity-70 hover:opacity-100'
+                        }`}
+                        style={{ backgroundColor: BUCKET_SWATCH[bucket] }}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {hasFilters && (
+                  <button onClick={clearAll} className="label text-muted underline underline-offset-4 hover:text-ink">
+                    Limpiar
+                  </button>
+                )}
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Rejilla */}
           {flowers.length === 0 ? (
-            <div className="text-center py-24">
-              <p className="font-script text-4xl text-[#9C7A3C] mb-4">Próximamente</p>
-              <p className="font-display text-2xl text-[#2B1620] mb-3">El catálogo está en preparación</p>
-              <p className="text-[#6B5D50] text-sm max-w-sm mx-auto mb-8">
-                Estamos cargando nuestra selección exclusiva. Mientras tanto, puedes contactarnos directamente.
-              </p>
-              <Link
-                href="/#contacto"
-                className="border border-[#9C7A3C] text-[#9C7A3C] px-6 py-3 font-display text-sm tracking-widest uppercase hover:bg-[#9C7A3C] hover:text-white transition-all"
-              >
+            <div className="py-32 text-center">
+              <p className="font-serif text-3xl font-light text-ink">El catálogo está en preparación</p>
+              <Link href="/cotizacion" className="label mt-8 inline-block border-b border-ink pb-1 text-ink">
                 Contactar
               </Link>
             </div>
           ) : displayed.length === 0 ? (
-            <div className="text-center py-24">
-              <p className="font-display text-2xl text-[#2B1620] mb-3">Ninguna flor coincide con estos filtros</p>
-              <p className="text-[#6B5D50] text-sm max-w-sm mx-auto mb-8">
-                Prueba con otra combinación, o contáctanos directamente para variedades fuera del catálogo.
-              </p>
-              <button
-                onClick={() => { setFilter('all'); clearExtraFilters(); }}
-                className="border border-[#9C7A3C] text-[#9C7A3C] px-6 py-3 font-display text-sm tracking-widest uppercase hover:bg-[#9C7A3C] hover:text-white transition-all"
-              >
+            <div className="py-32 text-center">
+              <p className="font-serif text-3xl font-light text-ink">Nada coincide con estos filtros</p>
+              <button onClick={clearAll} className="label mt-8 border-b border-ink pb-1 text-ink">
                 Limpiar filtros
               </button>
             </div>
           ) : (
-            <div className="catalog-grid">
+            <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {displayed.map((flower, i) => (
-                <div
-                  key={flower.id}
-                  className="opacity-0 translate-y-4"
-                  style={{ animation: `fadeInUp 0.6s ease ${i * 60}ms forwards` }}
-                >
+                <Reveal key={flower.id} delay={(i % 4) * 70} y={32}>
                   <FlowerCard flower={flower} priority={i < 4} detailHref={`/catalogo/${flower.id}`} />
-                </div>
+                </Reveal>
               ))}
             </div>
           )}
-
-          {/* Back */}
-          <div className="text-center mt-12 md:mt-16">
-            <Link href="/" className="font-display text-sm tracking-widest uppercase text-[#6B5D50] hover:text-[#9C7A3C] transition-colors hover-underline">
-              ← Volver al inicio
-            </Link>
-          </div>
         </div>
       </main>
       <Footer />

@@ -1,102 +1,92 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FlowerCard from '@/components/FlowerCard';
+import { MaskLines, Reveal } from '@/components/motion';
 import type { Flower } from '@/lib/types';
 import type { Category } from '@/lib/categories';
-import Link from 'next/link';
-import { useQuote } from '@/context/QuoteContext';
-import { useRouter } from 'next/navigation';
 
 export default function CategoryClient({ category, initialFlowers }: { category: Category; initialFlowers: Flower[] }) {
   const flowers = initialFlowers;
-  const [filter, setFilter] = useState<'all' | 'inStock'>('all');
-  const { count } = useQuote();
-  const router = useRouter();
+  const [onlyStock, setOnlyStock] = useState(false);
 
-  const displayed = filter === 'inStock' ? flowers.filter((f) => f.inStock) : flowers;
+  const displayed = onlyStock ? flowers.filter((f) => f.inStock) : flowers;
+  const available = flowers.filter((f) => f.inStock).length;
 
   return (
     <>
       <Header />
-      <main className="pt-24 md:pt-32 pb-16 md:pb-24 min-h-screen">
-        <div className="max-w-7xl mx-auto px-5 md:px-6">
-          {/* Breadcrumb */}
-          <nav className="mb-6 md:mb-8 text-xs font-display tracking-widest uppercase text-[#6B5D50]">
-            <Link href="/catalogo" className="hover:text-[#9C7A3C] transition-colors">Catálogo</Link>
-            <span className="mx-2">/</span>
-            <span className="text-[#2B1620]">{category.label}</span>
+      <main className="min-h-screen bg-bone px-6 pb-24 pt-32 md:px-10 md:pb-40 md:pt-40">
+        <div className="mx-auto max-w-[1500px]">
+          <nav className="label mb-12 flex flex-wrap items-center gap-3 text-muted md:mb-16">
+            <Link href="/catalogo" className="transition-opacity hover:opacity-60">Catálogo</Link>
+            <span aria-hidden>/</span>
+            <span className="text-ink">{category.label}</span>
           </nav>
 
-          {/* Page header */}
-          <div className="text-center mb-10 md:mb-16">
-            <h1 className="font-display text-4xl md:text-5xl lg:text-7xl text-[#2B1620]">{category.label}</h1>
-            <p className="text-[#6B5D50] max-w-xl mx-auto text-sm leading-relaxed mt-4">{category.blurb}</p>
+          <div className="mb-14 md:mb-20">
+            <Reveal>
+              <p className="label mb-6 text-muted">
+                {flowers.length} {flowers.length === 1 ? 'variedad' : 'variedades'}
+              </p>
+            </Reveal>
+            <MaskLines
+              lines={[category.label]}
+              className="font-serif text-ink"
+              lineClassName="text-[clamp(44px,7vw,104px)] font-light leading-[1] tracking-[-0.02em]"
+            />
+            <Reveal delay={200}>
+              <p className="mt-8 max-w-lg text-[15px] leading-relaxed text-muted">{category.blurb}</p>
+            </Reveal>
           </div>
 
-          {/* Filters & CTA bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-8 border-b border-[#DDD2C2] pb-5">
-            <div className="flex gap-2">
+          <Reveal delay={120}>
+            <div className="flex items-center gap-8 border-y border-line py-6">
               <button
-                onClick={() => setFilter('all')}
-                className={`font-display text-xs tracking-widest uppercase px-4 py-2 border transition-all ${filter === 'all' ? 'bg-[#2B1620] text-[#EDE4D8] border-[#2B1620]' : 'border-[#A69485] text-[#6B5D50] hover:border-[#9C7A3C]'}`}
+                onClick={() => setOnlyStock(false)}
+                className={`label border-b pb-1 transition-colors duration-300 ${
+                  !onlyStock ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'
+                }`}
               >
                 Todas ({flowers.length})
               </button>
               <button
-                onClick={() => setFilter('inStock')}
-                className={`font-display text-xs tracking-widest uppercase px-4 py-2 border transition-all ${filter === 'inStock' ? 'bg-[#2B1620] text-[#EDE4D8] border-[#2B1620]' : 'border-[#A69485] text-[#6B5D50] hover:border-[#9C7A3C]'}`}
+                onClick={() => setOnlyStock(true)}
+                className={`label border-b pb-1 transition-colors duration-300 ${
+                  onlyStock ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'
+                }`}
               >
-                Disponibles ({flowers.filter((f) => f.inStock).length})
+                Disponibles ({available})
               </button>
             </div>
-            {count > 0 && (
-              <button
-                onClick={() => router.push('/cotizacion')}
-                className="flex items-center gap-2 bg-[#9C7A3C] text-[#EDE4D8] px-6 py-2 font-display text-sm tracking-widest uppercase hover:bg-[#2B1620] transition-all"
-              >
-                Solicitar cotización
-                <span className="bg-[#EDE4D8] text-[#9C7A3C] rounded-full w-5 h-5 text-xs flex items-center justify-center font-body font-bold">
-                  {count}
-                </span>
-              </button>
-            )}
-          </div>
+          </Reveal>
 
-          {/* Grid */}
           {displayed.length === 0 ? (
-            <div className="text-center py-24">
-              <p className="font-display text-2xl text-[#2B1620] mb-3">Próximamente</p>
-              <p className="text-[#6B5D50] text-sm max-w-sm mx-auto mb-8">
-                Estamos cargando la selección de {category.label.toLowerCase()}. Mientras tanto, puedes contactarnos directamente.
+            <div className="py-32 text-center">
+              <p className="font-serif text-3xl font-light text-ink">
+                Estamos cargando {category.label.toLowerCase()}
               </p>
-              <Link
-                href="/#contacto"
-                className="border border-[#9C7A3C] text-[#9C7A3C] px-6 py-3 font-display text-sm tracking-widest uppercase hover:bg-[#9C7A3C] hover:text-white transition-all"
-              >
-                Contactar
+              <Link href="/cotizacion" className="label mt-8 inline-block border-b border-ink pb-1 text-ink">
+                Pedir por encargo
               </Link>
             </div>
           ) : (
-            <div className="catalog-grid">
+            <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {displayed.map((flower, i) => (
-                <div
-                  key={flower.id}
-                  className="opacity-0 translate-y-4"
-                  style={{ animation: `fadeInUp 0.6s ease ${i * 60}ms forwards` }}
-                >
+                <Reveal key={flower.id} delay={(i % 4) * 70} y={32}>
                   <FlowerCard flower={flower} priority={i < 4} detailHref={`/catalogo/${flower.id}`} />
-                </div>
+                </Reveal>
               ))}
             </div>
           )}
 
-          {/* Back */}
-          <div className="text-center mt-12 md:mt-16">
-            <Link href="/catalogo" className="font-display text-sm tracking-widest uppercase text-[#6B5D50] hover:text-[#9C7A3C] transition-colors hover-underline">
-              ← Ver todas las categorías
+          <div className="mt-20 border-t border-line pt-10">
+            <Link href="/catalogo" className="label group inline-flex items-center gap-4 text-ink">
+              <span className="h-px w-10 bg-ink transition-all duration-500 group-hover:w-16" />
+              Ver todo el catálogo
             </Link>
           </div>
         </div>

@@ -1,8 +1,9 @@
 import Header from '@/components/Header';
-import HeroSection from '@/components/HeroSection';
-import CatalogPreview from '@/components/CatalogPreview';
-import BenefitsSection from '@/components/BenefitsSection';
-import CTASection from '@/components/CTASection';
+import Hero from '@/components/Hero';
+import Collection from '@/components/Collection';
+import Atmosphere from '@/components/Atmosphere';
+import Origen from '@/components/Origen';
+import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import { getPublicFlowersServer } from '@/lib/flowers-server';
 
@@ -14,9 +15,9 @@ const organizationJsonLd = {
   '@type': 'Organization',
   name: 'Loleanthe',
   description:
-    'Flores exóticas de alta gama. Rosas y flores premium con tallos largos y larga duración, ideales para arreglos únicos e irrepetibles.',
+    'Consolidamos flor ecuatoriana de varias fincas y la importamos bajo pedido para floristas, decoradores y hoteles en Costa Rica y Guatemala.',
   url: 'https://loleanthe.com',
-  image: 'https://loleanthe.com/images/hero-roses.jpg',
+  image: 'https://loleanthe.com/images/hero-dark.jpg',
   areaServed: [
     { '@type': 'Country', name: 'Costa Rica' },
     { '@type': 'Country', name: 'Guatemala' },
@@ -33,10 +34,11 @@ export default async function Home() {
       />
       <Header />
       <main>
-        <HeroSection />
-        <CatalogPreview initialFlowers={flowers} />
-        <BenefitsSection />
-        <CTASection />
+        <Hero />
+        <Collection initialFlowers={flowers} />
+        <Atmosphere />
+        <Origen />
+        <Contact />
       </main>
       <Footer />
     </>
