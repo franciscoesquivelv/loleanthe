@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 
 const features = [
   {
@@ -36,24 +37,40 @@ export default function BenefitsSection() {
 
   return (
     <section id="nosotros" ref={sectionRef} className="bg-[#1C2A22] text-[#F7F8F4] py-24 md:py-32 px-5 md:px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className={`mb-14 md:mb-16 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#8A3B57] mb-4">La diferencia</p>
-          <h2 className="font-display font-extrabold text-[clamp(38px,5.5vw,74px)] leading-[0.95]">Por qué Loleanthe</h2>
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-12 lg:gap-20 items-start">
+        <div
+          className={`transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        >
+          <div className="relative aspect-[4/5] max-w-xs sm:max-w-sm mx-auto lg:mx-0 bg-[#F7F8F4] border border-[#8E9C88]/25">
+            <Image
+              src="/images/flor-portada.jpg"
+              alt="Rosa Loleanthe de tallo largo"
+              fill
+              className="object-contain p-6"
+              sizes="(max-width: 1024px) 320px, 360px"
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-16">
-          {features.map((f, i) => (
-            <div
-              key={f.title}
-              className={`py-10 border-t border-[#8E9C88]/25 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-              style={{ transitionDelay: `${150 + i * 110}ms` }}
-            >
-              <div className="w-8 h-[2px] bg-[#8A3B57] mb-5" />
-              <h3 className="font-display font-bold text-2xl md:text-[26px] mb-3">{f.title}</h3>
-              <p className="text-[#a9b4aa] text-[15px] leading-relaxed max-w-[46ch]">{f.desc}</p>
-            </div>
-          ))}
+        <div>
+          <div className={`mb-14 md:mb-16 transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#8A3B57] mb-4">La diferencia</p>
+            <h2 className="font-display font-extrabold text-[clamp(38px,5.5vw,74px)] leading-[0.95]">Por qué Loleanthe</h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-16">
+            {features.map((f, i) => (
+              <div
+                key={f.title}
+                className={`py-10 border-t border-[#8E9C88]/25 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                style={{ transitionDelay: `${150 + i * 110}ms` }}
+              >
+                <div className="w-8 h-[2px] bg-[#8A3B57] mb-5" />
+                <h3 className="font-display font-bold text-2xl md:text-[26px] mb-3">{f.title}</h3>
+                <p className="text-[#a9b4aa] text-[15px] leading-relaxed max-w-[46ch]">{f.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
