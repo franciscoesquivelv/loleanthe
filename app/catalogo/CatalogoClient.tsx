@@ -6,8 +6,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FlowerCard from '@/components/FlowerCard';
 import { MaskLines, Reveal } from '@/components/motion';
-import type { Flower } from '@/lib/types';
-import { APERTURAS } from '@/lib/types';
+import { APERTURAS, COUNTRIES, isAvailableIn, type CountryCode, type Flower } from '@/lib/types';
 import { CATEGORIES } from '@/lib/categories';
 import { bucketsForColors, type ColorBucket } from '@/lib/colors';
 
@@ -33,6 +32,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
   const [category, setCategory] = useState('');
   const [apertura, setApertura] = useState('');
   const [color, setColor] = useState<ColorBucket | ''>('');
+  const [pais, setPais] = useState<CountryCode | ''>('');
 
   const availableAperturas = useMemo(
     () => APERTURAS.filter((a) => flowers.some((f) => f.apertura === a)),
@@ -44,12 +44,14 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
     return Array.from(present);
   }, [flowers]);
 
-  const hasFilters = stock !== 'all' || category !== '' || apertura !== '' || color !== '';
+  const hasFilters =
+    stock !== 'all' || category !== '' || apertura !== '' || color !== '' || pais !== '';
   const clearAll = () => {
     setStock('all');
     setCategory('');
     setApertura('');
     setColor('');
+    setPais('');
   };
 
   const displayed = flowers.filter((f) => {
@@ -57,6 +59,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
     if (category && (f.category ?? '').toLowerCase() !== category.toLowerCase()) return false;
     if (apertura && f.apertura !== apertura) return false;
     if (color && !bucketsForColors(f.colors).includes(color)) return false;
+    if (pais && !isAvailableIn(f, pais)) return false;
     return true;
   });
 
@@ -105,6 +108,18 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
               </div>
 
               <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+                <select
+                  value={pais}
+                  onChange={(e) => setPais(e.target.value as CountryCode | '')}
+                  className="label border-b border-line bg-transparent pb-1 text-muted focus:border-ink focus:text-ink"
+                  aria-label="Filtrar por país"
+                >
+                  <option value="">País</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>{c.label}</option>
+                  ))}
+                </select>
+
                 {availableAperturas.length > 0 && (
                   <select
                     value={apertura}

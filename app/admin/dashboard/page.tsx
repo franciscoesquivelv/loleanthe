@@ -17,8 +17,7 @@ import {
 } from '@/lib/flowers';
 import { compressImage } from '@/lib/image-compress';
 import Image from 'next/image';
-import type { Flower } from '@/lib/types';
-import { APERTURAS, ROSE_TIERS } from '@/lib/types';
+import { APERTURAS, COUNTRIES, ROSE_TIERS, type CountryCode, type Flower } from '@/lib/types';
 import { CATEGORIES } from '@/lib/categories';
 import toast from 'react-hot-toast';
 
@@ -34,8 +33,10 @@ const emptyForm = {
   tier: '',
   apertura: '',
   stemLength: '',
+  headSize: '',
   vaseLifeDays: '',
   colors: [] as string[],
+  availableIn: [] as CountryCode[],
 };
 
 export default function AdminDashboard() {
@@ -105,8 +106,10 @@ export default function AdminDashboard() {
       tier: flower.tier || '',
       apertura: flower.apertura || '',
       stemLength: flower.stemLength || '',
+      headSize: flower.headSize || '',
       vaseLifeDays: flower.vaseLifeDays?.toString() || '',
       colors: flower.colors || [],
+      availableIn: flower.availableIn || [],
     });
     setExistingImages([...flower.images]);
     setImageFiles([]);
@@ -178,8 +181,12 @@ export default function AdminDashboard() {
         ...(form.tier && { tier: form.tier as Flower['tier'] }),
         ...(form.apertura && { apertura: form.apertura as Flower['apertura'] }),
         ...(form.stemLength && { stemLength: form.stemLength }),
+        ...(form.headSize && { headSize: form.headSize }),
         ...(form.vaseLifeDays && { vaseLifeDays: Number(form.vaseLifeDays) }),
         ...(form.colors.length > 0 && { colors: form.colors }),
+        // Este va siempre, incluso vacío: `updateDoc` hace merge, así que si se
+        // omitiera, desmarcar las dos casillas no borraría el valor anterior.
+        availableIn: form.availableIn,
       };
       if (mode === 'create') {
         await createFlower(
@@ -526,6 +533,17 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#7B7369] mb-2">Tamaño de cabeza</label>
+                      <input
+                        type="text"
+                        value={form.headSize}
+                        onChange={(e) => setForm((p) => ({ ...p, headSize: e.target.value }))}
+                        placeholder="Ej: 5.5 cm"
+                        className="w-full border border-[#A39C92] bg-transparent px-4 py-3 font-display text-[#12100E] placeholder:text-[#7B7369]/40 text-sm"
+                      />
+                    </div>
+
+                    <div>
                       <label className="block text-xs tracking-widest uppercase font-display text-[#7B7369] mb-2">Vida en florero (días)</label>
                       <input
                         type="number"
@@ -572,6 +590,35 @@ export default function AdminDashboard() {
                     </div>
                     <p className="text-xs text-[#7B7369] mt-2">
                       Algunas variedades vienen en varios colores (ej. ranunculus, lisianthus). Agrega uno por cada opción disponible.
+                    </p>
+                  </div>
+
+                  {/* Dónde está esta flor */}
+                  <div>
+                    <label className="block text-xs tracking-widest uppercase font-display text-[#7B7369] mb-2">Dónde está esta flor</label>
+                    <div className="flex flex-wrap items-center gap-6">
+                      {COUNTRIES.map((country) => (
+                        <label key={country.code} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={form.availableIn.includes(country.code)}
+                            onChange={(e) =>
+                              setForm((p) => ({
+                                ...p,
+                                availableIn: e.target.checked
+                                  ? [...p.availableIn, country.code]
+                                  : p.availableIn.filter((c) => c !== country.code),
+                              }))
+                            }
+                            className="w-4 h-4 accent-[#7B7369]"
+                          />
+                          <span className="font-display text-sm text-[#12100E]">{country.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-xs text-[#7B7369] mt-2">
+                      Marca los países donde llega esta variedad. Si no marcas ninguno, la flor
+                      aparece en los dos mercados y la ficha no muestra el dato.
                     </p>
                   </div>
 

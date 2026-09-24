@@ -10,7 +10,7 @@ import FlowerCard from '@/components/FlowerCard';
 import { MaskLines, Reveal } from '@/components/motion';
 import { useQuote } from '@/context/QuoteContext';
 import toast from 'react-hot-toast';
-import { toQuoteItem, type Flower } from '@/lib/types';
+import { countryLabels, toQuoteItem, type Flower } from '@/lib/types';
 import { getCategoryByLabel } from '@/lib/categories';
 
 export default function FlowerDetailClient({ flower, related = [] }: { flower: Flower; related?: Flower[] }) {
@@ -37,11 +37,17 @@ export default function FlowerDetailClient({ flower, related = [] }: { flower: F
     router.push('/cotizacion');
   };
 
+  // Vacío cuando la flor todavía no está marcada, así la ficha no afirma una
+  // disponibilidad que nadie confirmó.
+  const paises = countryLabels(flower);
+
   const specs = [
     flower.tier && { label: 'Grado', value: flower.tier },
     flower.apertura && { label: 'Apertura', value: flower.apertura },
     flower.stemLength && { label: 'Largo de tallo', value: flower.stemLength },
+    flower.headSize && { label: 'Tamaño de cabeza', value: flower.headSize },
     flower.vaseLifeDays != null && { label: 'Vida en florero', value: `${flower.vaseLifeDays} días` },
+    paises.length > 0 && { label: 'Disponible en', value: paises.join(', ') },
   ].filter(Boolean) as { label: string; value: string }[];
 
   return (

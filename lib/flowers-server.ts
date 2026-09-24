@@ -1,4 +1,4 @@
-import type { Flower } from './types';
+import { COUNTRIES, type CountryCode, type Flower } from './types';
 
 // Lectura pública del catálogo desde el SERVIDOR (Server Components), vía la API
 // REST de Firestore. La lectura de `flowers` es pública en las Security Rules,
@@ -38,6 +38,11 @@ function strArray(v?: FsValue): string[] {
 function parseFlowerDoc(doc: FsDoc): Flower {
   const f = doc.fields ?? {};
   const colors = strArray(f.colors);
+  // Se filtra contra los códigos conocidos para que un valor viejo o mal
+  // escrito en Firestore no se cuele hasta la interfaz.
+  const availableIn = strArray(f.availableIn).filter((c): c is CountryCode =>
+    COUNTRIES.some((country) => country.code === c)
+  );
   return {
     id: doc.name.split('/').pop() ?? '',
     name: str(f.name),
@@ -51,8 +56,10 @@ function parseFlowerDoc(doc: FsDoc): Flower {
     tier: f.tier?.stringValue as Flower['tier'],
     apertura: f.apertura?.stringValue as Flower['apertura'],
     stemLength: f.stemLength?.stringValue,
+    headSize: f.headSize?.stringValue,
     vaseLifeDays: int(f.vaseLifeDays),
     colors: colors.length > 0 ? colors : undefined,
+    availableIn: availableIn.length > 0 ? availableIn : undefined,
   };
 }
 
