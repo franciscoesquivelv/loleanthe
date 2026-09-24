@@ -8,16 +8,28 @@ import FlowerCard from './FlowerCard';
 import { Reveal } from './motion';
 
 export default function Collection({ initialFlowers }: { initialFlowers: Flower[] }) {
-  // Dos variedades disponibles por categoría: muestra el surtido real sin
-  // convertir la portada en un catálogo completo.
+  // Muestra el surtido real sin convertir la portada en un catálogo completo.
+  // Se reparte por rondas, una de cada categoría antes de repetir, y se corta
+  // en 6 para que la rejilla de 3 columnas siempre quede en filas completas.
   const featured = useMemo(() => {
+    const byCategory = CATEGORIES.map((category) =>
+      initialFlowers.filter(
+        (f) => f.inStock && (f.category ?? '').toLowerCase() === category.label.toLowerCase()
+      )
+    );
+
     const picks: Flower[] = [];
-    for (const category of CATEGORIES) {
-      picks.push(
-        ...initialFlowers
-          .filter((f) => f.inStock && (f.category ?? '').toLowerCase() === category.label.toLowerCase())
-          .slice(0, 2)
-      );
+    for (let round = 0; picks.length < 6; round++) {
+      let addedThisRound = false;
+      for (const candidates of byCategory) {
+        if (picks.length >= 6) break;
+        const pick = candidates[round];
+        if (pick) {
+          picks.push(pick);
+          addedThisRound = true;
+        }
+      }
+      if (!addedThisRound) break;
     }
     return picks;
   }, [initialFlowers]);

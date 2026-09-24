@@ -20,7 +20,7 @@ export const WHATSAPP_DISPLAY = '8847-2038';
 
 export const PRICE_ITEMS: PriceItem[] = [
   { slug: 'rosa', name: 'Rosa', size: '50 cm', stemsPerBunch: 25, price: 1.0, image: '/images-dia-de-la-madre/rosa.jpg', categorySlug: 'rosas' },
-  { slug: 'rosa-garden', name: 'Rosa Garden', size: '50 cm', stemsPerBunch: 25, price: 3.18, image: '/images-dia-de-la-madre/rosa-garden.jpg', catalogName: "White O'hara" },
+  { slug: 'rosa-garden', name: 'Rosa Garden', size: '50 cm', stemsPerBunch: 25, price: 3.18, image: '/images-dia-de-la-madre/rosa-garden.jpg', catalogName: "White O'hara", categorySlug: 'rosas-garden' },
   { slug: 'ranunculus', name: 'Ranunculus', size: '35 cm', stemsPerBunch: 10, price: 3.19, image: '/images-dia-de-la-madre/ranunculus.jpg', categorySlug: 'ranunculus' },
   { slug: 'crisantemo', name: 'Crisantemo', size: '70 cm', stemsPerBunch: 10, price: 2.05, image: '/images-dia-de-la-madre/crisantemo.jpg' },
   { slug: 'delphinium', name: 'Delphinium', size: '80 cm', stemsPerBunch: 10, price: 1.8, image: '/images-dia-de-la-madre/delphinium.jpg', catalogName: 'Delphinium Sea Waltz' },
