@@ -9,7 +9,7 @@ import { getPublicFlowersServer } from '@/lib/flowers-server';
 
 // Datos estructurados para Google + motores de IA (GEO/AEO).
 // Organization (no LocalBusiness/Florist): mayorista B2B sin tienda física,
-// sirve a Costa Rica y Guatemala — no aplica el schema de negocio local.
+// sirve a Costa Rica y Guatemala, no aplica el schema de negocio local.
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',

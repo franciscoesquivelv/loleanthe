@@ -25,7 +25,7 @@ export default function Atmosphere() {
       <div className="relative flex h-full items-center px-6 md:px-10">
         <div className="mx-auto w-full max-w-[1500px]">
           <MaskLines
-            lines={['Dos o tres semanas', 'entre la finca', 'y tu mesa de trabajo.']}
+            lines={['No tenemos bodega.', 'Cada pedido se consolida', 'y llega en dos o tres semanas.']}
             stagger={120}
             className="font-serif text-bone"
             lineClassName="max-w-4xl text-[clamp(28px,4.6vw,62px)] font-light leading-[1.12] tracking-[-0.015em]"

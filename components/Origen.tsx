@@ -21,7 +21,7 @@ const ROWS = [
   {
     label: 'Selección',
     title: 'Lo que otros no traen',
-    desc: 'Colores, texturas y variedades fuera del surtido habitual del mercado local — y pedidos específicos de lo que no está en catálogo.',
+    desc: 'Colores, texturas y variedades fuera del surtido habitual del mercado local, y pedidos específicos de lo que no está en catálogo.',
   },
 ];
 

@@ -129,7 +129,7 @@ export default function FlowerDetailClient({ flower, related = [] }: { flower: F
                 </Reveal>
               )}
 
-              {/* Ficha técnica — lo que un florista usa para cotizarle a su cliente */}
+              {/* Ficha técnica, lo que un florista usa para cotizarle a su cliente */}
               {specs.length > 0 && (
                 <Reveal delay={260}>
                   <dl className="mt-14 border-t border-line">

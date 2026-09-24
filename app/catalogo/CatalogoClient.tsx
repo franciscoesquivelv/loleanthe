@@ -78,8 +78,8 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
             />
             <Reveal delay={200}>
               <p className="mt-8 max-w-lg text-[15px] leading-relaxed text-muted">
-                Lo que normalmente manejamos. Agrega lo que te interese y pide cotización —
-                si buscas algo que no está aquí, también lo conseguimos.
+                Lo que normalmente manejamos. Agrega lo que te interese y pide cotización.
+                Si buscas algo que no está aquí, también lo conseguimos.
               </p>
             </Reveal>
           </div>

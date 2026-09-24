@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 const LINKS = [
   { href: '/catalogo', label: 'Catálogo' },
+  { href: '/precios', label: 'Precios' },
   { href: '/#origen', label: 'Origen' },
   { href: '/cotizacion', label: 'Cotizar' },
 ];
@@ -12,7 +13,7 @@ export default function Footer() {
     <footer className="bg-ink px-6 pb-12 text-bone md:px-10">
       <div className="mx-auto max-w-[1500px] border-t border-bone/15 pt-12">
         <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
-          <Link href="/" aria-label="Loleanthe — inicio">
+          <Link href="/" aria-label="Loleanthe, inicio">
             <Image
               src="/logo-wordmark-white.png"
               alt="Loleanthe"

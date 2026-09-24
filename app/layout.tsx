@@ -22,7 +22,7 @@ const body = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL('https://loleanthe.com'),
   title: {
-    default: 'Loleanthe — Flor ecuatoriana para floristas y decoradores',
+    default: 'Loleanthe · Flor ecuatoriana para floristas y decoradores',
     template: '%s | Loleanthe',
   },
   description: 'Consolidamos flor ecuatoriana de varias fincas y la importamos bajo pedido para floristas, decoradores y hoteles en Costa Rica y Guatemala.',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Loleanthe — Flor ecuatoriana consolidada',
+    title: 'Loleanthe · Flor ecuatoriana consolidada',
     description: 'Flor ecuatoriana de varias fincas, importada bajo pedido para floristas, decoradores y hoteles en Costa Rica y Guatemala.',
     url: 'https://loleanthe.com',
     siteName: 'Loleanthe',
@@ -43,19 +43,15 @@ export const metadata: Metadata = {
         url: '/images/hero-dark.jpg',
         width: 1200,
         height: 630,
-        alt: 'Loleanthe — flor ecuatoriana',
+        alt: 'Loleanthe, flor ecuatoriana',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Loleanthe — Flor ecuatoriana consolidada',
+    title: 'Loleanthe · Flor ecuatoriana consolidada',
     description: 'Flor ecuatoriana de varias fincas, importada bajo pedido para floristas, decoradores y hoteles.',
     images: ['/images/hero-dark.jpg'],
-  },
-  icons: {
-    icon: '/favicon-black.png',
-    apple: '/favicon-black.png',
   },
 };
 

@@ -119,7 +119,7 @@ export default function AdminDashboard() {
     if (files.length === 0) return;
 
     // Downscale + re-encode client-side first, then enforce the size limit on
-    // the result — so a large photo straight off a phone still goes through.
+    // the result, so a large photo straight off a phone still goes through.
     const compressed = await Promise.all(files.map(compressImage));
 
     const error = validateImageFiles(compressed);
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
     }
     setSaving(true);
     try {
-      // Firestore rechaza `undefined` explícito — solo se incluyen los atributos con valor.
+      // Firestore rechaza `undefined` explícito, solo se incluyen los atributos con valor.
       const attributes = {
         ...(form.tier && { tier: form.tier as Flower['tier'] }),
         ...(form.apertura && { apertura: form.apertura as Flower['apertura'] }),
@@ -493,7 +493,7 @@ export default function AdminDashboard() {
                         onChange={(e) => setForm((p) => ({ ...p, tier: e.target.value }))}
                         className="w-full border border-[#A39C92] bg-transparent px-4 py-3 font-display text-[#12100E] text-sm"
                       >
-                        <option value="">— Sin especificar —</option>
+                        <option value="">Sin especificar</option>
                         {ROSE_TIERS.map((t) => (
                           <option key={t} value={t}>{t}</option>
                         ))}
@@ -507,7 +507,7 @@ export default function AdminDashboard() {
                         onChange={(e) => setForm((p) => ({ ...p, apertura: e.target.value }))}
                         className="w-full border border-[#A39C92] bg-transparent px-4 py-3 font-display text-[#12100E] text-sm"
                       >
-                        <option value="">— Sin especificar —</option>
+                        <option value="">Sin especificar</option>
                         {APERTURAS.map((a) => (
                           <option key={a} value={a}>{a}</option>
                         ))}
@@ -571,7 +571,7 @@ export default function AdminDashboard() {
                       </button>
                     </div>
                     <p className="text-xs text-[#7B7369] mt-2">
-                      Algunas variedades vienen en varios colores (ej. ranunculus, lisianthus) — agrega uno por cada opción disponible.
+                      Algunas variedades vienen en varios colores (ej. ranunculus, lisianthus). Agrega uno por cada opción disponible.
                     </p>
                   </div>
 
