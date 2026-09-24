@@ -55,8 +55,23 @@ export async function getStorageInfo(): Promise<{ usedBytes: number; limitBytes:
 
 // ── Validation ──────────────────────────────────────────────────────────────
 
+/**
+ * Tipos que acepta la regla de Storage. Tienen que coincidir EXACTAMENTE con
+ * `storage.rules`: si no, el archivo pasa la validación del navegador y lo
+ * rechaza el servidor, que es mucho más difícil de diagnosticar.
+ */
+export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
 export function validateImageFiles(files: File[]): string | null {
   for (const file of files) {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      // El caso típico: fotos de iPhone en HEIC. Chrome no las decodifica, así
+      // que el compresor tampoco puede convertirlas y hay que avisar acá.
+      const esHeic = /heic|heif/i.test(file.type) || /\.(heic|heif)$/i.test(file.name);
+      return esHeic
+        ? `"${file.name}" está en HEIC, el formato del iPhone, y no se puede subir. En Fotos, exportala como JPG (Archivo → Exportar → JPEG) o mandátela por WhatsApp, que la convierte sola.`
+        : `"${file.name}" es de tipo ${file.type || 'desconocido'}. Solo se aceptan JPG, PNG, WebP y GIF.`;
+    }
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
       return `"${file.name}" supera el límite de ${MAX_IMAGE_SIZE_MB} MB. Por favor optimiza la imagen antes de subirla.`;
     }

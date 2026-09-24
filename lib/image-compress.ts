@@ -1,11 +1,18 @@
+import { ALLOWED_IMAGE_TYPES } from './flowers';
+
 const MAX_DIMENSION = 1600;
 const JPEG_QUALITY = 0.85;
 
-// Downscales + re-encodes an uploaded photo client-side before it ever reaches
-// Storage. Falls back to the original file on anything unexpected (SVGs, a
-// decode failure, or a "compressed" result that isn't actually smaller).
+// Reduce y recodifica la foto en el navegador antes de que llegue a Storage.
+// Ante cualquier imprevisto (SVG, fallo al decodificar) devuelve el original.
 export async function compressImage(file: File): Promise<File> {
   if (!file.type.startsWith('image/') || file.type === 'image/svg+xml') return file;
+
+  // Un formato que la regla de Storage no acepta HAY que convertirlo, aunque el
+  // JPEG salga más pesado: subir el original garantiza un rechazo del servidor.
+  // Si el navegador tampoco puede decodificarlo (HEIC del iPhone), se devuelve
+  // igual y lo frena `validateImageFiles` con un mensaje claro.
+  const hayQueConvertir = !ALLOWED_IMAGE_TYPES.includes(file.type);
 
   try {
     const bitmap = await createImageBitmap(file);
@@ -24,7 +31,8 @@ export async function compressImage(file: File): Promise<File> {
     const blob: Blob | null = await new Promise((resolve) =>
       canvas.toBlob(resolve, 'image/jpeg', JPEG_QUALITY)
     );
-    if (!blob || blob.size >= file.size) return file;
+    if (!blob) return file;
+    if (!hayQueConvertir && blob.size >= file.size) return file;
 
     return new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
   } catch {
