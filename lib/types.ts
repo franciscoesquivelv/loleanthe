@@ -14,11 +14,11 @@ export interface Flower {
   createdAt: string;
   updatedAt: string;
   category?: string;
-  tier?: RoseTier; // solo aplica a Rosas — grado del catálogo impreso
+  tier?: RoseTier; // solo aplica a Rosas, grado del catálogo impreso
   apertura?: Apertura; // escala de apertura de la flor (todas las categorías)
   stemLength?: string; // rango en cm, ej. "50-70cm"
   vaseLifeDays?: number; // vida en florero, en días
-  colors?: string[]; // uno o más colores (hex) — varias variedades vienen en múltiples colores
+  colors?: string[]; // uno o más colores (hex), varias variedades vienen en múltiples colores
 }
 
 export interface QuoteItem {

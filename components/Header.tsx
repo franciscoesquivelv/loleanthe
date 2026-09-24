@@ -8,6 +8,7 @@ import { useQuote } from '@/context/QuoteContext';
 
 const NAV = [
   { href: '/catalogo', label: 'Catálogo' },
+  { href: '/precios', label: 'Precios' },
   { href: '/#origen', label: 'Origen' },
   { href: '/#contacto', label: 'Contacto' },
 ];
@@ -50,7 +51,7 @@ export default function Header() {
         }`}
       >
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 md:px-10">
-          <Link href="/" aria-label="Loleanthe — inicio" className="shrink-0 leading-none">
+          <Link href="/" aria-label="Loleanthe, inicio" className="shrink-0 leading-none">
             <Image
               src={overHero ? '/logo-wordmark-white.png' : '/logo-wordmark.png'}
               alt="Loleanthe"
@@ -62,7 +63,7 @@ export default function Header() {
             />
           </Link>
 
-          <nav className="hidden items-center gap-12 md:flex">
+          <nav className="hidden items-center gap-10 md:flex">
             {NAV.map(({ href, label }) => (
               <Link
                 key={label}

@@ -23,7 +23,7 @@ export async function generateMetadata({
   }
   const description =
     flower.description ||
-    `${flower.name} — flor premium de Loleanthe, disponible para cotización.`;
+    `${flower.name}: flor premium de Loleanthe, disponible para cotización.`;
   return {
     title: flower.name,
     description,

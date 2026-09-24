@@ -45,27 +45,13 @@ input, textarea, select {
   outline: none;
 }
 
-/* Etiqueta pequeña en versalitas — el único "adorno" tipográfico del sistema */
+/* Etiqueta pequeña en versalitas, el único "adorno" tipográfico del sistema */
 .label {
   font-family: var(--font-body), sans-serif;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-}
-
-/* Divisor heredado (lo usa /precios) */
-.ornament {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.ornament::before,
-.ornament::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(to right, transparent, #DED8CD, transparent);
 }
 
 /* ── Profundidad ──────────────────────────────────────────────────────────
@@ -85,10 +71,14 @@ input, textarea, select {
   transform: none;
 }
 
-/* Revelado enmascarado: la línea sube desde detrás de su propio borde */
+/* Revelado enmascarado: la línea sube desde detrás de su propio borde.
+   El padding/margin negativo da aire a los descendentes (g, y, q, p) para que
+   el recorte de la máscara no se los coma, sin alterar el espaciado real. */
 .mask-line {
   display: block;
   overflow: hidden;
+  padding-bottom: 0.24em;
+  margin-bottom: -0.24em;
 }
 .mask-line > span {
   display: block;
@@ -145,24 +135,53 @@ input, textarea, select {
 }
 
 @media print {
-  .price-ornament { display: none !important; }
   .price-card,
   .price-footer {
     break-inside: avoid;
     page-break-inside: avoid;
   }
-  /* Chrome fragmenta mal un CSS Grid entre páginas impresas — flexbox sí parte
+  /* Chrome fragmenta mal un CSS Grid entre páginas impresas, flexbox sí parte
      limpio, así que la impresión usa eso en lugar de la rejilla de pantalla. */
   .price-grid {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+    justify-content: flex-start;
+    gap: 9px;
   }
+  /* 3 por fila: con 9 variedades salen 3 filas exactas, sin la tarjeta huérfana
+     que dejaba la rejilla de 4. El margen holgado evita que el redondeo de
+     Chrome provoque un salto de línea antes de tiempo. */
   .price-reveal {
-    width: calc(25% - 12px);
+    width: calc(33.333% - 6px);
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
   }
+
+  /* El tamaño impreso vive aquí y no en utilidades `print:` sueltas, para que
+     la altura total de la hoja sea verificable de un solo lugar. */
+  .price-head { padding: 0 0 8px; }
+  .price-title { font-size: 29px; line-height: 1; }
+  .price-head .label { margin-bottom: 5px; font-size: 7.5px; }
+  .price-note { display: block; margin-top: 5px; font-size: 8.5px; }
+
+  /* Foto apaisada al imprimir: a 3 por fila la tarjeta es mucho más ancha, así
+     que la proporción tiene que achatarse para que la fila mida lo mismo que
+     antes. Con 4:3 o con un cuadrado, las tres filas se iban a una segunda hoja. */
+  .price-photo { aspect-ratio: 7 / 5; }
+
+  .price-body { padding: 7px 10px 8px; }
+  /* Altura mínima para el nombre: si una tarjeta parte el nombre en dos
+     líneas, los precios de toda la fila siguen alineados. */
+  .price-name { font-size: 15px; line-height: 1.15; min-height: 1.2em; }
+  .price-meta {
+    margin-top: 4px;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
+  .price-split { margin-top: 6px; padding-top: 6px; }
+  .price-bunch { font-size: 20px; white-space: nowrap; }
+  .price-bunch .label { margin-left: 4px; font-size: 7px; letter-spacing: 0.1em; }
+  .price-stem { margin-top: 3px; font-size: 9px; }
 }

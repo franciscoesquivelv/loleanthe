@@ -1,122 +1,169 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { getPublicFlowersServer } from '@/lib/flowers-server';
 import { PRICE_ITEMS, SHIPMENT_TITLE, WHATSAPP_DISPLAY, WHATSAPP_NUMBER } from './data';
+import DownloadButton from './DownloadButton';
 
 export const metadata: Metadata = {
-  title: `Precios — ${SHIPMENT_TITLE}`,
-  description: `Lista de precios por tallo (USD) de la selección exclusiva de Loleanthe para ${SHIPMENT_TITLE}.`,
+  title: `Precios · ${SHIPMENT_TITLE}`,
+  description: `Precios por bunch y por tallo (USD) de la flor ecuatoriana que traemos en la temporada. Rosas en bunch de 25 tallos, el resto de 10.`,
   alternates: { canonical: '/precios' },
   openGraph: {
-    title: `Precios — ${SHIPMENT_TITLE} | Loleanthe`,
-    description: 'Lista de precios por tallo (USD) — selección exclusiva de Loleanthe.',
+    title: `Precios · ${SHIPMENT_TITLE} | Loleanthe`,
+    description: 'Precios por bunch y por tallo (USD) de la temporada.',
     url: '/precios',
+    images: [{ url: '/images/hero-dark.jpg', width: 1200, height: 630, alt: 'Loleanthe, flor ecuatoriana' }],
   },
 };
 
-export default function PreciosPage() {
+export default async function PreciosPage() {
+  const flowers = await getPublicFlowersServer();
+
+  // Enlace a la ficha de la variedad cuando existe en el catálogo; si no, a su
+  // categoría. Las que no están cargadas (crisantemo, larkspur, limonium) se
+  // quedan sin enlace en lugar de mandar al visitante a una página vacía.
+  const hrefFor = (item: (typeof PRICE_ITEMS)[number]) => {
+    if (item.catalogName) {
+      const match = flowers.find((f) => f.name.toLowerCase() === item.catalogName!.toLowerCase());
+      if (match) return `/catalogo/${match.id}`;
+    }
+    if (item.categorySlug) return `/catalogo/${item.categorySlug}`;
+    return null;
+  };
+
   const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    `Hola, quiero hacer un pedido de la lista de precios — ${SHIPMENT_TITLE}`
+    `Hola, quiero hacer un pedido de la lista de precios: ${SHIPMENT_TITLE}`
   )}`;
 
   return (
-    <main className="min-h-screen bg-[#F2EFE8]">
-      <header className="print:hidden flex items-center justify-between px-6 md:px-10 py-6">
-        <Link href="/" aria-label="Loleanthe — inicio">
-          <Image
-            src="/logo.png"
-            alt="Loleanthe"
-            width={160}
-            height={74}
-            className="h-9 w-auto object-contain"
-            style={{ width: 'auto' }}
-          />
-        </Link>
-        <Link
-          href="/catalogo"
-          className="font-body font-medium text-xs tracking-widest uppercase text-[#7B7369] hover:text-[#7B7369] transition-colors hover-underline"
-        >
-          Ver catálogo completo
-        </Link>
-      </header>
-
-      <div className="max-w-6xl mx-auto px-6 md:px-10 pb-16 md:pb-20 print:px-3 print:pb-2">
-        <div className="hidden print:flex justify-center pt-2 mb-3">
-          <Image
-            src="/logo.png"
-            alt="Loleanthe"
-            width={160}
-            height={74}
-            className="h-10 w-auto object-contain"
-            style={{ width: 'auto' }}
-          />
-        </div>
-
-        <div className="text-center pt-2 md:pt-8 pb-12 md:pb-16 print:pt-0 print:pb-3">
-          <p className="font-display italic text-[#7B7369] text-2xl md:text-3xl mb-2">Precios</p>
-          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-light text-[#12100E] leading-[1.05]">
-            <em className="italic text-[#7B7369]">{SHIPMENT_TITLE}</em>
-          </h1>
-          <div className="price-ornament ornament max-w-xs mx-auto mt-6 mb-5">
-            <span className="text-[#7B7369] text-xs tracking-[0.3em] uppercase font-display">Loleanthe</span>
-          </div>
-          <p className="print:hidden text-[#7B7369] max-w-md mx-auto text-sm leading-relaxed">
-            Selección exclusiva para el próximo envío — precio por tallo, en dólares (USD).
-          </p>
-        </div>
-
-        <div className="price-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-          {PRICE_ITEMS.map((item, i) => (
-            <div
-              key={item.slug}
-              className="price-reveal opacity-0 translate-y-4"
-              style={{ animation: `fadeInUp 0.6s ease ${i * 60}ms forwards` }}
-            >
-              <article className="price-card group bg-[#FBF9F5] overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_24px_48px_rgba(28,42,34,0.14)]">
-                <div className="relative aspect-[4/5] overflow-hidden">
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E8E3DA] to-[#C9C2B6]">
-                      <span className="font-display text-6xl text-[#A39C92]/70">{item.name.charAt(0)}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-3.5 md:p-4 print:p-2 border-t border-[#E8E3DA] text-center">
-                  <h3 className="font-display font-bold text-base md:text-lg text-[#12100E] leading-tight">{item.name}</h3>
-                  <p className="text-[#7B7369] text-xs mt-0.5 tracking-wide">{item.size}</p>
-                  <p className="font-display text-xl md:text-2xl text-[#7B7369] mt-2">
-                    ${item.price.toFixed(2)}
-                    <span className="text-[11px] text-[#7B7369] font-body"> / tallo</span>
-                  </p>
-                </div>
-              </article>
-            </div>
-          ))}
-        </div>
-
-        <p className="hidden print:block text-right text-[11px] text-[#7B7369] tracking-wide mt-4">
-          WhatsApp {WHATSAPP_DISPLAY}
-        </p>
+    <>
+      <div className="print:hidden">
+        <Header />
       </div>
 
-      <footer className="price-footer print:hidden bg-[#12100E] text-[#FBF9F5] py-14 md:py-16 px-6 text-center">
-        <p className="font-body font-bold text-[11px] tracking-[0.24em] uppercase text-[#7B7369] mb-3">¿Hacemos tu pedido?</p>
-        <p className="font-display text-2xl md:text-3xl mb-7">Escríbenos por WhatsApp</p>
-        <a
-          href={whatsappHref}
-          className="inline-block bg-[#7B7369] text-[#FBF9F5] px-8 py-4 font-body font-bold tracking-wide text-sm uppercase hover:bg-[#7B7369] transition-colors"
-        >
-          Escribir por WhatsApp
-        </a>
-        <p className="font-body text-sm text-[#A39C92] mt-5 tracking-wide">{WHATSAPP_DISPLAY}</p>
-      </footer>
-    </main>
+      <main className="min-h-screen bg-bone px-6 pb-20 pt-32 md:px-10 md:pt-40 print:px-2 print:pb-1 print:pt-0">
+        <div className="mx-auto max-w-[1400px]">
+          {/* Encabezado de la versión impresa: solo el logo */}
+          <div className="mb-4 hidden justify-center pt-1 print:flex">
+            <Image
+              src="/logo-wordmark.png"
+              alt="Loleanthe"
+              width={200}
+              height={73}
+              className="h-9 w-auto object-contain"
+              style={{ width: 'auto' }}
+            />
+          </div>
+
+          <div className="price-head pb-12 md:pb-16">
+            <p className="label mb-5 text-muted">Precios · Próximo envío</p>
+            <h1 className="price-title font-serif text-[clamp(40px,6.5vw,92px)] font-light leading-[0.98] tracking-[-0.02em] text-ink">
+              {SHIPMENT_TITLE}
+            </h1>
+
+            <div className="mt-8 flex flex-col gap-8 md:flex-row md:items-end md:justify-between print:hidden">
+              <p className="max-w-md text-[15px] leading-relaxed text-muted">
+                Precios en dólares (USD). Rosas en bunch de 25 tallos, el resto de 10.
+                La mayoría de estas variedades viene en distintos colores, escríbenos
+                para ver la disponibilidad de la temporada.
+              </p>
+              <DownloadButton />
+            </div>
+
+            <p className="price-note mt-2 hidden text-[10px] text-muted">
+              USD · Rosas: bunch de 25 tallos · Resto: bunch de 10 · Disponibles en distintos colores
+            </p>
+          </div>
+
+          <div className="price-grid grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
+            {PRICE_ITEMS.map((item) => {
+              const bunch = item.price != null ? item.price * item.stemsPerBunch : null;
+              const href = hrefFor(item);
+
+              const card = (
+                <>
+                  <div className="price-photo relative aspect-[4/5] overflow-hidden bg-line">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                        className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05]"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <span className="font-serif text-4xl font-light text-muted/50">
+                          {item.name.charAt(0)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="price-body px-4 pb-5 pt-4">
+                    <h3 className="price-name font-serif text-lg font-light leading-tight text-ink">
+                      {item.name}
+                    </h3>
+                    <p className="price-meta label mt-2 text-muted">
+                      {[item.size, `${item.stemsPerBunch} tallos`].filter(Boolean).join(' · ')}
+                    </p>
+
+                    <div className="price-split mt-4 border-t border-line pt-3">
+                      {bunch != null ? (
+                        <>
+                          <p className="price-bunch font-serif text-2xl font-light leading-none text-ink">
+                            ${bunch.toFixed(2)}
+                            <span className="label ml-1.5 align-middle text-muted">bunch</span>
+                          </p>
+                          <p className="price-stem mt-1.5 text-[13px] text-muted">
+                            ${item.price!.toFixed(2)} por tallo
+                          </p>
+                        </>
+                      ) : (
+                        <p className="price-stem text-[13px] leading-snug text-muted">Precio a confirmar</p>
+                      )}
+                    </div>
+                  </div>
+                </>
+              );
+
+              return href ? (
+                <Link key={item.slug} href={href} className="price-card price-reveal group block bg-paper">
+                  {card}
+                </Link>
+              ) : (
+                <article key={item.slug} className="price-card price-reveal group bg-paper">
+                  {card}
+                </article>
+              );
+            })}
+          </div>
+
+          <p className="mt-5 hidden text-right text-[9px] tracking-wide text-muted print:mt-2 print:block">
+            WhatsApp {WHATSAPP_DISPLAY}
+          </p>
+
+          <div className="mt-16 flex flex-col gap-6 border-t border-line pt-10 md:flex-row md:items-center md:justify-between print:hidden">
+            <p className="font-serif text-[clamp(22px,3vw,34px)] font-light leading-tight text-ink">
+              ¿Hacemos tu pedido?
+            </p>
+            <div className="flex flex-wrap items-center gap-10">
+              <a href={whatsappHref} className="label group inline-flex items-center gap-3 text-ink">
+                WhatsApp {WHATSAPP_DISPLAY}
+                <span className="h-px w-8 bg-ink transition-all duration-500 group-hover:w-14" />
+              </a>
+              <DownloadButton />
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <div className="print:hidden">
+        <Footer />
+      </div>
+    </>
   );
 }

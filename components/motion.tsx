@@ -88,7 +88,7 @@ export function MaskLines({
 
 /**
  * Desplaza el contenido más lento que la página, así el fondo queda "detrás".
- * `speed` 0.1–0.3 es sutil; negativo invierte la dirección.
+ * `speed` 0.1 a 0.3 es sutil; negativo invierte la dirección.
  */
 export function Parallax({
   children,
