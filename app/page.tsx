@@ -15,7 +15,7 @@ const organizationJsonLd = {
   '@type': 'Organization',
   name: 'Loleanthe',
   description:
-    'Consolidamos flor ecuatoriana de varias fincas y la importamos bajo pedido para floristas, decoradores y hoteles en Costa Rica y Guatemala.',
+    'Consolidamos flor ecuatoriana de varias fincas y la importamos bajo pedido para floristas, decoradores, hoteles y más en Costa Rica y Guatemala.',
   url: 'https://loleanthe.com',
   image: 'https://loleanthe.com/images/hero-dark.jpg',
   areaServed: [

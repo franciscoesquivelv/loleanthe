@@ -27,6 +27,20 @@ export interface QuoteItem {
   flowerImage?: string;
 }
 
+/**
+ * Construye el ítem de cotización omitiendo `flowerImage` cuando la flor no
+ * tiene foto. Firestore rechaza el documento entero si un campo llega como
+ * `undefined`, así que la clave no puede existir con ese valor.
+ */
+export function toQuoteItem(flower: Pick<Flower, 'id' | 'name' | 'images'>): QuoteItem {
+  const image = flower.images?.[0];
+  return {
+    flowerId: flower.id,
+    flowerName: flower.name,
+    ...(image ? { flowerImage: image } : {}),
+  };
+}
+
 export interface QuoteFormData {
   name: string;
   email: string;

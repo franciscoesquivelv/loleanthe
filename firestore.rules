@@ -42,7 +42,7 @@ service cloud.firestore {
       // al inicio de esta condición para bloquear bots automatizados.
       allow create: if
         request.resource.data.keys().hasOnly(
-             ['name', 'email', 'phone', 'message', 'flowers', 'createdAt', 'status'])
+             ['name', 'email', 'phone', 'buyerType', 'volume', 'message', 'flowers', 'createdAt', 'status'])
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
         && request.resource.data.name.size() <= 100
@@ -51,6 +51,12 @@ service cloud.firestore {
         && request.resource.data.email.size() <= 200
         && request.resource.data.phone is string
         && request.resource.data.phone.size() <= 30
+        // El formulario de contacto no manda buyerType ni volume; el de
+        // cotización sí. `get` con valor por defecto acepta los dos casos.
+        && request.resource.data.get('buyerType', '') is string
+        && request.resource.data.get('buyerType', '').size() <= 60
+        && request.resource.data.get('volume', '') is string
+        && request.resource.data.get('volume', '').size() <= 60
         && request.resource.data.message is string
         && request.resource.data.message.size() <= 2000
         && request.resource.data.flowers is list

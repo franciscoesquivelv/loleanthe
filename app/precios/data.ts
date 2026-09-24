@@ -26,9 +26,7 @@ export const PRICE_ITEMS: PriceItem[] = [
   { slug: 'delphinium', name: 'Delphinium', size: '80 cm', stemsPerBunch: 10, price: 1.8, image: '/images-dia-de-la-madre/delphinium.jpg', catalogName: 'Delphinium Sea Waltz' },
   { slug: 'larkspur', name: 'Larkspur', size: '80 cm', stemsPerBunch: 10, price: 2.2, image: '/images-dia-de-la-madre/larkspur.jpg' },
   { slug: 'hypericum', name: 'Hypericum', size: '60 cm', stemsPerBunch: 10, price: 1.28, image: '/images-dia-de-la-madre/hypericum.jpg', catalogName: 'Hypericum' },
-  // TODO(Francisco): falta confirmar el largo de tallo del limonium.
-  { slug: 'limonium', name: 'Limonium', stemsPerBunch: 10, price: 2.2, image: '/images-dia-de-la-madre/limonium.jpg' },
-  // TODO(Francisco): el precio es "el mismo de la gypso blanca", pero ese dato
-  // no está en ninguna lista, falta el número.
-  { slug: 'gypsophila', name: 'Gypsophila de colores', size: '60-80 cm', stemsPerBunch: 10, price: null, image: '/images-dia-de-la-madre/gypsophila-colores.jpg', catalogName: 'Gypsophila Xlence' },
+  { slug: 'limonium', name: 'Limonium', size: '70 cm', stemsPerBunch: 10, price: 2.2, image: '/images-dia-de-la-madre/limonium.jpg' },
+  // Francisco dio el precio por bunch ($12), no por tallo: 12 / 10 tallos = 1.20.
+  { slug: 'gypsophila', name: 'Gypsophila de colores', size: '60-80 cm', stemsPerBunch: 10, price: 1.2, image: '/images-dia-de-la-madre/gypsophila-colores.jpg', catalogName: 'Gypsophila Xlence' },
 ];

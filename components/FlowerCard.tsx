@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useQuote } from '@/context/QuoteContext';
 import toast from 'react-hot-toast';
-import type { Flower } from '@/lib/types';
+import { toQuoteItem, type Flower } from '@/lib/types';
 
 interface Props {
   flower: Flower;
@@ -23,7 +23,7 @@ export default function FlowerCard({ flower, priority = false, detailHref }: Pro
       removeFromQuote(flower.id);
       toast('Quitada de tu cotización');
     } else {
-      addToQuote({ flowerId: flower.id, flowerName: flower.name, flowerImage: flower.images[0] });
+      addToQuote(toQuoteItem(flower));
       toast.success(`${flower.name} agregada`);
     }
   };

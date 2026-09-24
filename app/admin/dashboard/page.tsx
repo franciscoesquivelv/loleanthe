@@ -713,6 +713,8 @@ function InquiriesPanel() {
     name: string;
     email: string;
     phone?: string;
+    buyerType?: string;
+    volume?: string;
     message?: string;
     flowers?: Array<{ flowerName: string }>;
     createdAt: { seconds: number };
@@ -772,11 +774,26 @@ function InquiriesPanel() {
               <div className="flex items-center gap-3">
                 <span className="text-xs text-[#7B7369] font-display">
                   {inq.createdAt?.seconds
-                    ? new Date(inq.createdAt.seconds * 1000).toLocaleDateString('es-SV', { day: 'numeric', month: 'long', year: 'numeric' })
+                    ? new Date(inq.createdAt.seconds * 1000).toLocaleDateString('es-CR', { day: 'numeric', month: 'long', year: 'numeric' })
                     : 'Fecha no disponible'}
                 </span>
               </div>
             </div>
+
+            {(inq.buyerType || inq.volume) && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {inq.buyerType && (
+                  <span className="border border-[#DED8CD] text-[#12100E] text-xs font-display px-3 py-1">
+                    {inq.buyerType}
+                  </span>
+                )}
+                {inq.volume && (
+                  <span className="border border-[#DED8CD] text-[#12100E] text-xs font-display px-3 py-1">
+                    {inq.volume}
+                  </span>
+                )}
+              </div>
+            )}
 
             {inq.flowers && inq.flowers.length > 0 && (
               <div className="mb-3">

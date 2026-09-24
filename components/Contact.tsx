@@ -31,7 +31,10 @@ export default function Contact() {
       setSent(true);
       setForm({ name: '', email: '', phone: '', message: '' });
       clearQuote();
-    } catch {
+    } catch (err) {
+      // Sin este log, un rechazo de las reglas de Firestore se ve igual que un
+      // problema de red y no hay forma de diagnosticarlo desde el navegador.
+      console.error('[contacto] falló el envío:', err);
       toast.error('Ocurrió un error. Intenta de nuevo.');
     } finally {
       setLoading(false);
@@ -109,6 +112,7 @@ export default function Contact() {
 
               <textarea
                 rows={4}
+                maxLength={2000}
                 value={form.message}
                 onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
                 placeholder="Variedades, cantidad de tallos, fecha…"
