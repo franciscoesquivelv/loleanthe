@@ -6,7 +6,7 @@ const ROWS = [
   {
     label: 'Suministro',
     title: 'Varias fincas, no una',
-    desc: 'Consolidamos de distintas fincas ecuatorianas a la vez. Si a una le va mal la semana por clima o escasez, tu pedido no se queda corto ni cambia de variedad sin avisarte.',
+    desc: 'Consolidamos de distintas fincas ecuatorianas a la vez para poder garantizar la entrega del producto solicitado.',
   },
   {
     label: 'Trato',

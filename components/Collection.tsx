@@ -8,16 +8,28 @@ import FlowerCard from './FlowerCard';
 import { Reveal } from './motion';
 
 export default function Collection({ initialFlowers }: { initialFlowers: Flower[] }) {
-  // Dos variedades disponibles por categoría: muestra el surtido real sin
-  // convertir la portada en un catálogo completo.
+  // Muestra el surtido real sin convertir la portada en un catálogo completo.
+  // Se reparte por rondas, una de cada categoría antes de repetir, y se corta
+  // en 6 para que la rejilla de 3 columnas siempre quede en filas completas.
   const featured = useMemo(() => {
+    const byCategory = CATEGORIES.map((category) =>
+      initialFlowers.filter(
+        (f) => f.inStock && (f.category ?? '').toLowerCase() === category.label.toLowerCase()
+      )
+    );
+
     const picks: Flower[] = [];
-    for (const category of CATEGORIES) {
-      picks.push(
-        ...initialFlowers
-          .filter((f) => f.inStock && (f.category ?? '').toLowerCase() === category.label.toLowerCase())
-          .slice(0, 2)
-      );
+    for (let round = 0; picks.length < 6; round++) {
+      let addedThisRound = false;
+      for (const candidates of byCategory) {
+        if (picks.length >= 6) break;
+        const pick = candidates[round];
+        if (pick) {
+          picks.push(pick);
+          addedThisRound = true;
+        }
+      }
+      if (!addedThisRound) break;
     }
     return picks;
   }, [initialFlowers]);
@@ -34,15 +46,17 @@ export default function Collection({ initialFlowers }: { initialFlowers: Flower[
             <h2 className="font-serif text-[clamp(38px,5vw,64px)] font-light leading-[1.02] tracking-[-0.015em] text-ink">
               Lo que traemos
             </h2>
-            <p className="mt-7 max-w-xs text-[15px] leading-relaxed text-muted">
-              Rosas, ranunculus y fillers de tallo largo. Cada variedad con su ficha
-              técnica: apertura, largo y vida en florero.
+            <p className="mt-7 max-w-sm text-[15px] leading-relaxed text-muted">
+              Tenemos una selección amplia de flores, como rosas, ranunculus y flores
+              de relleno, en distintos tamaños, colores y texturas. Cada producto
+              indica su apertura, el largo del tallo, los colores disponibles y su
+              vida en florero.
             </p>
             <Link
               href="/catalogo"
               className="label group mt-10 inline-flex items-center gap-4 text-ink"
             >
-              Ver las {initialFlowers.length} variedades
+              Ver variedades
               <span className="h-px w-10 bg-ink transition-all duration-500 group-hover:w-16" />
             </Link>
           </Reveal>

@@ -40,7 +40,7 @@ export default function Hero() {
             <Reveal delay={950} y={18}>
               <p className="max-w-md text-[15px] leading-relaxed text-bone/75">
                 Consolidamos flor ecuatoriana de varias fincas y la traemos bajo pedido
-                para floristas, decoradores y hoteles.
+                para floristas, decoradores, hoteles y más.
               </p>
             </Reveal>
 

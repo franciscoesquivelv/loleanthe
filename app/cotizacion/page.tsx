@@ -34,7 +34,10 @@ export default function CotizacionPage() {
       });
       setSent(true);
       clearQuote();
-    } catch {
+    } catch (err) {
+      // Sin este log, un rechazo de las reglas de Firestore se ve igual que un
+      // problema de red y no hay forma de diagnosticarlo desde el navegador.
+      console.error('[cotización] falló el envío:', err);
       toast.error('Ocurrió un error. Intenta de nuevo.');
     } finally {
       setLoading(false);
@@ -184,6 +187,9 @@ export default function CotizacionPage() {
 
                 <textarea
                   rows={5}
+                  // Las reglas de Firestore cortan en 2000: sin este tope el
+                  // envío fallaba en silencio al pasarse.
+                  maxLength={2000}
                   value={form.message}
                   onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
                   placeholder="Cantidad de tallos, fecha de entrega, colores… ¿Buscas una variedad que no está en el catálogo? Cuéntanos aquí."

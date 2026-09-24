@@ -25,14 +25,14 @@ export const metadata: Metadata = {
     default: 'Loleanthe · Flor ecuatoriana para floristas y decoradores',
     template: '%s | Loleanthe',
   },
-  description: 'Consolidamos flor ecuatoriana de varias fincas y la importamos bajo pedido para floristas, decoradores y hoteles en Costa Rica y Guatemala.',
+  description: 'Consolidamos flor ecuatoriana de varias fincas y la importamos bajo pedido para floristas, decoradores, hoteles y más en Costa Rica y Guatemala.',
   keywords: 'flor ecuatoriana, rosas de tallo largo, flores al por mayor, importador de flores Costa Rica, flores Guatemala, ranunculus',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'Loleanthe · Flor ecuatoriana consolidada',
-    description: 'Flor ecuatoriana de varias fincas, importada bajo pedido para floristas, decoradores y hoteles en Costa Rica y Guatemala.',
+    description: 'Flor ecuatoriana de varias fincas, importada bajo pedido para floristas, decoradores, hoteles y más en Costa Rica y Guatemala.',
     url: 'https://loleanthe.com',
     siteName: 'Loleanthe',
     type: 'website',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Loleanthe · Flor ecuatoriana consolidada',
-    description: 'Flor ecuatoriana de varias fincas, importada bajo pedido para floristas, decoradores y hoteles.',
+    description: 'Flor ecuatoriana de varias fincas, importada bajo pedido para floristas, decoradores, hoteles y más.',
     images: ['/images/hero-dark.jpg'],
   },
 };

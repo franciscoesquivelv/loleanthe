@@ -1,5 +1,5 @@
 export interface Category {
-  slug: 'rosas' | 'ranunculus' | 'fillers';
+  slug: 'rosas' | 'rosas-garden' | 'ranunculus' | 'fillers';
   label: string;
   blurb: string;
   // Imagen de respaldo mientras la categoría no tenga flores reales cargadas.
@@ -12,6 +12,12 @@ export const CATEGORIES: Category[] = [
     label: 'Rosas',
     blurb: 'Tallos largos, cabezas grandes, para el arreglo que impone.',
     fallbackImage: '/images/flor-portada.jpg',
+  },
+  {
+    slug: 'rosas-garden',
+    label: 'Rosas Garden',
+    blurb: 'Copa abierta y decenas de pétalos, con aire de jardín.',
+    fallbackImage: '/images/rosa-garden.jpg',
   },
   {
     slug: 'ranunculus',
