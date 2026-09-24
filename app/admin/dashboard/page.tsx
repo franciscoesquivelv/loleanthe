@@ -24,6 +24,40 @@ import toast from 'react-hot-toast';
 type Tab = 'catalog' | 'inquiries';
 type Mode = 'list' | 'create' | 'edit';
 
+/** Una escritura de Firestore o una subida a Storage no tienen límite de tiempo
+ *  propio: si la conexión se degrada, la promesa queda pendiente para siempre y
+ *  el botón gira sin fin. Este tope la convierte en un error visible. */
+const SAVE_TIMEOUT_MS = 60_000;
+
+function conTiempoLimite<T>(promesa: Promise<T>, ms = SAVE_TIMEOUT_MS): Promise<T> {
+  return Promise.race([
+    promesa,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('TIMEOUT')), ms)
+    ),
+  ]);
+}
+
+/** Traduce el fallo a algo accionable en vez de "Error al guardar la flor". */
+function mensajeDeError(err: unknown): string {
+  const code = (err as { code?: string })?.code ?? '';
+  const msg = (err as { message?: string })?.message ?? '';
+
+  if (msg === 'TIMEOUT') {
+    return 'El guardado se quedó esperando al servidor y se canceló. Revisa tu conexión y volvé a intentar; la flor NO se guardó.';
+  }
+  if (msg === 'STORAGE_LIMIT_REACHED') {
+    return 'El almacenamiento está lleno. Elimina imágenes antes de subir nuevas.';
+  }
+  if (code.includes('unauthorized') || code.includes('permission-denied')) {
+    return 'El servidor rechazó el guardado. Si la foto no es JPG, PNG, WebP o GIF, conviértela y volvé a intentar.';
+  }
+  if (code.includes('unauthenticated')) {
+    return 'Tu sesión expiró. Recargá la página e iniciá sesión de nuevo.';
+  }
+  return `No se pudo guardar${code ? ` (${code})` : ''}. Mirá la consola del navegador para el detalle.`;
+}
+
 const emptyForm = {
   name: '',
   description: '',
@@ -189,23 +223,30 @@ export default function AdminDashboard() {
         availableIn: form.availableIn,
       };
       if (mode === 'create') {
-        await createFlower(
-          { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: [], ...attributes },
-          imageFiles
+        await conTiempoLimite(
+          createFlower(
+            { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: [], ...attributes },
+            imageFiles
+          )
         );
         toast.success('Flor creada exitosamente');
       } else if (editingFlower) {
-        await updateFlower(
-          editingFlower.id,
-          { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: existingImages, ...attributes },
-          imageFiles
+        await conTiempoLimite(
+          updateFlower(
+            editingFlower.id,
+            { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: existingImages, ...attributes },
+            imageFiles
+          )
         );
         toast.success('Flor actualizada');
       }
       await loadFlowers();
       setMode('list');
-    } catch {
-      toast.error('Error al guardar la flor');
+    } catch (err) {
+      // Sin este log, cualquier fallo (reglas, Storage, red) se veía igual y no
+      // había forma de diagnosticarlo desde el navegador.
+      console.error('[admin] falló el guardado de la flor:', err);
+      toast.error(mensajeDeError(err), { duration: 8000 });
     } finally {
       setSaving(false);
     }
