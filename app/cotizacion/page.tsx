@@ -3,12 +3,11 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { MaskLines, Reveal } from '@/components/motion';
 import { useQuote } from '@/context/QuoteContext';
-import { getDb } from '@/lib/firebase';
+import { enviarSolicitud } from '@/lib/enviar-solicitud';
 import toast from 'react-hot-toast';
 
 const FIELD =
@@ -25,20 +24,16 @@ export default function CotizacionPage() {
     if (!form.name || !form.email) return;
     setLoading(true);
     try {
-      const db = getDb();
-      await addDoc(collection(db, 'inquiries'), {
-        ...form,
-        flowers: items,
-        createdAt: serverTimestamp(),
-        status: 'pending',
-      });
+      await enviarSolicitud(form, items, 'cotizacion');
       setSent(true);
       clearQuote();
     } catch (err) {
-      // Sin este log, un rechazo de las reglas de Firestore se ve igual que un
-      // problema de red y no hay forma de diagnosticarlo desde el navegador.
+      // Solo se llega acá si fallaron los DOS caminos, el correo y Firestore.
       console.error('[cotización] falló el envío:', err);
-      toast.error('Ocurrió un error. Intenta de nuevo.');
+      toast.error(
+        'No pudimos enviar tu solicitud. Escribinos por WhatsApp al 8847-2038 y la tomamos por ahí.',
+        { duration: 9000 }
+      );
     } finally {
       setLoading(false);
     }
