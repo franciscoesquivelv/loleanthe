@@ -14,10 +14,12 @@ import {
   deleteFlowerImage,
   getStorageInfo,
   validateImageFiles,
+  bulkUpdateFlowers,
+  type EtapaSubida,
 } from '@/lib/flowers';
 import { compressImage } from '@/lib/image-compress';
 import Image from 'next/image';
-import { APERTURAS, COUNTRIES, ROSE_TIERS, type CountryCode, type Flower } from '@/lib/types';
+import { APERTURAS, COUNTRIES, ROSE_TIERS, countryLabels, type CountryCode, type Flower } from '@/lib/types';
 import { CATEGORIES } from '@/lib/categories';
 import toast from 'react-hot-toast';
 
@@ -88,6 +90,11 @@ export default function AdminDashboard() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [storageInfo, setStorageInfo] = useState<{ usedBytes: number; limitBytes: number; nearLimit: boolean } | null>(null);
+  const [marcadas, setMarcadas] = useState<Set<string>>(new Set());
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroCategoria, setFiltroCategoria] = useState('');
+  const [aplicandoLote, setAplicandoLote] = useState(false);
+  const [paso, setPaso] = useState('');
 
   useEffect(() => {
     const auth = getAuthInstance();
@@ -155,13 +162,28 @@ export default function AdminDashboard() {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    // Downscale + re-encode client-side first, then enforce the size limit on
-    // the result, so a large photo straight off a phone still goes through.
-    const compressed = await Promise.all(files.map(compressImage));
+    // Se reduce y recodifica en el navegador antes de que llegue a Storage.
+    // Con foto de celular esto puede tardar, así que se avisa: antes parecía
+    // que la pantalla se había colgado.
+    setPaso('Preparando la foto…');
+    let compressed: File[];
+    try {
+      compressed = await conTiempoLimite(Promise.all(files.map(compressImage)), 30_000);
+    } catch (err) {
+      console.error('[admin] falló la preparación de la foto:', err);
+      toast.error(
+        'No se pudo preparar la foto. Si viene del iPhone, exportala como JPG y volvé a intentar.',
+        { duration: 8000 }
+      );
+      e.target.value = '';
+      setPaso('');
+      return;
+    }
+    setPaso('');
 
     const error = validateImageFiles(compressed);
     if (error) {
-      toast.error(error, { duration: 5000 });
+      toast.error(error, { duration: 8000 });
       e.target.value = '';
       return;
     }
@@ -222,11 +244,25 @@ export default function AdminDashboard() {
         // omitiera, desmarcar las dos casillas no borraría el valor anterior.
         availableIn: form.availableIn,
       };
+      // Con foto, el guardado pasa por cuatro etapas y cualquiera puede
+      // trabarse. Mostrarlas convierte "se quedó cargando" en un dato.
+      const avisar = (etapa: EtapaSubida, pct?: number) =>
+        setPaso(
+          etapa === 'cuota'
+            ? 'Revisando espacio…'
+            : etapa === 'subiendo'
+              ? `Subiendo foto ${pct ?? 0}%`
+              : etapa === 'url'
+                ? 'Obteniendo enlace…'
+                : 'Actualizando contador…'
+        );
+
       if (mode === 'create') {
         await conTiempoLimite(
           createFlower(
             { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: [], ...attributes },
-            imageFiles
+            imageFiles,
+            avisar
           )
         );
         toast.success('Flor creada exitosamente');
@@ -235,7 +271,8 @@ export default function AdminDashboard() {
           updateFlower(
             editingFlower.id,
             { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: existingImages, ...attributes },
-            imageFiles
+            imageFiles,
+            avisar
           )
         );
         toast.success('Flor actualizada');
@@ -249,6 +286,7 @@ export default function AdminDashboard() {
       toast.error(mensajeDeError(err), { duration: 8000 });
     } finally {
       setSaving(false);
+      setPaso('');
     }
   };
 
@@ -268,12 +306,18 @@ export default function AdminDashboard() {
     }
   };
 
+  // Parche local en vez de `loadFlowers()`: recargar el catálogo entero después
+  // de cada clic son 25 lecturas de Firestore y una espera que se siente.
+  const parchear = (id: string, cambio: Partial<Flower>) =>
+    setFlowers((prev) => prev.map((f) => (f.id === id ? { ...f, ...cambio } : f)));
+
   const toggleStock = async (flower: Flower) => {
     try {
       await setFlowerStock(flower.id, !flower.inStock);
-      await loadFlowers();
+      parchear(flower.id, { inStock: !flower.inStock });
       toast.success(flower.inStock ? 'Marcada sin stock' : 'Marcada con stock');
-    } catch {
+    } catch (err) {
+      console.error('[admin] falló el cambio de stock:', err);
       toast.error('No se pudo actualizar el stock.');
     }
   };
@@ -281,10 +325,57 @@ export default function AdminDashboard() {
   const toggleArchive = async (flower: Flower) => {
     try {
       await setFlowerArchived(flower.id, !flower.archived);
-      await loadFlowers();
+      parchear(flower.id, { archived: !flower.archived });
       toast.success(flower.archived ? 'Restaurada al catálogo' : 'Archivada');
-    } catch {
+    } catch (err) {
+      console.error('[admin] falló el cambio de visibilidad:', err);
       toast.error('No se pudo actualizar la visibilidad.');
+    }
+  };
+
+  // ── Edición masiva ────────────────────────────────────────────────────────
+
+  const visibles = flowers.filter((f) => {
+    if (filtroCategoria && (f.category ?? '') !== filtroCategoria) return false;
+    if (!busqueda) return true;
+    const q = busqueda.toLowerCase();
+    return (
+      f.name.toLowerCase().includes(q) ||
+      (f.category ?? '').toLowerCase().includes(q) ||
+      (f.description ?? '').toLowerCase().includes(q)
+    );
+  });
+
+  const todasVisiblesMarcadas = visibles.length > 0 && visibles.every((f) => marcadas.has(f.id));
+
+  const alternarMarca = (id: string) =>
+    setMarcadas((prev) => {
+      const s = new Set(prev);
+      if (s.has(id)) s.delete(id);
+      else s.add(id);
+      return s;
+    });
+
+  const alternarTodas = () =>
+    setMarcadas(todasVisiblesMarcadas ? new Set() : new Set(visibles.map((f) => f.id)));
+
+  const aplicarEnLote = async (
+    patch: Partial<Pick<Flower, 'category' | 'availableIn' | 'inStock' | 'archived'>>,
+    exito: string
+  ) => {
+    const ids = [...marcadas];
+    if (ids.length === 0) return;
+    setAplicandoLote(true);
+    try {
+      await conTiempoLimite(bulkUpdateFlowers(ids, patch));
+      setFlowers((prev) => prev.map((f) => (marcadas.has(f.id) ? { ...f, ...patch } : f)));
+      setMarcadas(new Set());
+      toast.success(`${exito} (${ids.length})`);
+    } catch (err) {
+      console.error('[admin] falló la edición en lote:', err);
+      toast.error(mensajeDeError(err), { duration: 8000 });
+    } finally {
+      setAplicandoLote(false);
     }
   };
 
@@ -394,79 +485,172 @@ export default function AdminDashboard() {
                     </button>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b border-[#DED8CD]">
-                          {['Imagen', 'Nombre', 'Estado', 'Stock', 'Visibilidad', 'Acciones'].map((h) => (
-                            <th key={h} className="text-left font-display text-xs tracking-widest uppercase text-[#7B7369] pb-4 pr-4">{h}</th>
+                  <div>
+                    {/* Búsqueda y filtro. Con 24 flores el filtrado en memoria
+                        alcanza y de paso es lo que hace útil "marcar todas". */}
+                    <div className="flex flex-col gap-4 border-y border-line py-4 sm:flex-row sm:items-center">
+                      <input
+                        type="search"
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                        placeholder="Buscar por nombre o categoría"
+                        className="w-full border-0 border-b border-line bg-transparent py-2 text-[15px] text-ink placeholder:text-muted/70 transition-colors duration-300 focus:border-ink sm:max-w-xs"
+                      />
+                      <select
+                        value={filtroCategoria}
+                        onChange={(e) => setFiltroCategoria(e.target.value)}
+                        className="label border-b border-line bg-transparent pb-1 text-muted transition-colors focus:border-ink focus:text-ink"
+                      >
+                        <option value="">Todas las categorías</option>
+                        {CATEGORIES.map((c) => (
+                          <option key={c.slug} value={c.label}>{c.label}</option>
+                        ))}
+                      </select>
+                      <span className="label text-muted sm:ml-auto">
+                        {visibles.length} de {flowers.length}
+                      </span>
+                    </div>
+
+                    {/* Barra de acciones en lote */}
+                    <div className="flex items-center gap-6 border-b border-line py-3">
+                      <label className="flex cursor-pointer items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={todasVisiblesMarcadas}
+                          onChange={alternarTodas}
+                          className="h-4 w-4 accent-[#12100E]"
+                        />
+                        <span className="label text-muted">
+                          {marcadas.size > 0 ? `${marcadas.size} marcadas` : 'Marcar todas'}
+                        </span>
+                      </label>
+                      {marcadas.size > 0 && (
+                        <button onClick={() => setMarcadas(new Set())} className="label text-muted transition-colors hover:text-ink">
+                          Limpiar
+                        </button>
+                      )}
+                    </div>
+
+                    {marcadas.size > 0 && (
+                      <div className="flex flex-col gap-4 border-b border-line bg-paper px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
+                        <select
+                          defaultValue=""
+                          disabled={aplicandoLote}
+                          onChange={(e) => {
+                            if (!e.target.value) return;
+                            aplicarEnLote({ category: e.target.value }, 'Categoría aplicada');
+                            e.target.value = '';
+                          }}
+                          className="label border-b border-line bg-transparent pb-1 text-muted focus:border-ink focus:text-ink"
+                        >
+                          <option value="">Poner categoría</option>
+                          {CATEGORIES.map((c) => (
+                            <option key={c.slug} value={c.label}>{c.label}</option>
                           ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {flowers.map((flower) => (
-                          <tr key={flower.id} className={`border-b border-[#DED8CD] group hover:bg-[#F2EFE8] transition-colors ${flower.archived ? 'opacity-50' : ''}`}>
-                            {/* Image */}
-                            <td className="py-4 pr-4">
-                              <div className="w-14 h-14 relative overflow-hidden bg-[#DED8CD] flex-shrink-0">
-                                {flower.images[0] ? (
-                                  <Image src={flower.images[0]} alt={flower.name} fill className="object-cover" />
-                                ) : (
-                                  <span className="font-script text-lg text-[#7B7369] flex items-center justify-center h-full">LB</span>
-                                )}
-                              </div>
-                            </td>
-                            {/* Name */}
-                            <td className="py-4 pr-4">
-                              <p className="font-display text-[#12100E] font-medium">{flower.name}</p>
-                              {flower.category && <p className="text-xs text-[#7B7369] mt-0.5">{flower.category}</p>}
-                              <p className="text-xs text-[#7B7369] mt-0.5 line-clamp-1 max-w-xs">{flower.description}</p>
-                            </td>
-                            {/* State */}
-                            <td className="py-4 pr-4">
-                              <span className={`text-xs tracking-wider font-display uppercase px-2 py-1 ${flower.archived ? 'bg-[#DED8CD] text-[#7B7369]' : 'bg-[#12100E] text-[#F2EFE8]'}`}>
-                                {flower.archived ? 'Archivada' : 'Activa'}
-                              </span>
-                            </td>
-                            {/* Stock */}
-                            <td className="py-4 pr-4">
+                        </select>
+
+                        <select
+                          defaultValue=""
+                          disabled={aplicandoLote}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (!v) return;
+                            const paises = v === 'ambos' ? COUNTRIES.map((c) => c.code) : [v as CountryCode];
+                            aplicarEnLote({ availableIn: paises }, 'País aplicado');
+                            e.target.value = '';
+                          }}
+                          className="label border-b border-line bg-transparent pb-1 text-muted focus:border-ink focus:text-ink"
+                        >
+                          <option value="">Poner país</option>
+                          <option value="ambos">Costa Rica y Guatemala</option>
+                          {COUNTRIES.map((c) => (
+                            <option key={c.code} value={c.code}>Solo {c.label}</option>
+                          ))}
+                        </select>
+
+                        <button disabled={aplicandoLote} onClick={() => aplicarEnLote({ inStock: true }, 'Marcadas con stock')} className="label text-ink transition-opacity hover:opacity-60 disabled:opacity-40">
+                          En stock
+                        </button>
+                        <button disabled={aplicandoLote} onClick={() => aplicarEnLote({ inStock: false }, 'Marcadas sin stock')} className="label text-ink transition-opacity hover:opacity-60 disabled:opacity-40">
+                          Sin stock
+                        </button>
+                        <button disabled={aplicandoLote} onClick={() => aplicarEnLote({ archived: true }, 'Archivadas')} className="label text-muted transition-colors hover:text-ink disabled:opacity-40">
+                          Archivar
+                        </button>
+                        <button disabled={aplicandoLote} onClick={() => aplicarEnLote({ archived: false }, 'Restauradas')} className="label text-muted transition-colors hover:text-ink disabled:opacity-40">
+                          Restaurar
+                        </button>
+                        {aplicandoLote && <span className="label text-muted">Aplicando…</span>}
+                      </div>
+                    )}
+
+                    {/* Lista, no tabla: en el celular la tabla de 6 columnas
+                        obligaba a desplazar de lado. Acá cada flor es una fila
+                        que se reacomoda sola. */}
+                    <ul>
+                      {visibles.map((flower) => (
+                        <li
+                          key={flower.id}
+                          className={`flex items-start gap-4 border-b border-line py-4 transition-colors hover:bg-paper ${flower.archived ? 'opacity-50' : ''}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={marcadas.has(flower.id)}
+                            onChange={() => alternarMarca(flower.id)}
+                            aria-label={`Marcar ${flower.name}`}
+                            className="mt-5 h-4 w-4 shrink-0 accent-[#12100E]"
+                          />
+
+                          <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-line">
+                            {flower.images[0] ? (
+                              <Image src={flower.images[0]} alt={flower.name} fill sizes="56px" className="object-cover" />
+                            ) : (
+                              <span className="flex h-full items-center justify-center font-serif text-lg text-muted">L</span>
+                            )}
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <p className="font-serif text-lg font-light leading-tight text-ink">{flower.name}</p>
+                            <p className="label mt-1 text-muted">
+                              {[
+                                flower.category,
+                                flower.archived ? 'Archivada' : null,
+                                countryLabels(flower).join(' y ') || null,
+                              ]
+                                .filter(Boolean)
+                                .join(' · ') || 'Sin categoría'}
+                            </p>
+
+                            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
                               <button
                                 onClick={() => toggleStock(flower)}
-                                className={`text-xs tracking-wider font-display uppercase px-2 py-1 border transition-all ${flower.inStock ? 'border-green-600 text-green-700 hover:bg-green-600 hover:text-white' : 'border-red-400 text-red-500 hover:bg-red-500 hover:text-white'}`}
+                                className={`label border-b pb-0.5 transition-colors duration-300 ${flower.inStock ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'}`}
                               >
                                 {flower.inStock ? 'En stock' : 'Sin stock'}
                               </button>
-                            </td>
-                            {/* Visibility */}
-                            <td className="py-4 pr-4">
-                              <button
-                                onClick={() => toggleArchive(flower)}
-                                className="text-xs tracking-wider font-display uppercase text-[#7B7369] hover:text-[#7B7369] transition-colors"
-                              >
+                              <button onClick={() => openEdit(flower)} className="label text-ink transition-opacity hover:opacity-60">
+                                Editar
+                              </button>
+                              <button onClick={() => toggleArchive(flower)} className="label text-muted transition-colors hover:text-ink">
                                 {flower.archived ? 'Restaurar' : 'Archivar'}
                               </button>
-                            </td>
-                            {/* Actions */}
-                            <td className="py-4">
-                              <div className="flex items-center gap-3">
-                                <button
-                                  onClick={() => openEdit(flower)}
-                                  className="font-display text-xs tracking-wider uppercase text-[#12100E] hover:text-[#7B7369] transition-colors"
-                                >
-                                  Editar
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(flower)}
-                                  className={`font-display text-xs tracking-wider uppercase transition-colors ${deleteConfirm === flower.id ? 'text-red-500 font-semibold' : 'text-[#7B7369] hover:text-red-500'}`}
-                                >
-                                  {deleteConfirm === flower.id ? '¿Confirmar?' : 'Eliminar'}
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                              <button
+                                onClick={() => handleDelete(flower)}
+                                className={`label transition-colors ${deleteConfirm === flower.id ? 'text-ink underline underline-offset-4' : 'text-muted hover:text-ink'}`}
+                              >
+                                {deleteConfirm === flower.id ? '¿Confirmar?' : 'Eliminar'}
+                              </button>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {visibles.length === 0 && (
+                      <p className="py-16 text-center text-[15px] text-muted">
+                        Ninguna flor coincide con la búsqueda.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -769,7 +953,7 @@ export default function AdminDashboard() {
                       disabled={saving}
                       className="bg-[#12100E] text-[#F2EFE8] px-8 py-4 font-display tracking-widest text-sm uppercase hover:bg-[#7B7369] transition-all duration-500 disabled:opacity-60"
                     >
-                      {saving ? 'Guardando...' : mode === 'create' ? 'Crear flor' : 'Guardar cambios'}
+                      {saving ? paso || 'Guardando…' : mode === 'create' ? 'Crear flor' : 'Guardar cambios'}
                     </button>
                     <button
                       type="button"

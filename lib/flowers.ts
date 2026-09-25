@@ -10,10 +10,11 @@ import {
   serverTimestamp,
   setDoc,
   increment,
+  writeBatch,
 } from 'firebase/firestore';
 import {
   ref,
-  uploadBytes,
+  uploadBytesResumable,
   getDownloadURL,
   deleteObject,
   getMetadata,
@@ -105,8 +106,16 @@ export async function getFlowerById(id: string): Promise<Flower | null> {
   return { id: snap.id, ...snap.data() } as Flower;
 }
 
-export async function uploadFlowerImage(file: File, flowerId: string): Promise<string> {
-  // Check storage limit before uploading
+/** Etapas de una subida, para poder mostrar en qué paso va y dónde se traba. */
+export type EtapaSubida = 'cuota' | 'subiendo' | 'url' | 'contador';
+export type AvisoProgreso = (etapa: EtapaSubida, porcentaje?: number) => void;
+
+export async function uploadFlowerImage(
+  file: File,
+  flowerId: string,
+  avisar?: AvisoProgreso
+): Promise<string> {
+  avisar?.('cuota');
   const used = await getStorageUsedBytes();
   if (used + file.size > STORAGE_LIMIT_BYTES) {
     throw new Error('STORAGE_LIMIT_REACHED');
@@ -114,10 +123,28 @@ export async function uploadFlowerImage(file: File, flowerId: string): Promise<s
 
   const storage = getStorageInstance();
   const fileRef = ref(storage, `flowers/${flowerId}/${Date.now()}_${file.name}`);
-  await uploadBytes(fileRef, file);
+
+  // Resumable en vez de `uploadBytes`: da eventos de progreso, así una subida
+  // lenta desde el celular se ve avanzar en vez de parecer colgada, y si se
+  // traba se sabe en qué porcentaje. `uploadBytes` no avisa nada hasta el final.
+  avisar?.('subiendo', 0);
+  await new Promise<void>((resolve, reject) => {
+    const tarea = uploadBytesResumable(fileRef, file, { contentType: file.type });
+    tarea.on(
+      'state_changed',
+      (snap) => {
+        const pct = snap.totalBytes > 0 ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
+        avisar?.('subiendo', pct);
+      },
+      reject,
+      resolve
+    );
+  });
+
+  avisar?.('url');
   const url = await getDownloadURL(fileRef);
 
-  // Track usage
+  avisar?.('contador');
   await adjustStorageUsage(file.size);
 
   return url;
@@ -141,9 +168,13 @@ export async function deleteFlowerImage(url: string): Promise<void> {
 // Sube todas las imágenes de un lote. Si alguna falla, borra las que SÍ se
 // subieron (y revierte su parte del contador) y relanza el error, para no dejar
 // archivos huérfanos en Storage ni un doc a medio crear.
-async function uploadImagesAtomic(files: File[], flowerId: string): Promise<string[]> {
+async function uploadImagesAtomic(
+  files: File[],
+  flowerId: string,
+  avisar?: AvisoProgreso
+): Promise<string[]> {
   const results = await Promise.allSettled(
-    files.map((file) => uploadFlowerImage(file, flowerId))
+    files.map((file) => uploadFlowerImage(file, flowerId, avisar))
   );
 
   const uploaded = results
@@ -164,7 +195,8 @@ async function uploadImagesAtomic(files: File[], flowerId: string): Promise<stri
 
 export async function createFlower(
   data: Omit<Flower, 'id' | 'createdAt' | 'updatedAt'>,
-  imageFiles: File[]
+  imageFiles: File[],
+  avisar?: AvisoProgreso
 ): Promise<string> {
   const db = getDb();
   // Reservamos un id sin escribir el doc todavía.
@@ -172,7 +204,7 @@ export async function createFlower(
 
   // Subimos las imágenes ANTES de crear el doc. Si una falla, se limpian las
   // demás y no se crea ningún doc fantasma.
-  const imageUrls = await uploadImagesAtomic(imageFiles, docRef.id);
+  const imageUrls = await uploadImagesAtomic(imageFiles, docRef.id, avisar);
 
   await setDoc(docRef, {
     ...data,
@@ -186,7 +218,8 @@ export async function createFlower(
 export async function updateFlower(
   id: string,
   data: Partial<Omit<Flower, 'id' | 'createdAt'>>,
-  newImageFiles?: File[]
+  newImageFiles?: File[],
+  avisar?: AvisoProgreso
 ): Promise<void> {
   const db = getDb();
   const docRef = doc(db, COLLECTION, id);
@@ -202,11 +235,48 @@ export async function updateFlower(
       const snap = await getDoc(docRef);
       existing = (snap.exists() ? (snap.data().images as string[] | undefined) : undefined) ?? [];
     }
-    const newUrls = await uploadImagesAtomic(newImageFiles, id);
+    const newUrls = await uploadImagesAtomic(newImageFiles, id, avisar);
     updates.images = [...existing, ...newUrls];
   }
 
   await updateDoc(docRef, updates);
+}
+
+/**
+ * Aplica el mismo cambio a varias flores en una sola escritura.
+ *
+ * Marcar 24 flores a mano son 24 aperturas de formulario y 24 guardados, cada
+ * uno con su recarga completa del catálogo. Un batch lo deja en una operación.
+ *
+ * Las reglas de Firestore no necesitan cambios: en un `update`,
+ * `request.resource.data` es el documento YA fusionado, no el parche, y las
+ * flores existentes traen name, description, inStock, archived e images.
+ */
+export async function bulkUpdateFlowers(
+  ids: string[],
+  patch: Partial<Pick<Flower, 'category' | 'availableIn' | 'inStock' | 'archived'>>
+): Promise<void> {
+  if (ids.length === 0) return;
+  // Un batch de Firestore admite 500 operaciones. Cortar acá evita un fallo
+  // opaco el día que el catálogo crezca.
+  if (ids.length > 450) {
+    throw new Error('DEMASIADAS_FLORES');
+  }
+
+  const db = getDb();
+  const batch = writeBatch(db);
+  for (const id of ids) {
+    batch.update(doc(db, COLLECTION, id), { ...patch, updatedAt: serverTimestamp() });
+  }
+
+  try {
+    await batch.commit();
+  } catch (err) {
+    // El batch es atómico: si un solo documento viola las reglas falla todo el
+    // lote con un único error que no dice cuál fue. Los ids ayudan a acotarlo.
+    console.error('[bulkUpdateFlowers] falló el lote', { ids, patch, err });
+    throw err;
+  }
 }
 
 export async function deleteFlower(id: string, images: string[]): Promise<void> {
