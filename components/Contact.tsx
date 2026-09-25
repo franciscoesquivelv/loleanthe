@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { getDb } from '@/lib/firebase';
+import { enviarSolicitud } from '@/lib/enviar-solicitud';
 import { useQuote } from '@/context/QuoteContext';
 import toast from 'react-hot-toast';
 import { MaskLines, Reveal } from './motion';
@@ -21,21 +20,17 @@ export default function Contact() {
     if (!form.name || !form.email) return;
     setLoading(true);
     try {
-      const db = getDb();
-      await addDoc(collection(db, 'inquiries'), {
-        ...form,
-        flowers: items,
-        createdAt: serverTimestamp(),
-        status: 'pending',
-      });
+      await enviarSolicitud(form, items, 'contacto');
       setSent(true);
       setForm({ name: '', email: '', phone: '', message: '' });
       clearQuote();
     } catch (err) {
-      // Sin este log, un rechazo de las reglas de Firestore se ve igual que un
-      // problema de red y no hay forma de diagnosticarlo desde el navegador.
+      // Solo se llega acá si fallaron los DOS caminos, el correo y Firestore.
       console.error('[contacto] falló el envío:', err);
-      toast.error('Ocurrió un error. Intenta de nuevo.');
+      toast.error(
+        'No pudimos enviar tu solicitud. Escríbenos por WhatsApp al 8847-2038 y la tomamos por ahí.',
+        { duration: 9000 }
+      );
     } finally {
       setLoading(false);
     }
