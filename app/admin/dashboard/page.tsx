@@ -172,7 +172,13 @@ export default function AdminDashboard() {
     setPaso('Preparando la foto…');
     let compressed: File[];
     try {
-      compressed = await conTiempoLimite(Promise.all(files.map(compressImage)), 30_000);
+      // De a una, no `Promise.all`: varias fotos de celular a la vez multiplican
+      // la memoria y el trabajo del navegador justo cuando menos aguanta.
+      compressed = [];
+      for (const [i, f] of files.entries()) {
+        setPaso(files.length > 1 ? `Preparando foto ${i + 1} de ${files.length}…` : 'Preparando la foto…');
+        compressed.push(await conTiempoLimite(compressImage(f), 30_000));
+      }
     } catch (err) {
       console.error('[admin] falló la preparación de la foto:', err);
       toast.error(
