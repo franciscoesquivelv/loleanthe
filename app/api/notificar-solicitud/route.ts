@@ -43,13 +43,40 @@ function fila(etiqueta: string, valor?: string): string {
   </tr>`;
 }
 
+const FORMA_CORREO = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+/**
+ * Limpia lo que venga de la variable de entorno. Un valor pegado a mano suele
+ * traer comillas, espacios o un salto de línea al final, y Resend lo rechaza
+ * con un 422 genérico que no dice cuál de los dos campos estaba mal. Ya nos
+ * pasó antes con el id de proyecto de Firebase.
+ */
+function destinatarios(valor: string): string[] {
+  return valor
+    .split(',')
+    .map((d) => d.trim().replace(/^["'<]+|[>"']+$/g, '').trim())
+    .filter((d) => FORMA_CORREO.test(d));
+}
+
 export async function POST(request: Request) {
   const apiKey = process.env.RESEND_API_KEY;
-  const destino = process.env.NOTIFICACION_EMAIL;
+  const crudo = process.env.NOTIFICACION_EMAIL;
 
-  if (!apiKey || !destino) {
+  if (!apiKey || !crudo) {
     console.error('[notificar-solicitud] falta RESEND_API_KEY o NOTIFICACION_EMAIL');
     return NextResponse.json({ ok: false, motivo: 'sin_configurar' }, { status: 503 });
+  }
+
+  const destino = destinatarios(crudo);
+  if (destino.length === 0) {
+    // Se describe la forma del valor sin imprimirlo: alcanza para diagnosticar
+    // y no deja la dirección en los registros.
+    console.error(
+      `[notificar-solicitud] NOTIFICACION_EMAIL no tiene una dirección válida ` +
+        `(largo ${crudo.length}, ${crudo.includes('@') ? 'tiene' : 'NO tiene'} arroba, ` +
+        `${/\s/.test(crudo) ? 'tiene espacios o saltos de línea' : 'sin espacios'})`
+    );
+    return NextResponse.json({ ok: false, motivo: 'destino_invalido' }, { status: 503 });
   }
 
   let datos: Cuerpo;
@@ -108,7 +135,7 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         from: process.env.NOTIFICACION_REMITENTE || REMITENTE_POR_DEFECTO,
-        to: destino.split(',').map((d) => d.trim()),
+        to: destino,
         // Responder al correo contesta directo al cliente, sin copiar y pegar.
         reply_to: correo,
         subject: asunto,
