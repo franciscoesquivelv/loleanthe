@@ -26,6 +26,10 @@ import toast from 'react-hot-toast';
 type Tab = 'catalog' | 'inquiries';
 type Mode = 'list' | 'create' | 'edit';
 
+/** Los 7 primeros caracteres del commit desplegado. Vercel expone la variable
+ *  sola cuando el proyecto tiene activadas las variables de sistema. */
+const VERSION = (process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? 'local').slice(0, 7);
+
 /** Una escritura de Firestore o una subida a Storage no tienen límite de tiempo
  *  propio: si la conexión se degrada, la promesa queda pendiente para siempre y
  *  el botón gira sin fin. Este tope la convierte en un error visible. */
@@ -396,12 +400,19 @@ export default function AdminDashboard() {
             <Image src="/logo-wordmark-white.png" alt="Loleanthe" width={200} height={73} className="h-6 w-auto object-contain opacity-70" style={{ width: 'auto' }} />
             <span className="text-[#7B7369] text-xs tracking-widest uppercase font-display hidden sm:block">Panel de Administración</span>
           </div>
-          <button
-            onClick={handleLogout}
-            className="font-display text-xs tracking-widest uppercase text-[#7B7369] hover:text-[#7B7369] transition-colors"
-          >
-            Cerrar sesión
-          </button>
+          <div className="flex items-center gap-5">
+            {/* Marcador de versión: si el navegador sirve un bundle viejo desde
+                la caché, este número lo delata sin tener que adivinar. */}
+            <span className="label text-bone/40" title="Versión desplegada">
+              {VERSION}
+            </span>
+            <button
+              onClick={handleLogout}
+              className="label text-bone/55 transition-colors hover:text-bone"
+            >
+              Cerrar sesión
+            </button>
+          </div>
         </div>
       </header>
 
@@ -919,6 +930,12 @@ export default function AdminDashboard() {
                       <p className="font-display text-[#7B7369] text-sm">Haz clic para subir imágenes</p>
                       <p className="text-xs text-[#7B7369] mt-1">JPG, PNG, WebP · Se optimizan automáticamente al subir</p>
                     </div>
+                    {/* El paso también se muestra acá: al elegir el archivo el
+                        botón de guardar todavía no está activo, así que el
+                        aviso de "Preparando la foto" no se llegaba a ver. */}
+                    {!saving && paso && (
+                      <p className="label mt-3 text-muted">{paso}</p>
+                    )}
                     <input
                       ref={fileInputRef}
                       type="file"
