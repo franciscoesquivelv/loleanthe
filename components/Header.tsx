@@ -6,9 +6,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useQuote } from '@/context/QuoteContext';
 
+// Precios NO va acá: es un enlace que Francisco manda directo por país
+// (/precios-cr, /precios-gt), no una sección pública del sitio.
 const NAV = [
   { href: '/catalogo', label: 'Catálogo' },
-  { href: '/precios', label: 'Precios' },
   { href: '/#origen', label: 'Origen' },
   { href: '/#contacto', label: 'Contacto' },
 ];

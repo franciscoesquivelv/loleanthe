@@ -24,7 +24,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/`, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE_URL}/catalogo`, changeFrequency: 'daily', priority: 0.9 },
     ...categoryRoutes,
-    { url: `${BASE_URL}/precios`, changeFrequency: 'monthly', priority: 0.8 },
+    // /precios, /precios-cr y /precios-gt NO van acá: son enlaces que Francisco
+    // reparte directo, con noindex en su metadata (ver app/precios*/page.tsx).
     { url: `${BASE_URL}/cotizacion`, changeFrequency: 'monthly', priority: 0.5 },
     ...flowerRoutes,
   ];

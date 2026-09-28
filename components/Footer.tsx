@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+// Precios NO va acá: es un enlace que Francisco manda directo por país
+// (/precios-cr, /precios-gt), no una sección pública del sitio.
 const LINKS = [
   { href: '/catalogo', label: 'Catálogo' },
-  { href: '/precios', label: 'Precios' },
   { href: '/#origen', label: 'Origen' },
   { href: '/cotizacion', label: 'Cotizar' },
 ];
