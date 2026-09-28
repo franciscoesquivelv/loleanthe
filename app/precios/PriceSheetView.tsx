@@ -2,15 +2,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import type { Flower } from '@/lib/types';
-import type { PriceItem } from './data';
+import type { CountryCode, Flower } from '@/lib/types';
+import type { TipoDeCambio } from '@/lib/exchange-rate';
+import { formatoLocal } from '@/lib/exchange-rate';
+import { priceFor, type PriceItem } from './data';
 import DownloadButton from './DownloadButton';
+
+const MONEDA: Record<CountryCode, { simbolo: string; tasaDe: (t: TipoDeCambio) => number; nombre: string }> = {
+  CR: { simbolo: '₡', tasaDe: (t) => t.crc, nombre: 'colones' },
+  GT: { simbolo: 'Q', tasaDe: (t) => t.gtq, nombre: 'quetzales' },
+};
 
 /**
  * El cuerpo de la hoja de precios, compartido entre `/precios` (genérica) y
- * las versiones por país (`/precios-cr`, `/precios-gt`). Las tres pueden tener
- * su propio título de sección y, más adelante, su propia lista de variedades
- * o precios: por eso `items` y `eyebrow` son props y no constantes.
+ * las versiones por país (`/precios-cr`, `/precios-gt`). La genérica no pasa
+ * `country` ni `tipoDeCambio`: se queda solo en dólares, sin favorecer una
+ * moneda sobre otra.
  */
 export default function PriceSheetView({
   items,
@@ -19,6 +26,8 @@ export default function PriceSheetView({
   eyebrow,
   whatsappNumber,
   whatsappDisplay,
+  country,
+  tipoDeCambio,
 }: {
   items: PriceItem[];
   flowers: Flower[];
@@ -26,7 +35,10 @@ export default function PriceSheetView({
   eyebrow: string;
   whatsappNumber: string;
   whatsappDisplay: string;
+  country?: CountryCode;
+  tipoDeCambio?: TipoDeCambio;
 }) {
+  const moneda = country ? MONEDA[country] : null;
   // Enlace a la ficha de la variedad cuando existe en el catálogo; si no, a su
   // categoría. Las que no están cargadas se quedan sin enlace en lugar de
   // mandar al visitante a una página vacía.
@@ -74,18 +86,30 @@ export default function PriceSheetView({
                 Precios en dólares (USD). Rosas en bunch de 25 tallos, el resto de 10.
                 La mayoría de estas variedades viene en distintos colores, escríbenos
                 para ver la disponibilidad de la temporada.
+                {moneda && tipoDeCambio && (
+                  <>
+                    {' '}El precio en dólares es el real; el de {moneda.nombre} es una
+                    referencia al tipo de cambio de hoy.
+                  </>
+                )}
               </p>
               <DownloadButton />
             </div>
 
             <p className="price-note mt-2 hidden text-[10px] text-muted">
               USD · Rosas: bunch de 25 tallos · Resto: bunch de 10 · Disponibles en distintos colores
+              {moneda && tipoDeCambio && ` · ≈ en ${moneda.nombre} al tipo de cambio de hoy, referencial`}
             </p>
           </div>
 
           <div className="price-grid grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
             {items.map((item) => {
-              const bunch = item.price != null ? item.price * item.stemsPerBunch : null;
+              const price = priceFor(item, country);
+              const bunch = price != null ? price * item.stemsPerBunch : null;
+              const local =
+                bunch != null && moneda && tipoDeCambio
+                  ? formatoLocal(bunch, moneda.tasaDe(tipoDeCambio), moneda.simbolo)
+                  : null;
               const href = hrefFor(item);
 
               const card = (
@@ -123,8 +147,11 @@ export default function PriceSheetView({
                             ${bunch.toFixed(2)}
                             <span className="label ml-1.5 align-middle text-muted">bunch</span>
                           </p>
+                          {local && (
+                            <p className="price-local mt-1 text-[12px] text-muted">≈ {local}</p>
+                          )}
                           <p className="price-stem mt-1.5 text-[13px] text-muted">
-                            ${item.price!.toFixed(2)} por tallo
+                            ${price!.toFixed(2)} por tallo
                           </p>
                         </>
                       ) : (
