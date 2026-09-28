@@ -26,18 +26,24 @@ import type { Flower } from './types';
 const COLLECTION = 'flowers';
 const MAX_IMAGE_SIZE_MB = 2;
 const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
-const STORAGE_LIMIT_BYTES = 4.5 * 1024 * 1024 * 1024; // 4.5 GB
+// Exportado: `lib/priceSheets.ts` sube fotos al mismo bucket y valida contra
+// el mismo límite total.
+export const STORAGE_LIMIT_BYTES = 4.5 * 1024 * 1024 * 1024; // 4.5 GB
 
 // ── Storage usage tracking ──────────────────────────────────────────────────
+// Exportadas porque `lib/priceSheets.ts` sube fotos al mismo bucket y tiene
+// que descontar contra el mismo contador: `_meta/storage` mide el bucket
+// completo, un segundo contador por colección quedaría desincronizado del
+// límite real.
 
-async function getStorageUsedBytes(): Promise<number> {
+export async function getStorageUsedBytes(): Promise<number> {
   const db = getDb();
   const snap = await getDoc(doc(db, '_meta', 'storage'));
   if (!snap.exists()) return 0;
   return (snap.data().usedBytes as number) ?? 0;
 }
 
-async function adjustStorageUsage(deltaBytes: number): Promise<void> {
+export async function adjustStorageUsage(deltaBytes: number): Promise<void> {
   const db = getDb();
   await setDoc(
     doc(db, '_meta', 'storage'),

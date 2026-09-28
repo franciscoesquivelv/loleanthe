@@ -22,9 +22,10 @@ import { compressImage } from '@/lib/image-compress';
 import Image from 'next/image';
 import { APERTURAS, COUNTRIES, ROSE_TIERS, countryLabels, type CountryCode, type Flower } from '@/lib/types';
 import { CATEGORIES } from '@/lib/categories';
+import PricingPanel from '../PricingPanel';
 import toast from 'react-hot-toast';
 
-type Tab = 'catalog' | 'inquiries';
+type Tab = 'catalog' | 'pricing' | 'inquiries';
 type Mode = 'list' | 'create' | 'edit';
 
 /** Los 7 primeros caracteres del commit desplegado. Vercel expone la variable
@@ -448,7 +449,7 @@ export default function AdminDashboard() {
       {/* Tabs */}
       <div className="bg-[#12100E] border-b border-[#7B7369]/10 px-6">
         <div className="max-w-7xl mx-auto flex gap-6">
-          {([['catalog', 'Catálogo'], ['inquiries', 'Solicitudes']] as const).map(([key, label]) => (
+          {([['catalog', 'Catálogo'], ['pricing', 'Precios'], ['inquiries', 'Solicitudes']] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => { setTab(key); setMode('list'); }}
@@ -1013,6 +1014,11 @@ export default function AdminDashboard() {
               </div>
             )}
           </>
+        )}
+
+        {/* =========== PRICING TAB =========== */}
+        {tab === 'pricing' && (
+          <PricingPanel catalogFlowers={flowers} />
         )}
 
         {/* =========== INQUIRIES TAB =========== */}
