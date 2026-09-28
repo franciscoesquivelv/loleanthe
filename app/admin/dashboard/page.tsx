@@ -759,7 +759,7 @@ export default function AdminDashboard() {
                   {/* Atributos de catálogo */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs tracking-widest uppercase font-display text-[#7B7369] mb-2">Tier (solo Rosas)</label>
+                      <label className="block text-xs tracking-widest uppercase font-display text-[#7B7369] mb-2">Tier (Rosas y Rosas Garden)</label>
                       <select
                         value={form.tier}
                         onChange={(e) => setForm((p) => ({ ...p, tier: e.target.value }))}

@@ -7,7 +7,13 @@
   --color-ink-2: #1E1A16;
   --color-bone: #F2EFE8;
   --color-paper: #FBF9F5;
-  --color-muted: #7B7369;
+  /* #7B7369 daba 4.07:1 sobre bone, por debajo del 4.5 que pide WCAG AA para
+     texto normal (Julian, hallazgo confirmado por Vera el 28/9). La primera
+     corrección (#746C63) medía 4.4956, JUSTO por debajo del umbral: se
+     verificó con la fórmula real de WCAG, no de memoria. Este tono da 4.63
+     sobre bone y 5.06 sobre paper, con margen real, y sigue indistinguible
+     del original a ojo. */
+  --color-muted: #726A61;
   --color-line: #DED8CD;
   --color-line-dark: #332C25;
 

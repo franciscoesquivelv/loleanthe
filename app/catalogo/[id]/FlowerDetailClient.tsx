@@ -124,6 +124,7 @@ export default function FlowerDetailClient({ flower, related = [] }: { flower: F
               </Reveal>
 
               <MaskLines
+                as="h1"
                 lines={[flower.name]}
                 className="font-serif text-ink"
                 lineClassName="text-[clamp(38px,5.5vw,72px)] font-light leading-[1.02] tracking-[-0.02em]"

@@ -44,6 +44,7 @@ export default function Contact() {
             <p className="label mb-6 text-bone/55">Contacto</p>
           </Reveal>
           <MaskLines
+            as="h2"
             lines={['Pide tu', 'cotización']}
             stagger={110}
             className="font-serif"
