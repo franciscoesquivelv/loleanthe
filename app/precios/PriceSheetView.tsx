@@ -40,8 +40,8 @@ export default function PriceSheetView({
 }) {
   const moneda = country ? MONEDA[country] : null;
   // Enlace a la ficha de la variedad cuando existe en el catálogo; si no, a su
-  // categoría. Las que no están cargadas se quedan sin enlace en lugar de
-  // mandar al visitante a una página vacía.
+  // categoría; si tampoco, sin enlace (la tarjeta se renderiza sin `group`,
+  // así el hover no promete un clic que no lleva a ningún lado).
   const hrefFor = (item: PriceItem) => {
     if (item.catalogName) {
       const match = flowers.find((f) => f.name.toLowerCase() === item.catalogName!.toLowerCase());
@@ -167,7 +167,9 @@ export default function PriceSheetView({
                   {card}
                 </Link>
               ) : (
-                <article key={item.slug} className="price-card price-reveal group bg-paper">
+                // Sin `group`: sin enlace, el hover no debe prometer un clic
+                // que no lleva a ningún lado (la foto no hace zoom).
+                <article key={item.slug} className="price-card price-reveal bg-paper">
                   {card}
                 </article>
               );
