@@ -1,3 +1,5 @@
+import type { CountryCode } from '@/lib/types';
+
 export interface PriceItem {
   slug: string;
   name: string;
@@ -7,11 +9,25 @@ export interface PriceItem {
   stemsPerBunch: number;
   /** Precio por tallo en USD. `null` = pendiente de confirmar. */
   price: number | null;
+  /**
+   * Precio por tallo distinto para CR o GT (flete, aranceles). Solo se pone
+   * la entrada del país que difiere de `price`; el que no aparece acá usa
+   * `price` tal cual. Ver `priceFor` más abajo.
+   */
+  priceByCountry?: Partial<Record<CountryCode, number>>;
   image?: string;
   /** Nombre exacto de la variedad en el catálogo, para enlazar a su ficha. */
   catalogName?: string;
   /** Si no hay ficha individual, se enlaza a la categoría. */
   categorySlug?: string;
+}
+
+/** Precio por tallo para un país dado: el override si existe, si no el general. */
+export function priceFor(item: PriceItem, country?: CountryCode): number | null {
+  if (country && item.priceByCountry?.[country] != null) {
+    return item.priceByCountry[country]!;
+  }
+  return item.price;
 }
 
 export const SHIPMENT_TITLE = 'Temporada Octubre - Diciembre';
