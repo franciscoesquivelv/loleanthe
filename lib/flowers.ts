@@ -4,6 +4,7 @@ import {
   getDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   doc,
   query,
   orderBy,
@@ -215,9 +216,20 @@ export async function createFlower(
   return docRef.id;
 }
 
+/**
+ * Centinela para borrar de verdad `vaseLifeDays` en una edición. No sirve
+ * mandar `undefined` (Firestore lo rechaza) ni `0` (el número, no ausente:
+ * la ficha lo mostraría como "0 días"). `deleteField()` es la única forma de
+ * quitar la clave del documento en un `updateDoc`.
+ */
+export const BORRAR_VASE_LIFE_DAYS = deleteField();
+
 export async function updateFlower(
   id: string,
-  data: Partial<Omit<Flower, 'id' | 'createdAt'>>,
+  // `unknown` en el valor, no solo en la clave: en edición se necesita poder
+  // mandar el centinela de arriba, que no es un `number`. Las claves siguen
+  // acotadas a los campos reales de Flower.
+  data: Partial<Record<keyof Omit<Flower, 'id' | 'createdAt'>, unknown>>,
   newImageFiles?: File[],
   avisar?: AvisoProgreso
 ): Promise<void> {
@@ -230,7 +242,7 @@ export async function updateFlower(
     // leemos las reales del doc para NUNCA borrarlas por accidente.
     let existing: string[];
     if (data.images !== undefined) {
-      existing = data.images;
+      existing = data.images as string[];
     } else {
       const snap = await getDoc(docRef);
       existing = (snap.exists() ? (snap.data().images as string[] | undefined) : undefined) ?? [];
