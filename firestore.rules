@@ -65,6 +65,39 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time;
     }
 
+    // ── priceSheets (hoja de precios / oferta) ────────────────────
+    // Un documento por temporada. `/precios`, `/precios-cr` y `/precios-gt`
+    // leen la que tenga status == 'published' (filtrado en el servidor, no
+    // acá: Firestore Rules no puede exigir "que no haya otra publicada").
+    // Esa regla de negocio, un solo published a la vez, la aplica la acción
+    // Publicar del admin (lib/priceSheets.ts), no estas reglas.
+    match /priceSheets/{sheetId} {
+      // Lectura pública: la consumen las tres rutas sin login.
+      allow read: if true;
+
+      // Solo admin crea/edita, con validación de forma. No valida cada
+      // campo de cada ítem de `items` (mismo criterio que ya usa el array
+      // `flowers` de `inquiries` más abajo): revisar 60 ítems campo por
+      // campo en reglas es costoso y frágil ante el próximo campo nuevo.
+      allow create, update: if isAdmin()
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 200
+        && request.resource.data.dateStart is string
+        && request.resource.data.dateStart.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.dateEnd is string
+        && request.resource.data.dateEnd.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 2000
+        && request.resource.data.status in ['draft', 'published', 'archived']
+        && request.resource.data.items is list
+        && request.resource.data.items.size() <= 60;
+
+      // No se puede borrar una hoja publicada: primero hay que publicar
+      // otra (que archiva esta sola) o pasarla a archived a mano.
+      allow delete: if isAdmin() && resource.data.status != 'published';
+    }
+
     // ── _meta/storage (contador de cuota) ────────────────────────
     // Lectura pública OK (la UI lo muestra). Escritura SOLO admin
     // para que nadie manipule el contador y rompa el límite de Storage.

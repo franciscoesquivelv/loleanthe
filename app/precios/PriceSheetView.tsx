@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import type { CountryCode, Flower } from '@/lib/types';
 import type { TipoDeCambio } from '@/lib/exchange-rate';
 import { formatoLocal } from '@/lib/exchange-rate';
-import { priceFor, type PriceItem } from './data';
+import { priceFor, type PriceItem } from '@/lib/priceSheets';
 import DownloadButton from './DownloadButton';
 
 const MONEDA: Record<CountryCode, { simbolo: string; tasaDe: (t: TipoDeCambio) => number; nombre: string }> = {
@@ -23,6 +23,7 @@ export default function PriceSheetView({
   items,
   flowers,
   title,
+  description,
   eyebrow,
   whatsappNumber,
   whatsappDisplay,
@@ -32,6 +33,9 @@ export default function PriceSheetView({
   items: PriceItem[];
   flowers: Flower[];
   title: string;
+  /** Editable desde el admin (sección Precios). Reemplaza el párrafo que
+   *  antes estaba escrito acá mismo en JSX. */
+  description: string;
   eyebrow: string;
   whatsappNumber: string;
   whatsappDisplay: string;
@@ -41,10 +45,12 @@ export default function PriceSheetView({
   const moneda = country ? MONEDA[country] : null;
   // Enlace a la ficha de la variedad cuando existe en el catálogo; si no, a su
   // categoría; si tampoco, sin enlace (la tarjeta se renderiza sin `group`,
-  // así el hover no promete un clic que no lleva a ningún lado).
+  // así el hover no promete un clic que no lleva a ningún lado). Antes era un
+  // match por nombre contra `catalogName`, que rompió dos veces (un typo en
+  // el catálogo, una categoría mal asignada); ahora es un id directo.
   const hrefFor = (item: PriceItem) => {
-    if (item.catalogName) {
-      const match = flowers.find((f) => f.name.toLowerCase() === item.catalogName!.toLowerCase());
+    if (item.catalogFlowerId) {
+      const match = flowers.find((f) => f.id === item.catalogFlowerId);
       if (match) return `/catalogo/${match.id}`;
     }
     if (item.categorySlug) return `/catalogo/${item.categorySlug}`;
@@ -83,9 +89,7 @@ export default function PriceSheetView({
 
             <div className="mt-8 flex flex-col gap-8 md:flex-row md:items-end md:justify-between print:hidden">
               <p className="max-w-md text-[15px] leading-relaxed text-muted">
-                Precios en dólares (USD). Rosas en bunch de 25 tallos, el resto de 10.
-                La mayoría de estas variedades viene en distintos colores, escríbenos
-                para ver la disponibilidad de la temporada.
+                {description}
                 {moneda && tipoDeCambio && (
                   <>
                     {' '}El precio en dólares es el real; el de {moneda.nombre} es una
@@ -96,8 +100,12 @@ export default function PriceSheetView({
               <DownloadButton />
             </div>
 
+            {/* Misma descripción, a tamaño de impresión: mejor repetir el
+                dato real y editable que mantener un resumen aparte a mano
+                que puede quedar desactualizado apenas Francisco cambie el
+                párrafo de arriba. */}
             <p className="price-note mt-2 hidden text-[10px] text-muted">
-              USD · Rosas: bunch de 25 tallos · Resto: bunch de 10 · Disponibles en distintos colores
+              {description}
               {moneda && tipoDeCambio && ` · ≈ en ${moneda.nombre} al tipo de cambio de hoy, referencial`}
             </p>
           </div>

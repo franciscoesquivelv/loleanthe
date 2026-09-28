@@ -20,6 +20,20 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
 
+    match /priceSheets/{sheetId}/{fileName} {
+      // Lectura pública (las fotos se sirven en /precios y sus variantes).
+      allow read: if true;
+
+      // Mismo límite que las fotos de flores. El contador de cuota es el
+      // mismo `_meta/storage` (ver adjustStorageUsage en lib/flowers.ts):
+      // mide el bucket completo, no hace falta uno por colección.
+      allow write: if isAdmin()
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
+
+      allow delete: if isAdmin();
+    }
+
     // Todo lo demás denegado.
     match /{allPaths=**} {
       allow read, write: if false;
