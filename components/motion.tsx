@@ -56,23 +56,35 @@ export function Reveal({
   );
 }
 
-/** Cada línea sube desde detrás de su propio borde, escalonadas. */
+/**
+ * Cada línea sube desde detrás de su propio borde, escalonadas.
+ *
+ * `as` por defecto es 'div': un titular visual sin peso semántico. Se usaba
+ * así en las cinco plantillas del sitio (home, catálogo, categoría, ficha de
+ * flor, cotización), así que ninguna tenía un `<h1>` real (hallazgo de Vera,
+ * 28/9). Un `<h1>` (o `<h2>` para un titular de sección, no de página) con
+ * varias líneas hijas adentro se sigue leyendo como un solo encabezado para
+ * un lector de pantalla o un buscador, así que envolver las líneas en la
+ * etiqueta correcta no cambia nada visual, solo la semántica.
+ */
 export function MaskLines({
   lines,
   className = '',
   lineClassName = '',
   stagger = 110,
   delay = 0,
+  as: Tag = 'div',
 }: {
   lines: string[];
   className?: string;
   lineClassName?: string;
   stagger?: number;
   delay?: number;
+  as?: 'div' | 'h1' | 'h2' | 'h3' | 'p';
 }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.3);
   return (
-    <div ref={ref} className={`${inView ? 'is-in' : ''} ${className}`}>
+    <Tag ref={ref as never} className={`${inView ? 'is-in' : ''} ${className}`}>
       {lines.map((line, i) => (
         <span
           key={line + i}
@@ -82,7 +94,7 @@ export function MaskLines({
           <span>{line}</span>
         </span>
       ))}
-    </div>
+    </Tag>
   );
 }
 

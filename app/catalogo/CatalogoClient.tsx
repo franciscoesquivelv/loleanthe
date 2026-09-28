@@ -29,7 +29,6 @@ const chip = (active: boolean) =>
 export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flower[] }) {
   const flowers = initialFlowers;
   const [stock, setStock] = useState<'all' | 'inStock'>('all');
-  const [category, setCategory] = useState('');
   const [apertura, setApertura] = useState('');
   const [color, setColor] = useState<ColorBucket | ''>('');
   const [pais, setPais] = useState<CountryCode | ''>('');
@@ -44,11 +43,9 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
     return Array.from(present);
   }, [flowers]);
 
-  const hasFilters =
-    stock !== 'all' || category !== '' || apertura !== '' || color !== '' || pais !== '';
+  const hasFilters = stock !== 'all' || apertura !== '' || color !== '' || pais !== '';
   const clearAll = () => {
     setStock('all');
-    setCategory('');
     setApertura('');
     setColor('');
     setPais('');
@@ -56,7 +53,6 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
 
   const displayed = flowers.filter((f) => {
     if (stock === 'inStock' && !f.inStock) return false;
-    if (category && (f.category ?? '').toLowerCase() !== category.toLowerCase()) return false;
     if (apertura && f.apertura !== apertura) return false;
     if (color && !bucketsForColors(f.colors).includes(color)) return false;
     if (pais && !isAvailableIn(f, pais)) return false;
@@ -75,6 +71,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
               </p>
             </Reveal>
             <MaskLines
+              as="h1"
               lines={['Catálogo']}
               className="font-serif text-ink"
               lineClassName="text-[clamp(44px,7vw,104px)] font-light leading-[1] tracking-[-0.02em]"
@@ -97,13 +94,17 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
 
                 <span className="h-4 w-px bg-line" aria-hidden />
 
-                <button onClick={() => setCategory('')} className={chip(category === '')}>
-                  Todas
-                </button>
+                {/* Antes eran botones que solo filtraban en el cliente, sin
+                    `href`: un buscador no tenía forma de llegar a estas 4
+                    páginas navegando el sitio, solo por el sitemap (hallazgo
+                    de Vera, 28/9). Cada categoría ya tiene su propia página
+                    indexable (/catalogo/{slug}), así que el enlace real es
+                    lo correcto acá: esta rejilla ya no filtra por categoría,
+                    "Rosas Garden" etc. llevan a su propia página. */}
                 {CATEGORIES.map((c) => (
-                  <button key={c.slug} onClick={() => setCategory(c.label)} className={chip(category === c.label)}>
+                  <Link key={c.slug} href={`/catalogo/${c.slug}`} className={chip(false)}>
                     {c.label}
-                  </button>
+                  </Link>
                 ))}
               </div>
 

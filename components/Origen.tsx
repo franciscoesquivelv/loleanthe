@@ -34,6 +34,7 @@ export default function Origen() {
             <p className="label mb-6 text-muted">Origen</p>
           </Reveal>
           <MaskLines
+            as="h2"
             lines={['Por qué Loleanthe']}
             className="font-serif text-ink"
             lineClassName="text-[clamp(38px,6vw,86px)] font-light leading-[1] tracking-[-0.02em]"

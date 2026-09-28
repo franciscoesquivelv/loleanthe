@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...excepto el ejemplo sin secretos, que sí conviene versionar (hallazgo de
+# Vera, 28/9): documenta qué variables hacen falta sin exponer ninguna real.
+!.env.local.example
 
 # vercel
 .vercel

@@ -29,6 +29,7 @@ export default function Hero() {
           </Reveal>
 
           <MaskLines
+            as="h1"
             lines={['Flores', 'fuera de serie']}
             delay={550}
             stagger={130}

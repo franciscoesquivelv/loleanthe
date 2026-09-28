@@ -21,7 +21,7 @@ export interface Flower {
   createdAt: string;
   updatedAt: string;
   category?: string;
-  tier?: RoseTier; // solo aplica a Rosas, grado del catálogo impreso
+  tier?: RoseTier; // grado del catálogo impreso: Rosas y Rosas Garden lo usan, el resto no
   apertura?: Apertura; // escala de apertura de la flor (todas las categorías)
   stemLength?: string; // rango en cm, ej. "50-70cm"
   headSize?: string; // diámetro de la cabeza, ej. "5.5 cm"

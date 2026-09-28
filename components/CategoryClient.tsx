@@ -34,6 +34,7 @@ export default function CategoryClient({ category, initialFlowers }: { category:
               </p>
             </Reveal>
             <MaskLines
+              as="h1"
               lines={[category.label]}
               className="font-serif text-ink"
               lineClassName="text-[clamp(44px,7vw,104px)] font-light leading-[1] tracking-[-0.02em]"
