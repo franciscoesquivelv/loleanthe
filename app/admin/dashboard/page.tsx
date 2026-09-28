@@ -15,6 +15,7 @@ import {
   getStorageInfo,
   validateImageFiles,
   bulkUpdateFlowers,
+  BORRAR_VASE_LIFE_DAYS,
   type EtapaSubida,
 } from '@/lib/flowers';
 import { compressImage } from '@/lib/image-compress';
@@ -242,18 +243,6 @@ export default function AdminDashboard() {
     }
     setSaving(true);
     try {
-      // Firestore rechaza `undefined` explícito, solo se incluyen los atributos con valor.
-      const attributes = {
-        ...(form.tier && { tier: form.tier as Flower['tier'] }),
-        ...(form.apertura && { apertura: form.apertura as Flower['apertura'] }),
-        ...(form.stemLength && { stemLength: form.stemLength }),
-        ...(form.headSize && { headSize: form.headSize }),
-        ...(form.vaseLifeDays && { vaseLifeDays: Number(form.vaseLifeDays) }),
-        ...(form.colors.length > 0 && { colors: form.colors }),
-        // Este va siempre, incluso vacío: `updateDoc` hace merge, así que si se
-        // omitiera, desmarcar las dos casillas no borraría el valor anterior.
-        availableIn: form.availableIn,
-      };
       // Con foto, el guardado pasa por cuatro etapas y cualquiera puede
       // trabarse. Mostrarlas convierte "se quedó cargando" en un dato.
       const avisar = (etapa: EtapaSubida, pct?: number) =>
@@ -268,6 +257,18 @@ export default function AdminDashboard() {
         );
 
       if (mode === 'create') {
+        // Firestore rechaza `undefined` explícito, y en creación se puede
+        // simplemente omitir el atributo: un documento nuevo no trae la
+        // clave si el campo quedó vacío, no hay valor viejo que proteger.
+        const attributes = {
+          ...(form.tier && { tier: form.tier as Flower['tier'] }),
+          ...(form.apertura && { apertura: form.apertura as Flower['apertura'] }),
+          ...(form.stemLength && { stemLength: form.stemLength }),
+          ...(form.headSize && { headSize: form.headSize }),
+          ...(form.vaseLifeDays && { vaseLifeDays: Number(form.vaseLifeDays) }),
+          ...(form.colors.length > 0 && { colors: form.colors }),
+          availableIn: form.availableIn,
+        };
         await conTiempoLimite(
           createFlower(
             { name: form.name, description: form.description, inStock: form.inStock, archived: form.archived, category: form.category, images: [], ...attributes },
@@ -277,6 +278,28 @@ export default function AdminDashboard() {
         );
         toast.success('Flor creada exitosamente');
       } else if (editingFlower) {
+        // BUG DE FONDO (encontrado el 2026-09-28, ver AGENTS copy/memory/Leo.md):
+        // en edición, omitir un atributo cuando el campo queda vacío NO lo
+        // borra. `updateDoc` hace merge, así que el valor viejo se queda
+        // pegado para siempre por más veces que se guarde. Así terminaron 8
+        // flores con "Tamaño de cabeza: -" imposible de limpiar desde la
+        // interfaz: cada intento de vaciar el campo y guardar dejaba el "-"
+        // intacto. Acá SIEMPRE se manda el valor actual, incluso vacío.
+        const attributes = {
+          // Texto libre: el resto del código ya los trata como ausentes
+          // cuando son '' (`flower.tier && ...`, etc.), mandarlos vacíos
+          // alcanza para borrarlos de verdad.
+          tier: form.tier || '',
+          apertura: form.apertura || '',
+          stemLength: form.stemLength || '',
+          headSize: form.headSize || '',
+          // vaseLifeDays no puede vaciarse con '' ni con 0: 0 es un valor
+          // válido (`!= null` en FlowerDetailClient lo mostraría como
+          // "0 días"). Hace falta borrar la clave de verdad.
+          vaseLifeDays: form.vaseLifeDays ? Number(form.vaseLifeDays) : BORRAR_VASE_LIFE_DAYS,
+          colors: form.colors,
+          availableIn: form.availableIn,
+        };
         await conTiempoLimite(
           updateFlower(
             editingFlower.id,
