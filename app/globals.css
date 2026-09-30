@@ -137,7 +137,7 @@ input, textarea, select {
 
 @page {
   size: letter;
-  margin: 12mm;
+  margin: 9mm;
 }
 
 @media print {
@@ -193,5 +193,5 @@ input, textarea, select {
   .price-stem { margin-top: 1px; font-size: 9px; }
   /* Mismo criterio que .price-meta: chico y compacto para no estirar la fila
      completa por un ítem con nota (hoy Gypsophila y Rosa Garden). */
-  .price-note-item { margin-top: 2px; font-size: 7px; line-height: 1.25; }
+  .price-note-item { margin-top: 1px; font-size: 6.5px; line-height: 1.15; }
 }

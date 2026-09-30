@@ -48,7 +48,13 @@ export default function Footer() {
             aria-hidden="true"
             className="relative mt-20 aspect-[1315/478] w-[clamp(280px,60vw,900px)] select-none md:mt-28"
           >
-            <Image src="/logo-wordmark-white.png" alt="" fill className="object-contain object-left" />
+            <Image
+              src="/logo-wordmark-white.png"
+              alt=""
+              fill
+              sizes="(max-width: 768px) 280px, 900px"
+              className="object-contain object-left"
+            />
           </div>
         </Reveal>
 

@@ -59,6 +59,7 @@ function parsePriceItem(v: FsValue): PriceItem {
     image: f.image?.stringValue,
     catalogFlowerId: f.catalogFlowerId?.stringValue,
     categorySlug: f.categorySlug?.stringValue,
+    note: f.note?.stringValue,
   };
 }
 
