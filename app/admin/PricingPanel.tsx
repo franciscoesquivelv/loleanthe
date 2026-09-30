@@ -66,6 +66,7 @@ interface ItemForm {
   catalogSearch: string;
   categorySlug: string;
   image: string;
+  note: string;
 }
 const itemFormVacio: ItemForm = {
   slug: '',
@@ -81,6 +82,7 @@ const itemFormVacio: ItemForm = {
   catalogSearch: '',
   categorySlug: '',
   image: '',
+  note: '',
 };
 
 export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flower[] }) {
@@ -166,6 +168,7 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
       catalogSearch: catalogFlowers.find((f) => f.id === item.catalogFlowerId)?.name ?? '',
       categorySlug: item.categorySlug ?? '',
       image: item.image ?? '',
+      note: item.note ?? '',
     });
     setItemImageFile(null);
     setItemImagePreview('');
@@ -279,6 +282,7 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
         ...(image && { image }),
         ...(itemForm.catalogFlowerId && { catalogFlowerId: itemForm.catalogFlowerId }),
         ...(itemForm.categorySlug.trim() && { categorySlug: itemForm.categorySlug.trim() }),
+        ...(itemForm.note.trim() && { note: itemForm.note.trim() }),
       };
       const priceByCountry: PriceItem['priceByCountry'] = {};
       if (itemForm.crEnabled && itemForm.crPrice.trim()) priceByCountry.CR = Number(itemForm.crPrice);
@@ -773,6 +777,21 @@ function ItemEditor({
             placeholder="Ej: 25"
             className={FIELD}
           />
+        </div>
+
+        <div>
+          <label className="label mb-2 block text-muted">Nota sobre el bunch (opcional)</label>
+          <textarea
+            value={form.note}
+            onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))}
+            placeholder="Ej: la finca puede empacar menos tallos según la variedad, para evitar maltrato de la flor"
+            rows={2}
+            className={`${FIELD} resize-none`}
+          />
+          <p className="label mt-1 text-muted/70">
+            Se muestra chico, junto al tallos/bunch, en la hoja pública. Usalo para cuando ese
+            número no es fijo (ej. Gypsophila se vende por peso, no por cantidad).
+          </p>
         </div>
 
         <div>

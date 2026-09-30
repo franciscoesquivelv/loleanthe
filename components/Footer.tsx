@@ -44,13 +44,12 @@ export default function Footer() {
         </div>
 
         <Reveal>
-          <p
+          <div
             aria-hidden="true"
-            className="mt-20 select-none font-serif text-bone md:mt-28"
-            style={{ fontSize: 'clamp(64px, 14vw, 240px)', fontWeight: 800, lineHeight: 0.85, letterSpacing: '-0.03em' }}
+            className="relative mt-20 aspect-[1315/478] w-[clamp(280px,60vw,900px)] select-none md:mt-28"
           >
-            Loleanthe
-          </p>
+            <Image src="/logo-wordmark-white.png" alt="" fill className="object-contain object-left" />
+          </div>
         </Reveal>
 
         <div className="mt-14 flex flex-col gap-3 border-t border-bone/10 pt-6 text-[11px] text-bone/40 md:flex-row md:justify-between">
