@@ -9,6 +9,7 @@ import { MaskLines, Reveal } from '@/components/motion';
 import { APERTURAS, COUNTRIES, isAvailableIn, type CountryCode, type Flower } from '@/lib/types';
 import { CATEGORIES } from '@/lib/categories';
 import { bucketsForColors, type ColorBucket } from '@/lib/colors';
+import { useQuote } from '@/context/QuoteContext';
 
 const BUCKET_SWATCH: Record<ColorBucket, string> = {
   Rojo: '#B33A3A',
@@ -28,6 +29,7 @@ const chip = (active: boolean) =>
 
 export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flower[] }) {
   const flowers = initialFlowers;
+  const { count } = useQuote();
   const [stock, setStock] = useState<'all' | 'inStock'>('all');
   const [apertura, setApertura] = useState('');
   const [color, setColor] = useState<ColorBucket | ''>('');
@@ -186,6 +188,18 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
             </div>
           )}
         </div>
+
+        <section className="mx-auto mt-24 max-w-[1500px] border-t border-line py-24 text-center md:py-32">
+          <Reveal>
+            <p className="label mb-8 text-muted">Cotización</p>
+          </Reveal>
+          <Reveal delay={120}>
+            <Link href="/cotizacion" className="label group inline-flex items-center gap-4 text-ink">
+              {count > 0 ? `Enviar tu selección (${count})` : 'Contanos qué estás buscando'}
+              <span className="h-px w-10 bg-ink transition-all duration-500 group-hover:w-16" />
+            </Link>
+          </Reveal>
+        </section>
       </main>
       <Footer />
     </>

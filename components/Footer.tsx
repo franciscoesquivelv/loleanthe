@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Reveal } from '@/components/motion';
+import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from '@/app/precios/data';
 
 // Precios NO va acá: es un enlace que Francisco manda directo por país
 // (/precios-cr, /precios-gt), no una sección pública del sitio.
@@ -9,6 +11,9 @@ const LINKS = [
   { href: '/#origen', label: 'Origen' },
   { href: '/cotizacion', label: 'Cotizar' },
 ];
+
+const WHATSAPP_HREF = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola, quiero cotizar flor al por mayor')}`;
+const NAV_LINK_CLASS = 'label text-bone/70 transition-opacity duration-300 hover:opacity-100 hover:text-bone';
 
 export default function Footer() {
   return (
@@ -28,16 +33,25 @@ export default function Footer() {
 
           <nav className="flex flex-wrap gap-8">
             {LINKS.map(({ href, label }) => (
-              <Link
-                key={label}
-                href={href}
-                className="label text-bone/70 transition-opacity duration-300 hover:opacity-100 hover:text-bone"
-              >
+              <Link key={label} href={href} className={NAV_LINK_CLASS}>
                 {label}
               </Link>
             ))}
+            <a href={WHATSAPP_HREF} target="_blank" rel="noreferrer" className={NAV_LINK_CLASS}>
+              WhatsApp {WHATSAPP_DISPLAY}
+            </a>
           </nav>
         </div>
+
+        <Reveal>
+          <p
+            aria-hidden="true"
+            className="mt-20 select-none font-serif text-bone md:mt-28"
+            style={{ fontSize: 'clamp(64px, 14vw, 240px)', fontWeight: 800, lineHeight: 0.85, letterSpacing: '-0.03em' }}
+          >
+            Loleanthe
+          </p>
+        </Reveal>
 
         <div className="mt-14 flex flex-col gap-3 border-t border-bone/10 pt-6 text-[11px] text-bone/40 md:flex-row md:justify-between">
           <p>© {new Date().getFullYear()} Loleanthe</p>
