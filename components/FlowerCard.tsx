@@ -12,6 +12,14 @@ interface Props {
   detailHref?: string;
 }
 
+// La foto de origen deja ver la pared del estudio arriba del recorte por
+// defecto (centro): bajar el punto de referencia la saca de cuadro sin
+// perder flor. Por id en vez de nombre porque el nombre puede cambiar
+// desde el admin y este ajuste es específico de ESTA foto, no de la flor.
+const IMAGE_POSITION: Record<string, string> = {
+  dmp0797ppb2160xonrZM: 'center 80%', // Cotton Xpression
+};
+
 export default function FlowerCard({ flower, priority = false, detailHref }: Props) {
   const { addToQuote, isInQuote, removeFromQuote } = useQuote();
   const inQuote = isInQuote(flower.id);
@@ -40,6 +48,7 @@ export default function FlowerCard({ flower, priority = false, detailHref }: Pro
             fill
             priority={priority}
             sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectPosition: IMAGE_POSITION[flower.id] }}
             className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
           />
         ) : (

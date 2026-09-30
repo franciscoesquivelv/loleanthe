@@ -147,6 +147,11 @@ export default function PriceSheetView({
                     <p className="price-meta label mt-2 text-muted">
                       {[item.size, `${item.stemsPerBunch} tallos`].filter(Boolean).join(' · ')}
                     </p>
+                    {item.note && (
+                      <p className="price-note-item mt-1 text-[11px] leading-snug text-muted/80">
+                        {item.note}
+                      </p>
+                    )}
 
                     <div className="price-split mt-4 border-t border-line pt-3">
                       {bunch != null ? (

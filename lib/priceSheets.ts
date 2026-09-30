@@ -51,6 +51,12 @@ export interface PriceItem {
   catalogFlowerId?: string;
   /** Si no hay ficha individual, se enlaza a la categoría. */
   categorySlug?: string;
+  /**
+   * Aclaración corta y visible junto al tallos/bunch: para cuando el dato no
+   * es un número fijo (ej. Gypsophila se vende por peso, no por cantidad;
+   * algunas garden roses vienen con menos tallos por bunch según la finca).
+   */
+  note?: string;
 }
 
 export type PriceSheetStatus = 'draft' | 'published' | 'archived';
