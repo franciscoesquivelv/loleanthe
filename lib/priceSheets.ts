@@ -165,6 +165,16 @@ export async function updatePriceSheet(
 ): Promise<void> {
   const db = getDb();
   await updateDoc(doc(db, COLLECTION, id), { ...data, updatedAt: serverTimestamp() });
+
+  // Best-effort, igual que en publishPriceSheet: si la hoja editada ya
+  // estaba publicada, el cambio (precio, nota, foto) tiene que verse ya, no
+  // en hasta 5 min (ISR). Revalidar una hoja que sigue en borrador no hace
+  // daño, las rutas públicas igual muestran la que esté published.
+  try {
+    await fetch('/api/revalidar-precios', { method: 'POST' });
+  } catch (err) {
+    console.error('[updatePriceSheet] no se pudo revalidar de inmediato:', err);
+  }
 }
 
 /**
