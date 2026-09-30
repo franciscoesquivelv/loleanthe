@@ -8,8 +8,9 @@ const category = getCategoryBySlug('rosas-garden')!;
 const OG_IMAGE = { url: category.fallbackImage, width: 1200, height: 630, alt: category.label };
 
 export const metadata: Metadata = {
-  title: category.label,
-  description: `${category.blurb} Rosas garden importadas de Ecuador, disponibles para cotización en Loleanthe.`,
+  title: 'Rosas Garden al por Mayor para Bodas',
+  description:
+    'Rosas garden de copa abierta, la variedad que más se pide para ramo de novia y centros de mesa románticos. Al por mayor para Costa Rica y Guatemala.',
   alternates: { canonical: '/catalogo/rosas-garden' },
   openGraph: {
     title: `${category.label} | Loleanthe`,

@@ -29,7 +29,7 @@ export async function generateMetadata({
   }
   const description =
     flower.description ||
-    `${flower.name}: flor premium de Loleanthe, disponible para cotización.`;
+    `${flower.name}: flor importada al por mayor para floristas de bodas y eventos en Costa Rica y Guatemala.`;
   // Redefinir `openGraph` o `twitter` en una ruta hija REEMPLAZA por completo
   // el objeto del layout, no lo combina campo por campo (verificado contra
   // node_modules/next/dist/docs/.../generate-metadata.md). Por eso cada campo
@@ -98,6 +98,7 @@ export default async function FlowerDetailPage({
     image: flower.images.length > 0 ? flower.images : undefined,
     category: flower.category || undefined,
     brand: { '@type': 'Brand', name: 'Loleanthe' },
+    audience: { '@type': 'BusinessAudience', audienceType: 'Floristas de bodas y eventos' },
     ...(additionalProperty.length > 0 && { additionalProperty }),
     // Modelo por cotización: se expone disponibilidad y URL, sin precio público.
     offers: {

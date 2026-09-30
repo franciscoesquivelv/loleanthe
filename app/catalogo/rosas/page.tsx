@@ -8,8 +8,9 @@ const category = getCategoryBySlug('rosas')!;
 const OG_IMAGE = { url: category.fallbackImage, width: 1200, height: 630, alt: category.label };
 
 export const metadata: Metadata = {
-  title: category.label,
-  description: `${category.blurb} Rosas premium importadas, disponibles para cotización en Loleanthe.`,
+  title: 'Rosas al por Mayor para Bodas y Eventos',
+  description:
+    'Rosas de tallo largo importadas, cabezas grandes, para el centro de mesa y el arco que necesitan presencia. Cotización al por mayor CR y GT.',
   alternates: { canonical: '/catalogo/rosas' },
   openGraph: {
     title: `${category.label} | Loleanthe`,

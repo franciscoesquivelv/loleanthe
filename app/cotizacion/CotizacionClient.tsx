@@ -163,7 +163,8 @@ export default function CotizacionClient() {
                     className={`${FIELD} ${form.buyerType ? 'text-ink' : 'text-muted/70'}`}
                   >
                     <option value="">Tipo de negocio</option>
-                    <option value="Floristería">Floristería</option>
+                    <option value="Floristería de bodas y eventos">Floristería de bodas y eventos</option>
+                    <option value="Floristería (reposición)">Floristería (reposición)</option>
                     <option value="Decorador de eventos">Decorador de eventos</option>
                     <option value="Hotel">Hotel</option>
                     <option value="Otro">Otro</option>

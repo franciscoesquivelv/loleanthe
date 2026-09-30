@@ -4,6 +4,9 @@ export interface Category {
   blurb: string;
   // Imagen de respaldo mientras la categoría no tenga flores reales cargadas.
   fallbackImage: string;
+  // Enlace de vuelta a /flores-para-bodas: solo en las categorías donde el
+  // nicho de bodas pega más fuerte (Rosas Garden, Ranunculus).
+  weddingGuide?: boolean;
 }
 
 export const CATEGORIES: Category[] = [
@@ -16,19 +19,21 @@ export const CATEGORIES: Category[] = [
   {
     slug: 'rosas-garden',
     label: 'Rosas Garden',
-    blurb: 'Copa abierta y decenas de pétalos, con aire de jardín.',
+    blurb: 'Copa abierta y decenas de pétalos, la favorita para el ramo de novia.',
     fallbackImage: '/images/rosa-garden.jpg',
+    weddingGuide: true,
   },
   {
     slug: 'ranunculus',
     label: 'Ranunculus',
-    blurb: 'Pétalos en capas, colores imposibles de replicar.',
+    blurb: 'Pétalos en capas, colores imposibles de replicar, de las favoritas para bouquet de boda en temporada.',
     fallbackImage: '/images/ranunculus-hestia.jpg',
+    weddingGuide: true,
   },
   {
     slug: 'fillers',
     label: 'Fillers',
-    blurb: 'Textura y volumen que completan cualquier composición.',
+    blurb: 'Textura y volumen, el toque final de un centro de mesa de boda.',
     fallbackImage: '/images/flor-filler-web.jpg',
   },
 ];

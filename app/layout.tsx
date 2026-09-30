@@ -22,11 +22,11 @@ const body = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL('https://loleanthe.com'),
   title: {
-    default: 'Loleanthe · Flor ecuatoriana para floristas y decoradores',
+    default: 'Loleanthe · Flor Ecuatoriana al por Mayor para Bodas | CR y GT',
     template: '%s | Loleanthe',
   },
-  description: 'Consolidamos flor ecuatoriana de varias fincas y la importamos bajo pedido para floristas, decoradores, hoteles y más en Costa Rica y Guatemala.',
-  keywords: 'flor ecuatoriana, rosas de tallo largo, flores al por mayor, importador de flores Costa Rica, flores Guatemala, ranunculus',
+  description: 'Flor ecuatoriana al por mayor para floristas de bodas y eventos en Costa Rica y Guatemala. Rosas, rosas garden y ranunculus importados por pedido. Pedí tu cotización.',
+  keywords: 'flor ecuatoriana, rosas de tallo largo, flores al por mayor, importador de flores Costa Rica, flores Guatemala, ranunculus, mayorista de flores para bodas, flor importada para bodas Guatemala, rosas garden al por mayor',
   alternates: {
     canonical: '/',
   },

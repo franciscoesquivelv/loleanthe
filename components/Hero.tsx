@@ -25,7 +25,7 @@ export default function Hero() {
       <div className="relative flex h-full flex-col justify-end px-6 pb-16 md:px-10 md:pb-20">
         <div className="mx-auto w-full max-w-[1500px]">
           <Reveal delay={400} y={14}>
-            <p className="label mb-6 text-bone/70">Costa Rica · Guatemala</p>
+            <p className="label mb-6 text-bone/70">Mayoristas de flor para bodas y eventos · Costa Rica · Guatemala</p>
           </Reveal>
 
           <MaskLines
@@ -41,7 +41,7 @@ export default function Hero() {
             <Reveal delay={950} y={18}>
               <p className="max-w-md text-[15px] leading-relaxed text-bone/75">
                 Consolidamos flor ecuatoriana de varias fincas y la traemos bajo pedido
-                para floristas, decoradores, hoteles y más.
+                para floristas de bodas y eventos, y también decoradores y hoteles.
               </p>
             </Reveal>
 

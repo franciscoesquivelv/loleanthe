@@ -13,18 +13,18 @@ const OG_IMAGE = { url: '/images/hero-dark.jpg', width: 1200, height: 630, alt: 
  */
 export const metadata: Metadata = {
   title: 'Cotización',
-  description: 'Pide cotización de flor ecuatoriana consolidada, importada bajo pedido para Costa Rica y Guatemala.',
+  description: 'Pedí cotización de flor ecuatoriana al por mayor para tu boda o evento en Costa Rica y Guatemala. Respondemos en menos de 24 horas.',
   alternates: { canonical: '/cotizacion' },
   openGraph: {
     title: 'Cotización | Loleanthe',
-    description: 'Pide cotización de flor ecuatoriana consolidada, importada bajo pedido para Costa Rica y Guatemala.',
+    description: 'Pedí cotización de flor ecuatoriana al por mayor para tu boda o evento en Costa Rica y Guatemala. Respondemos en menos de 24 horas.',
     url: '/cotizacion',
     images: [OG_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cotización | Loleanthe',
-    description: 'Pide cotización de flor ecuatoriana consolidada, importada bajo pedido para Costa Rica y Guatemala.',
+    description: 'Pedí cotización de flor ecuatoriana al por mayor para tu boda o evento en Costa Rica y Guatemala. Respondemos en menos de 24 horas.',
     images: [OG_IMAGE.url],
   },
 };
