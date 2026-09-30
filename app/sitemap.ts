@@ -23,6 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: `${BASE_URL}/`, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE_URL}/catalogo`, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/flores-para-bodas`, changeFrequency: 'monthly', priority: 0.9 },
     ...categoryRoutes,
     // /precios, /precios-cr y /precios-gt NO van acá: son enlaces que Francisco
     // reparte directo, con noindex en su metadata (ver app/precios*/page.tsx).

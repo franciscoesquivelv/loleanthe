@@ -42,6 +42,16 @@ export default function CategoryClient({ category, initialFlowers }: { category:
             <Reveal delay={200}>
               <p className="mt-8 max-w-lg text-[15px] leading-relaxed text-muted">{category.blurb}</p>
             </Reveal>
+            {category.weddingGuide && (
+              <Reveal delay={260}>
+                <Link
+                  href="/flores-para-bodas"
+                  className="mt-4 inline-block max-w-lg text-[14px] text-ink underline underline-offset-4 decoration-line transition-colors hover:text-muted"
+                >
+                  ¿Es para una boda? Mirá nuestra guía completa de flores para bodas y eventos
+                </Link>
+              </Reveal>
+            )}
           </div>
 
           <Reveal delay={120}>

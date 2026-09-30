@@ -8,8 +8,9 @@ const category = getCategoryBySlug('fillers')!;
 const OG_IMAGE = { url: category.fallbackImage, width: 1200, height: 630, alt: category.label };
 
 export const metadata: Metadata = {
-  title: category.label,
-  description: `${category.blurb} Flores de relleno exóticas, disponibles para cotización en Loleanthe.`,
+  title: 'Flores de Relleno al por Mayor para Bodas y Eventos',
+  description:
+    'Textura y volumen para completar centros de mesa y arreglos de boda. Fillers importados al por mayor para Costa Rica y Guatemala.',
   alternates: { canonical: '/catalogo/fillers' },
   openGraph: {
     title: `${category.label} | Loleanthe`,

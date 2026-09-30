@@ -10,6 +10,7 @@ import { useQuote } from '@/context/QuoteContext';
 // (/precios-cr, /precios-gt), no una sección pública del sitio.
 const NAV = [
   { href: '/catalogo', label: 'Catálogo' },
+  { href: '/flores-para-bodas', label: 'Bodas y Eventos' },
   { href: '/#origen', label: 'Origen' },
   { href: '/#contacto', label: 'Contacto' },
 ];

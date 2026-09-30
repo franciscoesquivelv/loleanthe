@@ -16,7 +16,7 @@ const ROWS = [
   {
     label: 'Producto',
     title: 'Tallo largo, cabeza grande',
-    desc: 'Hasta 80 cm. Cada variedad llega con su ficha: apertura, largo de tallo y vida en florero, para que puedas prometerle algo concreto a tu cliente.',
+    desc: 'Hasta 80 cm. Cada variedad llega con su ficha: apertura, largo de tallo y vida en florero, para que puedas prometerle un centro de mesa o un ramo que aguante toda la boda.',
   },
   {
     label: 'Selección',

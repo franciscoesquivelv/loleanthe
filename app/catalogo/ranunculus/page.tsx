@@ -8,8 +8,9 @@ const category = getCategoryBySlug('ranunculus')!;
 const OG_IMAGE = { url: category.fallbackImage, width: 1200, height: 630, alt: category.label };
 
 export const metadata: Metadata = {
-  title: category.label,
-  description: `${category.blurb} Ranunculus importados, disponibles para cotización en Loleanthe.`,
+  title: 'Ranunculus al por Mayor para Bodas | Flor de Temporada',
+  description:
+    'Ranunculus importado, pétalos en capas y colores que no se consiguen en el mercado local. Ideal para bouquets de boda de temporada. Al por mayor CR y GT.',
   alternates: { canonical: '/catalogo/ranunculus' },
   openGraph: {
     title: `${category.label} | Loleanthe`,

@@ -25,8 +25,8 @@ const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
 initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore();
 
-// TODO(Francisco): confirmar las fechas reales de esta temporada antes de
-// correr el script. "YYYY-MM-DD", como las guarda el documento.
+// La temporada es por mes, no por fecha exacta: octubre a diciembre
+// completos. "YYYY-MM-DD", como las guarda el documento.
 const DATE_START = '2026-10-01';
 const DATE_END = '2026-12-31';
 
