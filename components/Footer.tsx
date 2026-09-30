@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Reveal } from '@/components/motion';
 import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from '@/app/precios/data';
 
 // Precios NO va acá: es un enlace que Francisco manda directo por país
@@ -42,21 +41,6 @@ export default function Footer() {
             </a>
           </nav>
         </div>
-
-        <Reveal>
-          <div
-            aria-hidden="true"
-            className="relative mt-20 aspect-[1315/478] w-[clamp(280px,60vw,900px)] select-none md:mt-28"
-          >
-            <Image
-              src="/logo-wordmark-white.png"
-              alt=""
-              fill
-              sizes="(max-width: 768px) 280px, 900px"
-              className="object-contain object-left"
-            />
-          </div>
-        </Reveal>
 
         <div className="mt-14 flex flex-col gap-3 border-t border-bone/10 pt-6 text-[11px] text-bone/40 md:flex-row md:justify-between">
           <p>© {new Date().getFullYear()} Loleanthe</p>
