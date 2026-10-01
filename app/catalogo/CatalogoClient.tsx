@@ -69,7 +69,7 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
           <div className="mb-14 md:mb-20">
             <Reveal>
               <p className="label mb-6 text-muted">
-                {flowers.length} variedades · Costa Rica y Guatemala
+                {displayed.length} variedades · Costa Rica y Guatemala
               </p>
             </Reveal>
             <MaskLines
