@@ -24,7 +24,13 @@ function hexToHsl(hex: string): [number, number, number] {
 
 export function colorBucket(hex: string): ColorBucket {
   const [h, s, l] = hexToHsl(hex);
-  if (l > 92 && s < 12) return 'Blanco';
+  // Cerca del blanco, el cálculo de saturación de HSL se dispara con
+  // diferencias de RGB mínimas (ej. #efece4, un crema casi blanco, da
+  // s=25.6%): el umbral viejo (s<12) solo atrapaba grises puros y dejaba
+  // afuera cualquier blanco con un ligerísimo tinte cálido, que terminaba
+  // en el balde de tono (acá, Naranja). Verificado contra los 13 colores
+  // reales en uso: este cambio solo mueve #efece4 a Blanco, nada más.
+  if (l > 90 && s < 30) return 'Blanco';
   if (s < 12) return 'Blanco';
   if (h < 10 || h >= 350) return 'Rojo';
   if (h < 45) return 'Naranja';
