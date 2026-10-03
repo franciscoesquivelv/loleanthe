@@ -23,6 +23,7 @@ import Image from 'next/image';
 import { APERTURAS, COUNTRIES, ROSE_TIERS, countryLabels, type CountryCode, type Flower } from '@/lib/types';
 import { CATEGORIES } from '@/lib/categories';
 import PricingPanel from '../PricingPanel';
+import ColorToggles from '../ColorToggles';
 import toast from 'react-hot-toast';
 
 type Tab = 'catalog' | 'pricing' | 'inquiries';
@@ -212,12 +213,6 @@ export default function AdminDashboard() {
       return prev.filter((_, i) => i !== idx);
     });
   };
-
-  const addColor = () => setForm((p) => ({ ...p, colors: [...p.colors, '#7B7369'] }));
-  const updateColor = (idx: number, value: string) =>
-    setForm((p) => ({ ...p, colors: p.colors.map((c, i) => (i === idx ? value : c)) }));
-  const removeColor = (idx: number) =>
-    setForm((p) => ({ ...p, colors: p.colors.filter((_, i) => i !== idx) }));
 
   const removeExistingImage = async (url: string) => {
     if (!editingFlower) return;
@@ -823,41 +818,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Colores disponibles */}
-                  <div>
-                    <label className="block text-xs tracking-widest uppercase font-display text-[#7B7369] mb-2">Colores disponibles</label>
-                    <div className="flex flex-wrap items-center gap-3">
-                      {form.colors.map((color, idx) => (
-                        <div key={idx} className="relative">
-                          <input
-                            type="color"
-                            value={color}
-                            onChange={(e) => updateColor(idx, e.target.value)}
-                            className="w-10 h-10 border border-[#A39C92] cursor-pointer p-0"
-                            aria-label={`Color ${idx + 1}`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeColor(idx)}
-                            className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center leading-none"
-                            aria-label="Quitar color"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={addColor}
-                        className="w-10 h-10 border border-dashed border-[#A39C92] text-[#7B7369] text-lg flex items-center justify-center hover:border-[#7B7369] transition-colors"
-                        aria-label="Agregar color"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <p className="text-xs text-[#7B7369] mt-2">
-                      Algunas variedades vienen en varios colores (ej. ranunculus, lisianthus). Agrega uno por cada opción disponible.
-                    </p>
-                  </div>
+                  <ColorToggles colors={form.colors} onChange={(colors) => setForm((p) => ({ ...p, colors }))} />
 
                   {/* Dónde está esta flor */}
                   <div>
