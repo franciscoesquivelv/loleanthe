@@ -70,13 +70,13 @@ export default function PriceSheetView({
       <main className="min-h-screen bg-bone px-6 pb-20 pt-32 md:px-10 md:pt-40 print:px-2 print:pb-1 print:pt-0">
         <div className="mx-auto max-w-[1400px]">
           {/* Encabezado de la versión impresa: solo el logo */}
-          <div className="mb-4 hidden justify-center pt-1 print:flex">
+          <div className="mb-3 hidden justify-center pt-1 print:flex">
             <Image
               src="/logo-wordmark.png"
               alt="Loleanthe"
               width={200}
               height={73}
-              className="h-9 w-auto object-contain"
+              className="h-7 w-auto object-contain"
               style={{ width: 'auto' }}
             />
           </div>

@@ -137,7 +137,7 @@ input, textarea, select {
 
 @page {
   size: letter;
-  margin: 9mm;
+  margin: 8mm;
 }
 
 @media print {
@@ -152,7 +152,7 @@ input, textarea, select {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
-    gap: 7px;
+    gap: 6px;
   }
   /* 3 por fila: con 9 variedades salen 3 filas exactas, sin la tarjeta huérfana
      que dejaba la rejilla de 4. El margen holgado evita que el redondeo de
@@ -167,16 +167,19 @@ input, textarea, select {
   /* El tamaño impreso vive aquí y no en utilidades `print:` sueltas, para que
      la altura total de la hoja sea verificable de un solo lugar. */
   .price-head { padding: 0 0 5px; }
-  .price-title { font-size: 27px; line-height: 1; }
+  .price-title { font-size: 25px; line-height: 1; }
   .price-head .label { margin-bottom: 4px; font-size: 7.5px; }
   .price-note { display: block; margin-top: 3px; font-size: 8.5px; }
 
   /* Foto apaisada al imprimir: a 3 por fila la tarjeta es mucho más ancha, así
      que la proporción tiene que achatarse para que la fila mida lo mismo que
-     antes. Con 4:3 o con un cuadrado, las tres filas se iban a una segunda hoja. */
-  .price-photo { aspect-ratio: 7 / 5; }
+     antes. Con 4:3 o con un cuadrado, las tres filas se iban a una segunda hoja.
+     3:2 y no 7:5: las dos notas de ítem (Rosa Garden, Gypsophila) estiraron las
+     filas 1 y 3 y la tercera fila se pasaba ~30 px, justo lo que costaba esa
+     fila entera en una segunda hoja con tres tarjetas solas. */
+  .price-photo { aspect-ratio: 3 / 2; }
 
-  .price-body { padding: 6px 10px 6px; }
+  .price-body { padding: 5px 10px 5px; }
   /* Altura mínima para el nombre: si una tarjeta parte el nombre en dos
      líneas, los precios de toda la fila siguen alineados. */
   .price-name { font-size: 15px; line-height: 1.15; min-height: 1.2em; }
@@ -186,7 +189,7 @@ input, textarea, select {
     letter-spacing: 0.12em;
     white-space: nowrap;
   }
-  .price-split { margin-top: 5px; padding-top: 5px; }
+  .price-split { margin-top: 4px; padding-top: 4px; }
   .price-bunch { font-size: 19px; white-space: nowrap; }
   .price-bunch .label { margin-left: 4px; font-size: 7px; letter-spacing: 0.1em; }
   .price-local { margin-top: 0; font-size: 7.5px; white-space: nowrap; }
