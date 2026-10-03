@@ -19,7 +19,9 @@ const BUCKET_SWATCH: Record<ColorBucket, string> = {
   Verde: '#7E9464',
   Azul: '#5B6E9C',
   Morado: '#8A6A9E',
-  Blanco: '#EFEBE3',
+  // Blanco puro, no crema: el fondo del sitio es #F2EFE8 y un crema casi
+  // igual desaparecía. Se distingue por el borde (ver el botón), no por el tono.
+  Blanco: '#FFFFFF',
 };
 
 const chip = (active: boolean) =>
@@ -145,8 +147,14 @@ export default function CatalogoClient({ initialFlowers }: { initialFlowers: Flo
                         onClick={() => setColor((prev) => (prev === bucket ? '' : bucket))}
                         title={bucket}
                         aria-label={`Filtrar por ${bucket}`}
-                        className={`h-4 w-4 rounded-full transition-all duration-300 ${
-                          color === bucket ? 'ring-1 ring-ink ring-offset-4 ring-offset-bone' : 'opacity-70 hover:opacity-100'
+                        className={`h-4 w-4 rounded-full border transition-all duration-300 ${
+                          bucket === 'Blanco' ? 'border-ink/40' : 'border-ink/15'
+                        } ${
+                          color === bucket
+                            ? 'ring-1 ring-ink ring-offset-4 ring-offset-bone'
+                            : bucket === 'Blanco'
+                              ? ''
+                              : 'opacity-70 hover:opacity-100'
                         }`}
                         style={{ backgroundColor: BUCKET_SWATCH[bucket] }}
                       />
