@@ -3,7 +3,8 @@
 import type { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
 import type { PriceItem, PriceSheet } from '@/lib/priceSheets';
-import { priceRange, stemPriceLabel } from '@/lib/price-sheet-rules';
+import { availabilityNote, availabilityWarnings, priceRange, stemPriceLabel } from '@/lib/price-sheet-rules';
+import type { Flower } from '@/lib/types';
 import {
   PRICE_DESTINATIONS,
   destinationInfo,
@@ -34,6 +35,7 @@ export default function SheetEditor({
   form,
   setForm,
   sheet,
+  catalogFlowers,
   vivasPorDestino,
   dirty,
   guardando,
@@ -51,6 +53,8 @@ export default function SheetEditor({
   setForm: Dispatch<SetStateAction<SheetFormState>>;
   /** La hoja guardada; `null` mientras es nueva y todavía no se guardó. */
   sheet: PriceSheet | null;
+  /** El catálogo, para marcar qué flores no llegan al destino de la hoja. */
+  catalogFlowers: Flower[];
   /** La hoja publicada hoy en cada destino, para decir qué reemplazaría esta. */
   vivasPorDestino: Partial<Record<PriceDestination, PriceSheet>>;
   dirty: boolean;
@@ -73,6 +77,8 @@ export default function SheetEditor({
   const info = dest ? destinationInfo(dest) : null;
   const ocupante = dest ? vivasPorDestino[dest] : undefined;
   const nFlores = form.items.length;
+  const flowerPorId = new Map(catalogFlowers.map((f) => [f.id, f]));
+  const avisosCatalogo = availabilityWarnings(form, catalogFlowers);
 
   const estado = esNueva ? 'Nueva' : viva ? `En vivo ${info?.en ?? ''}`.trim() : archivada ? 'Archivada' : 'Borrador';
 
@@ -229,6 +235,12 @@ export default function SheetEditor({
           <p className="mt-3 text-[14px] text-muted">Guardá la hoja para empezar a agregar flores.</p>
         )}
 
+        {avisosCatalogo.map((a) => (
+          <p key={a.code} className={`${AVISO} mt-4`}>
+            {a.text} Revisá si siguen en la hoja.
+          </p>
+        ))}
+
         {nFlores === 0 ? (
           !esNueva && (
             <div className="mt-6 border-t border-line py-10">
@@ -275,11 +287,18 @@ export default function SheetEditor({
                       'Precio a confirmar'
                     )}
                   </p>
-                  {priceRange(item) && (
-                    <p className="mt-1">
-                      <span className={ETIQ_DESTINO}>Revisar el precio</span>
-                    </p>
-                  )}
+                  {(() => {
+                    const flor = item.catalogFlowerId ? flowerPorId.get(item.catalogFlowerId) : undefined;
+                    const nota = flor ? availabilityNote(flor, dest) : null;
+                    return (
+                      (nota?.fuera || priceRange(item)) && (
+                        <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                          {nota?.fuera && <span className={ETIQ_DESTINO}>{nota.text}</span>}
+                          {priceRange(item) && <span className={ETIQ_DESTINO}>Revisar el precio</span>}
+                        </p>
+                      )
+                    );
+                  })()}
                   <div className="mt-1 flex flex-wrap items-center gap-x-6">
                     <button type="button" onClick={() => onEditarItem(i)} className={ACCION}>
                       Editar

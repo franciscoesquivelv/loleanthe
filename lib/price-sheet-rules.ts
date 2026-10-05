@@ -2,8 +2,9 @@
 // Firebase, sin reloj. El admin las usa para decir qué va a pasar ANTES de
 // confirmar, y las acciones de lib/priceSheets.ts para aplicarlas, así que lo
 // que la pantalla promete y lo que se escribe salen de la misma cuenta.
-import type { PriceDestination } from './price-destinations';
+import { destinationInfo, type PriceDestination } from './price-destinations';
 import type { PriceItem, PriceSheet } from './priceSheets';
+import { COUNTRIES, isAvailableIn, type Flower } from './types';
 
 type Placement = Pick<PriceSheet, 'id' | 'status' | 'destination'>;
 
@@ -261,4 +262,93 @@ export class PriceSheetError extends Error {
     this.code = code;
     this.detail = detail;
   }
+}
+
+// ── Qué flores llegan a qué destino ────────────────────────────────────────
+//
+// La lista de ítems de CADA hoja es la respuesta a "qué flores aplican a este
+// país". El catálogo (`availableIn`) solo hace de guardia: sugiere primero las
+// que llegan, avisa si se agrega una que el catálogo no marca para ese destino,
+// pero no bloquea. La hoja es la oferta de un envío y `availableIn` un dato que
+// se marcó una vez: cuando discrepan, suele estar más al día la hoja. Y no se
+// filtra al mostrar la hoja pública: ocultar filas en silencio cambiaría una
+// oferta ya publicada sin que nadie lo sepa.
+
+type FlowerLite = Pick<Flower, 'id' | 'name' | 'availableIn'> & Partial<Pick<Flower, 'archived'>>;
+
+/**
+ * Cómo se ve una flor del catálogo respecto del destino de la hoja.
+ * - `fuera`: el catálogo la marca solo para el otro país. Se atenúa y se avisa.
+ * - Una flor SIN marcar (`availableIn` vacío) pasa cualquier filtro, igual que
+ *   en el catálogo público (lib/types.ts): son las que se cargaron antes de que
+ *   existiera el campo.
+ * - En General no hay filtro; solo se aclara si es de un solo país.
+ */
+export function availabilityNote(
+  flower: Pick<Flower, 'availableIn'>,
+  destination: PriceDestination | null
+): { fuera: boolean; text: string } {
+  const marcadas = flower.availableIn ?? [];
+  const info = destination ? destinationInfo(destination) : null;
+  if (info?.country) {
+    if (marcadas.length === 0) return { fuera: false, text: 'País sin marcar' };
+    return isAvailableIn(flower as Flower, info.country)
+      ? { fuera: false, text: '' }
+      : { fuera: true, text: `No llega a ${info.label}` };
+  }
+  if (marcadas.length === 1) {
+    return { fuera: false, text: `Solo ${COUNTRIES.find((c) => c.code === marcadas[0])?.label ?? marcadas[0]}` };
+  }
+  return { fuera: false, text: '' };
+}
+
+export const sinTildes = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
+/** Otras formas de escribir cada categoría, para que "rosa" o "ranunculo" la encuentren. */
+export const CATEGORY_ALIASES: Record<string, string[]> = {
+  rosas: ['rosa'],
+  'rosas-garden': ['garden', 'rosa garden'],
+  ranunculus: ['ranunculo', 'ranunculos'],
+  fillers: ['filler', 'relleno'],
+};
+
+/** Cada palabra de la búsqueda tiene que aparecer en el texto (sin tildes ni mayúsculas). */
+export function matchesQuery(texto: string, busqueda: string): boolean {
+  const base = sinTildes(texto);
+  return sinTildes(busqueda)
+    .split(/\s+/)
+    .filter(Boolean)
+    .every((palabra) => base.includes(palabra));
+}
+
+/** Avisos al publicar: flores que el catálogo no marca para este destino, o que
+ *  ya no están en el catálogo. No bloquean. */
+export function availabilityWarnings(
+  hoja: Pick<PriceSheet, 'destination' | 'items'>,
+  flowers: FlowerLite[]
+): SheetIssue[] {
+  const info = hoja.destination ? destinationInfo(hoja.destination) : null;
+  const porId = new Map(flowers.map((f) => [f.id, f]));
+  const fuera: string[] = [];
+  const inexistentes: string[] = [];
+  for (const item of hoja.items) {
+    if (!item.catalogFlowerId) continue; // sin enlace: no hay con qué comparar
+    const f = porId.get(item.catalogFlowerId);
+    if (!f || f.archived) inexistentes.push(item.name);
+    else if (info?.country && availabilityNote(f, hoja.destination).fuera) fuera.push(item.name);
+  }
+  const out: SheetIssue[] = [];
+  if (fuera.length > 0 && info) {
+    out.push({
+      code: 'FUERA_DE_DESTINO',
+      text: `${fuera.length === 1 ? '1 flor no llega' : `${fuera.length} flores no llegan`} a ${info.label} según el catálogo: ${lista(fuera)}.`,
+    });
+  }
+  if (inexistentes.length > 0) {
+    out.push({
+      code: 'FLOR_INEXISTENTE',
+      text: `${inexistentes.length === 1 ? '1 flor ya no está' : `${inexistentes.length} flores ya no están`} en el catálogo y se verá sin enlace a su ficha: ${lista(inexistentes)}.`,
+    });
+  }
+  return out;
 }

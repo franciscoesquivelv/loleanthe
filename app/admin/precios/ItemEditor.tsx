@@ -2,8 +2,11 @@
 
 import Image from 'next/image';
 import type { Dispatch, SetStateAction } from 'react';
+import type { Category } from '@/lib/categories';
+import type { PriceDestination } from '@/lib/price-destinations';
 import type { Flower } from '@/lib/types';
 import { parseMoneyInput, priceRange, stemPriceLabel } from '@/lib/price-sheet-rules';
+import CatalogPicker, { type YaEnHoja } from './CatalogPicker';
 import { ACCION_SUAVE, AVISO, BOTON, FIELD, chip } from './ui';
 
 /** Qué número se escribió en el campo de precio: el del bunch (lo normal, es lo
@@ -20,6 +23,7 @@ export interface ItemForm {
   price: string;
   priceMode: ModoPrecio;
   catalogFlowerId: string;
+  /** Lo escrito en el buscador del catálogo (no el nombre de la flor elegida). */
   catalogSearch: string;
   categorySlug: string;
   image: string;
@@ -73,9 +77,11 @@ export default function ItemEditor({
   setForm,
   imagePreview,
   onElegirFoto,
-  coincidencias,
-  onBuscar,
+  flowers,
+  destination,
+  yaEnHoja,
   onElegirFlor,
+  onElegirCategoria,
   onQuitarEnlace,
   onGuardar,
   onCancelar,
@@ -86,9 +92,13 @@ export default function ItemEditor({
   setForm: Dispatch<SetStateAction<ItemForm>>;
   imagePreview: string;
   onElegirFoto: (file: File) => void;
-  coincidencias: Flower[];
-  onBuscar: (texto: string) => void;
+  /** Catálogo completo; el selector deja afuera las archivadas. */
+  flowers: Flower[];
+  /** Destino de la hoja: decide qué flores se marcan como "No llega a …". */
+  destination: PriceDestination | null;
+  yaEnHoja: YaEnHoja;
   onElegirFlor: (flower: Flower) => void;
+  onElegirCategoria: (categoria: Category) => void;
   onQuitarEnlace: () => void;
   onGuardar: () => void;
   onCancelar: () => void;
@@ -161,45 +171,20 @@ export default function ItemEditor({
 
         <div>
           <label htmlFor="item-catalogo" className="label mb-2 block text-muted">
-            Enlazar a una flor del catálogo (opcional)
+            Flor del catálogo (opcional)
           </label>
-          <input
-            id="item-catalogo"
-            value={form.catalogSearch}
-            onChange={(e) => onBuscar(e.target.value)}
-            placeholder="Buscar flor del catálogo"
-            className={FIELD}
+          <CatalogPicker
+            flowers={flowers}
+            destination={destination}
+            yaEnHoja={yaEnHoja}
+            busqueda={form.catalogSearch}
+            onBuscar={(texto) => setForm((p) => ({ ...p, catalogSearch: texto }))}
+            flowerId={form.catalogFlowerId}
+            categorySlug={form.categorySlug}
+            onElegirFlor={onElegirFlor}
+            onElegirCategoria={onElegirCategoria}
+            onQuitar={onQuitarEnlace}
           />
-          {coincidencias.length > 0 && (
-            <ul className="mt-1 border-t border-line bg-paper">
-              {coincidencias.map((f) => (
-                <li key={f.id}>
-                  <button
-                    type="button"
-                    onClick={() => onElegirFlor(f)}
-                    className="flex w-full items-center gap-3 px-2 py-2 text-left hover:bg-bone"
-                  >
-                    <div className="relative h-10 w-9 shrink-0 overflow-hidden bg-line">
-                      {f.images[0] && <Image src={f.images[0]} alt="" fill sizes="36px" className="object-cover" />}
-                    </div>
-                    <span className="font-serif text-sm text-ink">{f.name}</span>
-                    {f.category && <span className="label text-muted">{f.category}</span>}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {form.catalogSearch.trim() && coincidencias.length === 0 && !form.catalogFlowerId && (
-            <p className="label mt-1 text-muted">Sin resultados</p>
-          )}
-          {form.catalogFlowerId && (
-            <p className="label mt-2 text-muted">
-              Enlazado a esta flor del catálogo ·{' '}
-              <button type="button" onClick={onQuitarEnlace} className="text-ink underline underline-offset-4">
-                Quitar enlace
-              </button>
-            </p>
-          )}
         </div>
 
         <div>
