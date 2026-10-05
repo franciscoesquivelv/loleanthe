@@ -85,6 +85,10 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [authLoading, setAuthLoading] = useState(true);
   const [tab, setTab] = useState<Tab>('catalog');
+  // Precios se monta la primera vez que se abre y DESPUÉS se queda montado
+  // (oculto) al cambiar de pestaña. Antes se desmontaba y se perdía, sin aviso,
+  // todo lo escrito en una hoja que aún no se había guardado.
+  const [preciosAbierto, setPreciosAbierto] = useState(false);
   const [mode, setMode] = useState<Mode>('list');
   const [flowers, setFlowers] = useState<Flower[]>([]);
   const [editingFlower, setEditingFlower] = useState<Flower | null>(null);
@@ -448,17 +452,24 @@ export default function AdminDashboard() {
 
       {/* Tabs */}
       <div className="bg-[#12100E] border-b border-[#7B7369]/10 px-6">
-        <div className="max-w-7xl mx-auto flex gap-6">
+        <nav aria-label="Secciones del panel" className="max-w-7xl mx-auto flex gap-6">
           {([['catalog', 'Catálogo'], ['pricing', 'Precios'], ['inquiries', 'Solicitudes']] as const).map(([key, label]) => (
             <button
               key={key}
-              onClick={() => { setTab(key); setMode('list'); }}
-              className={`font-display text-xs tracking-widest uppercase py-4 border-b-2 transition-all ${tab === key ? 'border-[#7B7369] text-[#7B7369]' : 'border-transparent text-[#7B7369] hover:text-[#7B7369]'}`}
+              onClick={() => {
+                setTab(key);
+                if (key === 'pricing') setPreciosAbierto(true);
+                setMode('list');
+              }}
+              aria-current={tab === key ? 'page' : undefined}
+              // Activa e inactiva se distinguían solo por el borde: el texto era
+              // el mismo #7B7369 en las dos (4.07:1 sobre el fondo oscuro).
+              className={`font-display text-xs tracking-widest uppercase py-4 border-b-2 transition-colors ${tab === key ? 'border-[#F2EFE8] text-[#F2EFE8]' : 'border-transparent text-[#F2EFE8]/60 hover:text-[#F2EFE8]'}`}
             >
               {label}
             </button>
           ))}
-        </div>
+        </nav>
       </div>
 
       {/* Storage warning banner */}
@@ -1017,8 +1028,10 @@ export default function AdminDashboard() {
         )}
 
         {/* =========== PRICING TAB =========== */}
-        {tab === 'pricing' && (
-          <PricingPanel catalogFlowers={flowers} />
+        {preciosAbierto && (
+          <div hidden={tab !== 'pricing'}>
+            <PricingPanel catalogFlowers={flowers} />
+          </div>
         )}
 
         {/* =========== INQUIRIES TAB =========== */}
