@@ -18,7 +18,7 @@ import { getDb, getStorageInstance } from './firebase';
 import { getStorageUsedBytes, adjustStorageUsage, STORAGE_LIMIT_BYTES } from './flowers';
 import type { AvisoProgreso } from './flowers';
 import { normalizeDestination, type PriceDestination } from './price-destinations';
-import { PriceSheetError, checkSheet, hoyLocal, planPlacement } from './price-sheet-rules';
+import { PriceSheetError, checkSheet, hoyLocal, planPlacement, readItem } from './price-sheet-rules';
 
 const COLLECTION = 'priceSheets';
 
@@ -30,10 +30,15 @@ export interface PriceItem {
   /** Largo de tallo de ESTE envío. Puede diferir del `stemLength` general de
    *  la ficha del catálogo a propósito (temporada corta o especial). */
   size?: string;
-  /** Tallos por bunch: rosas 25, el resto 10. */
-  stemsPerBunch: number;
-  /** Precio por tallo en USD. `null` = pendiente de confirmar. */
-  price: number | null;
+  /** Tallos por bunch: rosas 25, el resto 10. Ausente = se vende por peso, sin
+   *  cantidad fija (ej. Gypsophila, bunch de 250 g). */
+  stemsPerBunch?: number;
+  /**
+   * Precio del BUNCH en USD, que es lo que dicen las listas. El precio por tallo
+   * se deriva (ver stemPrice en price-sheet-rules.ts) y nunca se guarda.
+   * `null` = pendiente de confirmar.
+   */
+  bunchPrice: number | null;
   /** URL de la foto: de Firebase Storage o de /public, next/image sirve
    *  cualquiera de las dos igual. */
   image?: string;
@@ -92,23 +97,6 @@ function aIso(v: unknown): string | undefined {
   return typeof v === 'string' ? v : undefined;
 }
 
-/** Arma el ítem solo con los campos que existen. Descarta lo que quede de
- *  versiones viejas (`priceByCountry`) y nunca deja un `undefined`, que
- *  Firestore rechaza al escribir. */
-function leerItem(i: DocumentData): PriceItem {
-  return {
-    slug: i.slug ?? '',
-    name: i.name ?? '',
-    stemsPerBunch: Number(i.stemsPerBunch) || 0,
-    price: typeof i.price === 'number' ? i.price : null,
-    ...(i.size && { size: i.size }),
-    ...(i.image && { image: i.image }),
-    ...(i.catalogFlowerId && { catalogFlowerId: i.catalogFlowerId }),
-    ...(i.categorySlug && { categorySlug: i.categorySlug }),
-    ...(i.note && { note: i.note }),
-  };
-}
-
 function leerHoja(id: string, d: DocumentData): PriceSheet {
   const publishedAt = aIso(d.publishedAt);
   return {
@@ -119,7 +107,7 @@ function leerHoja(id: string, d: DocumentData): PriceSheet {
     description: d.description ?? '',
     status: d.status ?? 'draft',
     destination: normalizeDestination(d.destination),
-    items: Array.isArray(d.items) ? d.items.map(leerItem) : [],
+    items: Array.isArray(d.items) ? d.items.map((i) => readItem(i)) : [],
     createdAt: aIso(d.createdAt) ?? '',
     updatedAt: aIso(d.updatedAt) ?? '',
     ...(publishedAt && { publishedAt }),

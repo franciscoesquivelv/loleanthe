@@ -29,7 +29,7 @@ import { validateImageFiles, type EtapaSubida } from '@/lib/flowers';
 import { compressImage } from '@/lib/image-compress';
 import type { Flower } from '@/lib/types';
 import ConfirmDialog from './precios/ConfirmDialog';
-import ItemEditor, { itemFormVacio, type ItemForm } from './precios/ItemEditor';
+import ItemEditor, { itemFormVacio, parseStems, precioDeFormulario, type ItemForm, type ModoPrecio } from './precios/ItemEditor';
 import LinksList from './precios/LinksList';
 import SheetEditor, { type SheetFormState } from './precios/SheetEditor';
 import { AVISO } from './precios/ui';
@@ -123,6 +123,9 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
 
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [itemForm, setItemForm] = useState<ItemForm>(itemFormVacio);
+  // Si se empezó a cargar una lista por tallo, las flores siguientes arrancan
+  // en el mismo modo en vez de volver al del bunch cada vez.
+  const [modoPrecio, setModoPrecio] = useState<ModoPrecio>('bunch');
   const [itemImageFile, setItemImageFile] = useState<File | null>(null);
   const [itemImagePreview, setItemImagePreview] = useState<string>('');
   const [paso, setPaso] = useState('');
@@ -152,6 +155,10 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
   useEffect(() => {
     cargarHojas();
   }, [cargarHojas]);
+
+  useEffect(() => {
+    if (vista === 'item') setModoPrecio(itemForm.priceMode);
+  }, [vista, itemForm.priceMode]);
 
   // Cerrar la pestaña con cambios sin guardar: el navegador pregunta.
   useEffect(() => {
@@ -204,7 +211,7 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
 
   const abrirNuevoItem = () => {
     setEditingItemIndex(null);
-    setItemForm(itemFormVacio);
+    setItemForm({ ...itemFormVacio, priceMode: modoPrecio });
     setItemImageFile(null);
     setItemImagePreview('');
     setVista('item');
@@ -217,8 +224,9 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
       slug: item.slug,
       name: item.name,
       size: item.size ?? '',
-      stemsPerBunch: String(item.stemsPerBunch ?? ''),
-      price: item.price != null ? String(item.price) : '',
+      stemsPerBunch: item.stemsPerBunch ? String(item.stemsPerBunch) : '',
+      price: item.bunchPrice != null ? String(item.bunchPrice) : '',
+      priceMode: 'bunch',
       catalogFlowerId: item.catalogFlowerId ?? '',
       catalogSearch: catalogFlowers.find((f) => f.id === item.catalogFlowerId)?.name ?? '',
       categorySlug: item.categorySlug ?? '',
@@ -300,6 +308,16 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
       toast.error('El nombre es requerido');
       return;
     }
+    const precio = precioDeFormulario(itemForm);
+    if (!precio.ok) {
+      toast.error(precio.error);
+      return;
+    }
+    const tallos = parseStems(itemForm.stemsPerBunch);
+    if (tallos === null) {
+      toast.error('Los tallos por bunch tienen que ser un número entero. Si se vende por peso, dejalo vacío.');
+      return;
+    }
     if (!editing) {
       // No debería pasar: "Agregar flor" está deshabilitado hasta guardar la hoja.
       toast.error('Guardá la hoja antes de agregar flores.');
@@ -334,8 +352,8 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
       const item: PriceItem = {
         slug: itemForm.slug || slugify(itemForm.name),
         name: itemForm.name.trim(),
-        stemsPerBunch: Number(itemForm.stemsPerBunch) || 0,
-        price: itemForm.price.trim() ? Number(itemForm.price) : null,
+        bunchPrice: precio.bunchPrice,
+        ...(tallos && { stemsPerBunch: tallos }),
         ...(itemForm.size.trim() && { size: itemForm.size.trim() }),
         ...(image && { image }),
         ...(itemForm.catalogFlowerId && { catalogFlowerId: itemForm.catalogFlowerId }),

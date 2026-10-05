@@ -3,6 +3,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
 import type { PriceItem, PriceSheet } from '@/lib/priceSheets';
+import { priceRange, stemPriceLabel } from '@/lib/price-sheet-rules';
 import {
   PRICE_DESTINATIONS,
   destinationInfo,
@@ -10,7 +11,7 @@ import {
   urlVisible,
   type PriceDestination,
 } from '@/lib/price-destinations';
-import { ACCION, ACCION_PRINC, ACCION_SUAVE, AVISO, BOTON, FIELD } from './ui';
+import { ACCION, ACCION_PRINC, ACCION_SUAVE, AVISO, BOTON, ETIQ_DESTINO, FIELD } from './ui';
 
 export interface SheetFormState {
   title: string;
@@ -254,11 +255,31 @@ export default function SheetEditor({
                 <div className="min-w-0 flex-1">
                   <p className="font-serif text-lg font-light leading-tight text-ink">{item.name}</p>
                   <p className="label mt-1 text-muted">
-                    {[item.size, `${item.stemsPerBunch} tallos`].filter(Boolean).join(' · ')}
+                    {[item.size, item.stemsPerBunch ? `${item.stemsPerBunch} tallos` : 'Por peso'].filter(Boolean).join(' · ')}
                   </p>
                   <p className="mt-2 text-[14px] text-ink">
-                    {item.price != null ? `$${item.price.toFixed(2)} por tallo` : 'Precio a confirmar'}
+                    {item.bunchPrice != null ? (
+                      <>
+                        ${item.bunchPrice.toFixed(2)} por bunch
+                        {(() => {
+                          const sp = stemPriceLabel(item);
+                          return sp ? (
+                            <span className="text-muted">
+                              {' · '}
+                              {sp.approx ? '≈ ' : ''}${sp.text} por tallo
+                            </span>
+                          ) : null;
+                        })()}
+                      </>
+                    ) : (
+                      'Precio a confirmar'
+                    )}
                   </p>
+                  {priceRange(item) && (
+                    <p className="mt-1">
+                      <span className={ETIQ_DESTINO}>Revisar el precio</span>
+                    </p>
+                  )}
                   <div className="mt-1 flex flex-wrap items-center gap-x-6">
                     <button type="button" onClick={() => onEditarItem(i)} className={ACCION}>
                       Editar

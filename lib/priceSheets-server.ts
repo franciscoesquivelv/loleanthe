@@ -1,5 +1,6 @@
 import type { PriceItem, PriceSheet, PriceSheetStatus } from './priceSheets';
 import { normalizeDestination, type PriceDestination } from './price-destinations';
+import { readItem } from './price-sheet-rules';
 
 // Lectura pública de la hoja de precios ACTIVA de un destino desde el SERVIDOR (Server
 // Components), vía la API REST de Firestore, mismo patrón que
@@ -41,19 +42,23 @@ function arr(v?: FsValue): FsValue[] {
   return v?.arrayValue?.values ?? [];
 }
 
+/** Pasa el valor de la REST de Firestore a un objeto plano y deja que `readItem`
+ *  (el mismo que usa el admin) arme el ítem: así los dos leen igual, también la
+ *  forma vieja con `price` por tallo. Cada campo del ítem TIENE que listarse acá. */
 function parsePriceItem(v: FsValue): PriceItem {
   const f = v.mapValue?.fields ?? {};
-  return {
-    slug: str(f.slug),
-    name: str(f.name),
+  return readItem({
+    slug: f.slug?.stringValue,
+    name: f.name?.stringValue,
     size: f.size?.stringValue,
-    stemsPerBunch: num(f.stemsPerBunch) ?? 0,
+    stemsPerBunch: num(f.stemsPerBunch),
     price: num(f.price),
+    bunchPrice: num(f.bunchPrice),
     image: f.image?.stringValue,
     catalogFlowerId: f.catalogFlowerId?.stringValue,
     categorySlug: f.categorySlug?.stringValue,
     note: f.note?.stringValue,
-  };
+  });
 }
 
 // Cada campo nuevo del documento TIENE que sumarse acá: este parser es a mano
