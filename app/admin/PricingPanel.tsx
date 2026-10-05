@@ -17,7 +17,8 @@ import {
   type PriceItem,
   type PublishResult,
 } from '@/lib/priceSheets';
-import { checkSheet, hoyLocal, planPlacement, PriceSheetError } from '@/lib/price-sheet-rules';
+import { availabilityWarnings, checkSheet, hoyLocal, planPlacement, PriceSheetError } from '@/lib/price-sheet-rules';
+import type { Category } from '@/lib/categories';
 import {
   PRICE_DESTINATIONS,
   SIN_HOJA_TITULO,
@@ -228,7 +229,7 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
       price: item.bunchPrice != null ? String(item.bunchPrice) : '',
       priceMode: 'bunch',
       catalogFlowerId: item.catalogFlowerId ?? '',
-      catalogSearch: catalogFlowers.find((f) => f.id === item.catalogFlowerId)?.name ?? '',
+      catalogSearch: '',
       categorySlug: item.categorySlug ?? '',
       image: item.image ?? '',
       note: item.note ?? '',
@@ -279,27 +280,38 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
     setItemImagePreview(URL.createObjectURL(comprimida));
   };
 
-  const buscarEnCatalogo = (texto: string) => {
-    setItemForm((p) => ({ ...p, catalogSearch: texto, catalogFlowerId: '' }));
-  };
-
-  const coincidenciasCatalogo =
-    itemForm.catalogSearch.trim().length > 0 && !itemForm.catalogFlowerId
-      ? catalogFlowers
-          .filter((f) => f.name.toLowerCase().includes(itemForm.catalogSearch.trim().toLowerCase()))
-          .slice(0, 5)
-      : [];
+  // Lo que ya está en la hoja (menos la flor que se está editando) no se vuelve a ofrecer.
+  const yaEnHoja = useMemo(() => {
+    const otros = sheetForm.items.filter((_, i) => i !== editingItemIndex);
+    return {
+      flowerIds: new Set(otros.map((i) => i.catalogFlowerId).filter((x): x is string => !!x)),
+      categorySlugs: new Set(otros.map((i) => i.categorySlug).filter((x): x is string => !!x)),
+    };
+  }, [sheetForm.items, editingItemIndex]);
 
   const elegirFlorCatalogo = (flower: Flower) => {
     setItemForm((p) => ({
       ...p,
       catalogFlowerId: flower.id,
-      catalogSearch: flower.name,
+      categorySlug: '',
+      catalogSearch: '',
       // Prellena, no fuerza: solo si el campo todavía está vacío. Editar una
       // flor ya enlazada no debe pisar un nombre o foto que Francisco ya
-      // ajustó a mano para este envío.
+      // ajustó a mano para este envío. Los tallos y el precio NUNCA se
+      // prellenan: son datos comerciales de este envío.
       name: p.name || flower.name,
-      image: p.image || flower.images[0] || p.image,
+      image: p.image || flower.images[0] || '',
+    }));
+  };
+
+  const elegirCategoria = (categoria: Category) => {
+    setItemForm((p) => ({
+      ...p,
+      categorySlug: categoria.slug,
+      catalogFlowerId: '',
+      catalogSearch: '',
+      name: p.name || categoria.label,
+      image: p.image || categoria.fallbackImage,
     }));
   };
 
@@ -571,7 +583,8 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
       const reemplazadas = plan.replaces
         .map((id) => sheets.find((s) => s.id === id))
         .filter((s): s is PriceSheet => !!s);
-      const { errors, warnings } = checkSheet(sheet, hoy);
+      const { errors, warnings: avisosDeHoja } = checkSheet(sheet, hoy);
+      const warnings = [...availabilityWarnings(sheet, catalogFlowers), ...avisosDeHoja];
       const reemplaza = reemplazadas.length > 0;
       const etiqueta = reemplaza
         ? 'Reemplazar y publicar'
@@ -778,10 +791,12 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
         setForm={setItemForm}
         imagePreview={itemImagePreview || itemForm.image}
         onElegirFoto={elegirFotoItem}
-        coincidencias={coincidenciasCatalogo}
-        onBuscar={buscarEnCatalogo}
+        flowers={catalogFlowers}
+        destination={sheetForm.destination}
+        yaEnHoja={yaEnHoja}
         onElegirFlor={elegirFlorCatalogo}
-        onQuitarEnlace={() => setItemForm((p) => ({ ...p, catalogFlowerId: '', catalogSearch: '' }))}
+        onElegirCategoria={elegirCategoria}
+        onQuitarEnlace={() => setItemForm((p) => ({ ...p, catalogFlowerId: '', categorySlug: '', catalogSearch: '' }))}
         onGuardar={guardarItem}
         onCancelar={volverAHoja}
         guardando={guardando}
@@ -797,6 +812,7 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
           form={sheetForm}
           setForm={setSheetForm}
           sheet={editing}
+          catalogFlowers={catalogFlowers}
           vivasPorDestino={vivasPorDestino}
           dirty={dirty}
           guardando={guardando}
