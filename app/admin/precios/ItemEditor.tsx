@@ -5,7 +5,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { Category } from '@/lib/categories';
 import type { PriceDestination } from '@/lib/price-destinations';
 import type { Flower } from '@/lib/types';
-import { parseMoneyInput, priceRange, stemPriceLabel } from '@/lib/price-sheet-rules';
+import { NOTAS_POR_HOJA, parseMoneyInput, priceRange, stemPriceLabel } from '@/lib/price-sheet-rules';
 import CatalogPicker, { type YaEnHoja } from './CatalogPicker';
 import { ACCION_SUAVE, AVISO, BOTON, FIELD, chip } from './ui';
 
@@ -43,6 +43,10 @@ export const itemFormVacio: ItemForm = {
   image: '',
   note: '',
 };
+
+/** Lo que cabe en la tarjeta impresa: más largo se corta con "…". */
+const MAX_NOMBRE = 30;
+const MAX_NOTA = 140;
 
 /** Tallos escritos: entero >= 1, o `undefined` si se dejó vacío (por peso).
  *  `null` si lo escrito no sirve. */
@@ -163,6 +167,7 @@ export default function ItemEditor({
           <input
             id="item-nombre"
             value={form.name}
+            maxLength={MAX_NOMBRE}
             onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
             placeholder="Ej: Rosa Garden"
             className={FIELD}
@@ -238,14 +243,16 @@ export default function ItemEditor({
           <textarea
             id="item-nota"
             value={form.note}
+            maxLength={MAX_NOTA}
             onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))}
             placeholder="Ej: la finca puede empacar menos tallos según la variedad, para evitar maltrato de la flor"
             rows={2}
             className={`${FIELD} resize-none`}
           />
           <p className="label mt-1 text-muted">
-            Se muestra chico, junto al tallos/bunch, en la hoja pública. Usalo para cuando ese
-            número no es fijo (ej. Gypsophila se vende por peso, no por cantidad).
+            Se muestra junto a la flor en la hoja pública y al pie de la hoja impresa. Usalo para
+            cuando el número de tallos no es fijo (ej. Gypsophila se vende por peso). Entran
+            hasta {NOTAS_POR_HOJA} notas por hoja impresa. · {form.note.length} / {MAX_NOTA}
           </p>
         </div>
 

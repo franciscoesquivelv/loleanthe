@@ -51,3 +51,20 @@ export function formatoLocal(usd: number, tasa: number, simbolo: string): string
   const monto = Math.round(usd * tasa);
   return `${simbolo}${monto.toLocaleString('es-CR')}`;
 }
+
+/**
+ * "2 oct 2026" a partir de la fecha del cambio, que llega de dos formas: la
+ * fecha RFC de la API ("Sun, 05 Oct 2026 00:02:31 +0000") o el "YYYY-MM-DD"
+ * del respaldo. Se muestra SIEMPRE junto a la tasa: "al tipo de cambio de hoy"
+ * se vuelve falso en un PDF que circula una semana después.
+ */
+export function fechaDelCambio(fecha: string): string {
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(fecha);
+  // El respaldo es un día sin hora: se arma con componentes locales, porque
+  // `new Date('2026-09-28')` es medianoche UTC y en Costa Rica cae el día 27.
+  const d = iso ? new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3])) : new Date(fecha);
+  if (Number.isNaN(d.getTime())) return '';
+  return d
+    .toLocaleDateString('es-CR', { day: 'numeric', month: 'short', year: 'numeric', ...(iso ? {} : { timeZone: 'America/Costa_Rica' }) })
+    .replace('.', '');
+}

@@ -3,7 +3,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
 import type { PriceItem, PriceSheet } from '@/lib/priceSheets';
-import { availabilityNote, availabilityWarnings, priceRange, stemPriceLabel } from '@/lib/price-sheet-rules';
+import { availabilityNote, availabilityWarnings, priceRange, repartir, stemPriceLabel } from '@/lib/price-sheet-rules';
 import type { Flower } from '@/lib/types';
 import {
   PRICE_DESTINATIONS,
@@ -79,6 +79,7 @@ export default function SheetEditor({
   const nFlores = form.items.length;
   const flowerPorId = new Map(catalogFlowers.map((f) => [f.id, f]));
   const avisosCatalogo = availabilityWarnings(form, catalogFlowers);
+  const hojasImpresas = repartir(nFlores);
 
   const estado = esNueva ? 'Nueva' : viva ? `En vivo ${info?.en ?? ''}`.trim() : archivada ? 'Archivada' : 'Borrador';
 
@@ -225,6 +226,7 @@ export default function SheetEditor({
             <h2 className="font-serif text-2xl font-light text-ink">Flores</h2>
             <p className="label mt-1 text-muted">
               {nFlores} {nFlores === 1 ? 'flor' : 'flores'}
+              {nFlores > 0 && ` · se imprime en ${hojasImpresas.length} ${hojasImpresas.length === 1 ? 'hoja' : 'hojas'}${hojasImpresas.length > 1 ? ` (${hojasImpresas.join(' + ')})` : ''}`}
             </p>
           </div>
           <button type="button" onClick={onAgregarFlor} disabled={esNueva} className={BOTON}>
