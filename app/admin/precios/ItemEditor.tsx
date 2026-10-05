@@ -3,14 +3,22 @@
 import Image from 'next/image';
 import type { Dispatch, SetStateAction } from 'react';
 import type { Flower } from '@/lib/types';
-import { ACCION_SUAVE, BOTON, FIELD } from './ui';
+import { parseMoneyInput, priceRange, stemPriceLabel } from '@/lib/price-sheet-rules';
+import { ACCION_SUAVE, AVISO, BOTON, FIELD, chip } from './ui';
+
+/** Qué número se escribió en el campo de precio: el del bunch (lo normal, es lo
+ *  que dicen las listas) o el de un tallo (cuando solo se tiene ese). */
+export type ModoPrecio = 'bunch' | 'tallo';
 
 export interface ItemForm {
   slug: string;
   name: string;
   size: string;
+  /** Vacío = se vende por peso, sin cantidad fija de tallos. */
   stemsPerBunch: string;
+  /** Lo que se escribió, en el modo activo. */
   price: string;
+  priceMode: ModoPrecio;
   catalogFlowerId: string;
   catalogSearch: string;
   categorySlug: string;
@@ -24,12 +32,40 @@ export const itemFormVacio: ItemForm = {
   size: '',
   stemsPerBunch: '',
   price: '',
+  priceMode: 'bunch',
   catalogFlowerId: '',
   catalogSearch: '',
   categorySlug: '',
   image: '',
   note: '',
 };
+
+/** Tallos escritos: entero >= 1, o `undefined` si se dejó vacío (por peso).
+ *  `null` si lo escrito no sirve. */
+export function parseStems(texto: string): number | undefined | null {
+  const t = texto.trim();
+  if (t === '') return undefined;
+  const n = Number(t);
+  return Number.isInteger(n) && n >= 1 ? n : null;
+}
+
+const aDos = (n: number) => Math.round(n * 100) / 100;
+
+/**
+ * El precio del BUNCH que sale del formulario, o por qué no se puede guardar.
+ * En modo tallo se multiplica por los tallos y se redondea a centavos al
+ * guardar (nunca queda un 11.350000000000001 en la base).
+ */
+export function precioDeFormulario(
+  f: Pick<ItemForm, 'price' | 'priceMode' | 'stemsPerBunch'>
+): { ok: true; bunchPrice: number | null } | { ok: false; error: string } {
+  const r = parseMoneyInput(f.price, f.priceMode === 'tallo' ? 4 : 2);
+  if (!r.ok) return r;
+  if (r.value == null || f.priceMode === 'bunch') return { ok: true, bunchPrice: r.value };
+  const tallos = parseStems(f.stemsPerBunch);
+  if (!tallos) return { ok: false, error: 'Para cargar por tallo, primero escribí los tallos por bunch.' };
+  return { ok: true, bunchPrice: aDos(r.value * tallos) };
+}
 
 /** El formulario de una flor de la hoja, como vista propia. */
 export default function ItemEditor({
@@ -189,9 +225,25 @@ export default function ItemEditor({
             min={1}
             value={form.stemsPerBunch}
             onChange={(e) => setForm((p) => ({ ...p, stemsPerBunch: e.target.value }))}
-            placeholder="Ej: 25"
+            placeholder="Vacío si se vende por peso"
             className={FIELD}
           />
+          <div className="mt-1 flex flex-wrap items-center gap-x-6">
+            {[
+              ['10', '10'],
+              ['25', '25'],
+              ['', 'Por peso'],
+            ].map(([valor, etiqueta]) => (
+              <button
+                key={etiqueta}
+                type="button"
+                onClick={() => setForm((p) => ({ ...p, stemsPerBunch: valor }))}
+                className="inline-flex min-h-11 items-center"
+              >
+                <span className={chip(form.stemsPerBunch.trim() === valor)}>{etiqueta}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -212,24 +264,7 @@ export default function ItemEditor({
           </p>
         </div>
 
-        <div>
-          <label htmlFor="item-precio" className="label mb-2 block text-muted">
-            Precio por tallo (dólares)
-          </label>
-          <div className="flex items-center gap-2">
-            <span className="text-muted">$</span>
-            <input
-              id="item-precio"
-              type="number"
-              step="0.0001"
-              min={0}
-              value={form.price}
-              onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))}
-              placeholder="0.00"
-              className={FIELD}
-            />
-          </div>
-        </div>
+        <PrecioBunch form={form} setForm={setForm} />
       </div>
 
       <div className="mt-10 flex items-center gap-6">
@@ -240,6 +275,99 @@ export default function ItemEditor({
           Cancelar
         </button>
       </div>
+    </div>
+  );
+}
+
+/** El precio: el campo grande es el del bunch (lo que dicen las listas); el del
+ *  tallo se calcula solo y se muestra al lado, nunca se escribe a mano a menos
+ *  que se pida. */
+function PrecioBunch({
+  form,
+  setForm,
+}: {
+  form: ItemForm;
+  setForm: Dispatch<SetStateAction<ItemForm>>;
+}) {
+  const modoTallo = form.priceMode === 'tallo';
+  const tallos = parseStems(form.stemsPerBunch);
+  const r = precioDeFormulario(form);
+  const bunchPrice = r.ok ? r.bunchPrice : null;
+  const item = { bunchPrice, stemsPerBunch: tallos ?? undefined };
+  const rango = priceRange(item);
+  const porTallo = stemPriceLabel(item);
+
+  const cambiarModo = (modo: ModoPrecio) => setForm((p) => ({ ...p, priceMode: modo }));
+
+  let equivale: string | null = null;
+  if (r.ok) {
+    if (modoTallo) {
+      equivale =
+        bunchPrice != null && tallos
+          ? `Equivale a $${bunchPrice.toFixed(2)} por bunch de ${tallos} tallos (${(parseMoneyInput(form.price, 4) as { value: number }).value} × ${tallos}).`
+          : null;
+    } else if (bunchPrice != null) {
+      equivale = porTallo
+        ? `Equivale a ${porTallo.approx ? '≈ ' : ''}$${porTallo.text} por tallo (${bunchPrice.toFixed(2)} ÷ ${tallos}).`
+        : 'Sin cantidad de tallos, la hoja no muestra el precio por tallo.';
+    }
+  }
+
+  return (
+    <div>
+      <label htmlFor="item-precio" className="label mb-2 block text-muted">
+        {modoTallo ? 'Precio por tallo (dólares)' : 'Precio por bunch (dólares)'}
+      </label>
+      <div className="flex items-baseline gap-3 border-b border-muted/80 transition-colors focus-within:border-ink">
+        <span className="font-serif text-3xl font-light text-muted">$</span>
+        <input
+          id="item-precio"
+          inputMode="decimal"
+          autoComplete="off"
+          placeholder="0.00"
+          value={form.price}
+          onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))}
+          className="w-28 border-0 bg-transparent py-2 font-serif text-3xl font-light text-ink placeholder:text-muted focus-visible:outline-none!"
+        />
+        <span className="text-[14px] text-muted">
+          {modoTallo ? 'por tallo' : `por bunch${tallos ? ` de ${tallos} tallos` : ''}`}
+        </span>
+      </div>
+
+      {!r.ok && <p className="mt-3 text-[14px] text-ink">{r.error}</p>}
+      {equivale && (
+        <p className="mt-3 text-[14px] text-ink" aria-live="polite">
+          {equivale}
+        </p>
+      )}
+
+      {r.ok && rango && (
+        <div className={`${AVISO} mt-4`}>
+          {modoTallo
+            ? rango === 'bajo'
+              ? 'Es muy poco para una flor.'
+              : 'Es mucho para un solo tallo. ¿Es el precio del bunch?'
+            : rango === 'bajo'
+              ? 'Es muy poco para una flor. ¿Escribiste el precio por tallo?'
+              : 'Es mucho para una flor. ¿Escribiste el precio por bunch en un lugar equivocado?'}{' '}
+          <button
+            type="button"
+            onClick={() => cambiarModo(modoTallo ? 'bunch' : 'tallo')}
+            className="underline underline-offset-4"
+          >
+            {modoTallo ? 'Sí, es por bunch' : 'Sí, es por tallo'}
+          </button>
+        </div>
+      )}
+
+      <div className="mt-1">
+        <button type="button" onClick={() => cambiarModo(modoTallo ? 'bunch' : 'tallo')} className={ACCION_SUAVE}>
+          {modoTallo ? 'Volver al precio por bunch' : 'Tengo el precio por tallo'}
+        </button>
+      </div>
+      <p className="mt-1 text-[13px] leading-snug text-muted">
+        Si lo dejás vacío, la hoja dice «Precio a confirmar».
+      </p>
     </div>
   );
 }

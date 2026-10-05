@@ -17,3 +17,10 @@ export const AVISO = 'border-l border-ink pl-4 text-[14px] leading-relaxed text-
  *  vez de `line` (1.2:1, casi invisible) y el placeholder es `muted` pleno. */
 export const FIELD =
   'w-full border-0 border-b border-muted/80 bg-transparent py-2 text-[15px] text-ink placeholder:text-muted transition-colors duration-300 focus:border-ink';
+/** Opción rápida (10, 25, por peso): mismo idioma que los filtros del catálogo.
+ *  Va en un `<span>` dentro de un botón de 44 px: así el subrayado queda pegado
+ *  al texto y el blanco táctil sigue siendo cómodo. */
+export const chip = (activo: boolean) =>
+  `label border-b pb-1 transition-colors duration-300 ${
+    activo ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'
+  }`;

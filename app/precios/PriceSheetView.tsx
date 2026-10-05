@@ -6,6 +6,7 @@ import type { Flower } from '@/lib/types';
 import type { TipoDeCambio } from '@/lib/exchange-rate';
 import { formatoLocal } from '@/lib/exchange-rate';
 import type { PriceItem } from '@/lib/priceSheets';
+import { stemPriceLabel } from '@/lib/price-sheet-rules';
 import { destinationInfo, type PriceDestination } from '@/lib/price-destinations';
 import DownloadButton from './DownloadButton';
 
@@ -109,9 +110,11 @@ export default function PriceSheetView({
 
           <div className="price-grid grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
             {items.map((item) => {
-              const price = item.price;
-              const bunch = price != null ? price * item.stemsPerBunch : null;
+              const bunch = item.bunchPrice;
               const local = bunch != null && moneda ? formatoLocal(bunch, moneda.tasa, moneda.symbol) : null;
+              // Sin cantidad fija de tallos (se vende por peso) no hay precio por tallo.
+              const porTallo = stemPriceLabel(item);
+              const meta = [item.size, item.stemsPerBunch ? `${item.stemsPerBunch} tallos` : null].filter(Boolean);
               const href = hrefFor(item);
 
               const card = (
@@ -138,9 +141,9 @@ export default function PriceSheetView({
                     <h3 className="price-name font-serif text-lg font-light leading-tight text-ink">
                       {item.name}
                     </h3>
-                    <p className="price-meta label mt-2 text-muted">
-                      {[item.size, `${item.stemsPerBunch} tallos`].filter(Boolean).join(' · ')}
-                    </p>
+                    {meta.length > 0 && (
+                      <p className="price-meta label mt-2 text-muted">{meta.join(' · ')}</p>
+                    )}
                     {item.note && (
                       <p className="price-note-item mt-1 text-[11px] leading-snug text-muted/80">
                         {item.note}
@@ -157,9 +160,11 @@ export default function PriceSheetView({
                           {local && (
                             <p className="price-local mt-1 text-[12px] text-muted">≈ {local}</p>
                           )}
-                          <p className="price-stem mt-1.5 text-[13px] text-muted">
-                            ${price!.toFixed(2)} por tallo
-                          </p>
+                          {porTallo && (
+                            <p className="price-stem mt-1.5 text-[13px] text-muted">
+                              {porTallo.approx ? '≈ ' : ''}${porTallo.text} por tallo
+                            </p>
+                          )}
                         </>
                       ) : (
                         <p className="price-stem text-[13px] leading-snug text-muted">Precio a confirmar</p>
