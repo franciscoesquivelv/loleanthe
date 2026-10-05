@@ -24,12 +24,7 @@ export async function priceMetadata(destination: PriceDestination): Promise<Meta
   const info = destinationInfo(destination);
   const sheet = await getPublishedPriceSheetServer(destination);
   const nombre = sheet ? tituloPresentable(sheet.title) : '';
-  const image = {
-    url: '/images/hero-dark.jpg',
-    width: 2200,
-    height: 1466,
-    alt: 'Loleanthe, flor ecuatoriana',
-  };
+  const image = { url: info.shareImage, width: 1200, height: 630, alt: info.shareImageAlt };
   return {
     title: nombre ? `${info.metaTitle} · ${nombre}` : info.metaTitle,
     description: info.shareDescription,

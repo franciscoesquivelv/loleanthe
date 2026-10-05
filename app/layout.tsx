@@ -38,9 +38,12 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'es_CR',
     alternateLocale: ['es_GT'],
+    // Tarjeta de vista previa (WhatsApp, Facebook, X): 1200x630 reales y ~50 KB.
+    // La anterior era hero-dark.jpg (2200x1466, 526 KB) declarada como 1200x630, y
+    // WhatsApp deja sin foto las vistas previas que pesan más de ~300 KB.
     images: [
       {
-        url: '/images/hero-dark.jpg',
+        url: '/images/og/sitio-v1.jpg',
         width: 1200,
         height: 630,
         alt: 'Loleanthe, flor ecuatoriana',
@@ -51,7 +54,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Loleanthe · Flor ecuatoriana consolidada',
     description: 'Flor ecuatoriana de varias fincas, importada bajo pedido para floristas, decoradores, hoteles y más.',
-    images: ['/images/hero-dark.jpg'],
+    images: ['/images/og/sitio-v1.jpg'],
   },
 };
 

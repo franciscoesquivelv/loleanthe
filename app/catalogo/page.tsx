@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getPublicFlowersServer } from '@/lib/flowers-server';
 import CatalogoClient from './CatalogoClient';
 
-const OG_IMAGE = { url: '/images/hero-dark.jpg', width: 1200, height: 630, alt: 'Loleanthe, flor ecuatoriana' };
+const OG_IMAGE = { url: '/images/og/sitio-v1.jpg', width: 1200, height: 630, alt: 'Loleanthe, flor ecuatoriana' };
 
 export const metadata: Metadata = {
   title: 'Catálogo de Flor al por Mayor para Bodas y Eventos',
