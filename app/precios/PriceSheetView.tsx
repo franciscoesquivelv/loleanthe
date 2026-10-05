@@ -2,32 +2,27 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import type { CountryCode, Flower } from '@/lib/types';
+import type { Flower } from '@/lib/types';
 import type { TipoDeCambio } from '@/lib/exchange-rate';
 import { formatoLocal } from '@/lib/exchange-rate';
-import { priceFor, type PriceItem } from '@/lib/priceSheets';
+import type { PriceItem } from '@/lib/priceSheets';
+import { destinationInfo, type PriceDestination } from '@/lib/price-destinations';
 import DownloadButton from './DownloadButton';
 
-const MONEDA: Record<CountryCode, { simbolo: string; tasaDe: (t: TipoDeCambio) => number; nombre: string }> = {
-  CR: { simbolo: '₡', tasaDe: (t) => t.crc, nombre: 'colones' },
-  GT: { simbolo: 'Q', tasaDe: (t) => t.gtq, nombre: 'quetzales' },
-};
-
 /**
- * El cuerpo de la hoja de precios, compartido entre `/precios` (genérica) y
- * las versiones por país (`/precios-cr`, `/precios-gt`). La genérica no pasa
- * `country` ni `tipoDeCambio`: se queda solo en dólares, sin favorecer una
- * moneda sobre otra.
+ * El cuerpo de la hoja de precios, compartido entre los tres destinos
+ * (`/precios-cr`, `/precios-gt` y la general `/precios`). La moneda de
+ * referencia sale del destino: la general no la tiene y se queda solo en
+ * dólares, sin favorecer una moneda sobre otra.
  */
 export default function PriceSheetView({
   items,
   flowers,
   title,
   description,
-  eyebrow,
+  destination,
   whatsappNumber,
   whatsappDisplay,
-  country,
   tipoDeCambio,
 }: {
   items: PriceItem[];
@@ -36,13 +31,15 @@ export default function PriceSheetView({
   /** Editable desde el admin (sección Precios). Reemplaza el párrafo que
    *  antes estaba escrito acá mismo en JSX. */
   description: string;
-  eyebrow: string;
+  destination: PriceDestination;
   whatsappNumber: string;
   whatsappDisplay: string;
-  country?: CountryCode;
   tipoDeCambio?: TipoDeCambio;
 }) {
-  const moneda = country ? MONEDA[country] : null;
+  const info = destinationInfo(destination);
+  const eyebrow = info.eyebrow;
+  const tasa = tipoDeCambio ? (info.country === 'CR' ? tipoDeCambio.crc : tipoDeCambio.gtq) : null;
+  const moneda = info.currency && tasa ? { ...info.currency, tasa } : null;
   // Enlace a la ficha de la variedad cuando existe en el catálogo; si no, a su
   // categoría; si tampoco, sin enlace (la tarjeta se renderiza sin `group`,
   // así el hover no promete un clic que no lleva a ningún lado). Antes era un
@@ -58,7 +55,7 @@ export default function PriceSheetView({
   };
 
   const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-    `Hola, quiero hacer un pedido de la lista de precios: ${title}`
+    `Hola, quiero hacer un pedido de la lista de precios${destination === 'GENERAL' ? '' : ` ${info.deLa}`}: ${title}`
   )}`;
 
   return (
@@ -92,7 +89,7 @@ export default function PriceSheetView({
                 {description}
                 {moneda && tipoDeCambio && (
                   <>
-                    {' '}El precio en dólares es el real; el de {moneda.nombre} es una
+                    {' '}El precio en dólares es el real; el de {moneda.name} es una
                     referencia al tipo de cambio de hoy.
                   </>
                 )}
@@ -106,18 +103,15 @@ export default function PriceSheetView({
                 párrafo de arriba. */}
             <p className="price-note mt-2 hidden text-[10px] text-muted">
               {description}
-              {moneda && tipoDeCambio && ` · ≈ en ${moneda.nombre} al tipo de cambio de hoy, referencial`}
+              {moneda && tipoDeCambio && ` · ≈ en ${moneda.name} al tipo de cambio de hoy, referencial`}
             </p>
           </div>
 
           <div className="price-grid grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
             {items.map((item) => {
-              const price = priceFor(item, country);
+              const price = item.price;
               const bunch = price != null ? price * item.stemsPerBunch : null;
-              const local =
-                bunch != null && moneda && tipoDeCambio
-                  ? formatoLocal(bunch, moneda.tasaDe(tipoDeCambio), moneda.simbolo)
-                  : null;
+              const local = bunch != null && moneda ? formatoLocal(bunch, moneda.tasa, moneda.symbol) : null;
               const href = hrefFor(item);
 
               const card = (

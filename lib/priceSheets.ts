@@ -11,12 +11,14 @@ import {
   serverTimestamp,
   setDoc,
   writeBatch,
+  type DocumentData,
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { getDb, getStorageInstance } from './firebase';
 import { getStorageUsedBytes, adjustStorageUsage, STORAGE_LIMIT_BYTES } from './flowers';
 import type { AvisoProgreso } from './flowers';
-import type { CountryCode } from './types';
+import { normalizeDestination, type PriceDestination } from './price-destinations';
+import { PriceSheetError, checkSheet, hoyLocal, planPlacement } from './price-sheet-rules';
 
 const COLLECTION = 'priceSheets';
 
@@ -32,12 +34,6 @@ export interface PriceItem {
   stemsPerBunch: number;
   /** Precio por tallo en USD. `null` = pendiente de confirmar. */
   price: number | null;
-  /**
-   * Precio por tallo distinto para CR o GT (flete, aranceles). Solo se pone
-   * la entrada del país que difiere de `price`; el que no aparece acá usa
-   * `price` tal cual. Ver `priceFor` más abajo.
-   */
-  priceByCountry?: Partial<Record<CountryCode, number>>;
   /** URL de la foto: de Firebase Storage o de /public, next/image sirve
    *  cualquiera de las dos igual. */
   image?: string;
@@ -70,34 +66,94 @@ export interface PriceSheet {
   dateEnd: string;
   description: string;
   status: PriceSheetStatus;
+  /**
+   * En qué enlace sale esta hoja: /precios-cr, /precios-gt o /precios. `null`
+   * solo en hojas cargadas antes de que existiera el campo; una hoja sin
+   * destino no sale en ningún enlace (ver normalizeDestination).
+   */
+  destination: PriceDestination | null;
   items: PriceItem[];
+  /** ISO. Firestore las guarda como Timestamp; al leer se pasan a texto. */
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
 }
 
-/** Precio por tallo para un país dado: el override si existe, si no el general. */
-export function priceFor(item: PriceItem, country?: CountryCode): number | null {
-  if (country && item.priceByCountry?.[country] != null) {
-    return item.priceByCountry[country]!;
-  }
-  return item.price;
-}
+/** Lo que el admin escribe de una hoja. `status`, `publishedAt` y `destination`
+ *  no están: solo publicar, quitar y mover los tocan (ver más abajo). */
+export type PriceSheetContent = Pick<PriceSheet, 'title' | 'dateStart' | 'dateEnd' | 'description' | 'items'>;
 
 // ── Lectura (admin, todas las hojas) ───────────────────────────────────────
+
+function aIso(v: unknown): string | undefined {
+  if (v && typeof (v as { toDate?: unknown }).toDate === 'function') {
+    return (v as { toDate: () => Date }).toDate().toISOString();
+  }
+  return typeof v === 'string' ? v : undefined;
+}
+
+/** Arma el ítem solo con los campos que existen. Descarta lo que quede de
+ *  versiones viejas (`priceByCountry`) y nunca deja un `undefined`, que
+ *  Firestore rechaza al escribir. */
+function leerItem(i: DocumentData): PriceItem {
+  return {
+    slug: i.slug ?? '',
+    name: i.name ?? '',
+    stemsPerBunch: Number(i.stemsPerBunch) || 0,
+    price: typeof i.price === 'number' ? i.price : null,
+    ...(i.size && { size: i.size }),
+    ...(i.image && { image: i.image }),
+    ...(i.catalogFlowerId && { catalogFlowerId: i.catalogFlowerId }),
+    ...(i.categorySlug && { categorySlug: i.categorySlug }),
+    ...(i.note && { note: i.note }),
+  };
+}
+
+function leerHoja(id: string, d: DocumentData): PriceSheet {
+  const publishedAt = aIso(d.publishedAt);
+  return {
+    id,
+    title: d.title ?? '',
+    dateStart: d.dateStart ?? '',
+    dateEnd: d.dateEnd ?? '',
+    description: d.description ?? '',
+    status: d.status ?? 'draft',
+    destination: normalizeDestination(d.destination),
+    items: Array.isArray(d.items) ? d.items.map(leerItem) : [],
+    createdAt: aIso(d.createdAt) ?? '',
+    updatedAt: aIso(d.updatedAt) ?? '',
+    ...(publishedAt && { publishedAt }),
+  };
+}
 
 export async function getAllPriceSheets(): Promise<PriceSheet[]> {
   const db = getDb();
   const q = query(collection(db, COLLECTION), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as PriceSheet));
+  return snap.docs.map((d) => leerHoja(d.id, d.data()));
 }
 
 export async function getPriceSheetById(id: string): Promise<PriceSheet | null> {
   const db = getDb();
   const snap = await getDoc(doc(db, COLLECTION, id));
   if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() } as PriceSheet;
+  return leerHoja(snap.id, snap.data());
+}
+
+/**
+ * Avisa al sitio que las hojas publicadas cambiaron, para que se vea ya y no
+ * en hasta 5 min (ISR). Devuelve si funcionó: `fetch` solo lanza por falta de
+ * red, una respuesta 500 pasa como éxito si no se mira `res.ok`. El admin usa
+ * el resultado para no prometer "se actualiza en el momento" cuando no pasó.
+ */
+export async function revalidarPrecios(): Promise<boolean> {
+  try {
+    const res = await fetch('/api/revalidar-precios', { method: 'POST' });
+    return res.ok;
+  } catch (err) {
+    console.error('[priceSheets] no se pudo revalidar de inmediato:', err);
+    return false;
+  }
 }
 
 // ── Imágenes ────────────────────────────────────────────────────────────
@@ -146,8 +202,11 @@ export async function uploadPriceItemImage(
 // ── CRUD de la hoja ─────────────────────────────────────────────────────
 
 export async function createPriceSheet(
-  data: Omit<PriceSheet, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'publishedAt'>
+  data: PriceSheetContent & { destination: PriceDestination }
 ): Promise<string> {
+  // Sin valor por defecto a propósito: un default haría que una lista nueva de
+  // Guatemala se publique bajo Costa Rica por no mirar el campo.
+  if (!normalizeDestination(data.destination)) throw new PriceSheetError('DESTINO_INVALIDO');
   const db = getDb();
   const docRef = doc(collection(db, COLLECTION));
   await setDoc(docRef, {
@@ -159,59 +218,104 @@ export async function createPriceSheet(
   return docRef.id;
 }
 
+/**
+ * Guarda el contenido de una hoja. NO acepta `status`, `publishedAt` ni
+ * `destination`: de eso se encargan `publishPriceSheet`, `unpublishPriceSheet`
+ * y `changePriceSheetDestination`, que mantienen la regla de una sola hoja
+ * publicada por destino. Si la hoja está viva, el cambio (precio, nota, foto)
+ * tiene que verse ya: se revalida.
+ */
 export async function updatePriceSheet(
   id: string,
-  data: Partial<Omit<PriceSheet, 'id' | 'createdAt'>>
-): Promise<void> {
+  data: Partial<PriceSheetContent>,
+  opts: { viva: boolean }
+): Promise<{ revalidated: boolean | null }> {
   const db = getDb();
   await updateDoc(doc(db, COLLECTION, id), { ...data, updatedAt: serverTimestamp() });
-
-  // Best-effort, igual que en publishPriceSheet: si la hoja editada ya
-  // estaba publicada, el cambio (precio, nota, foto) tiene que verse ya, no
-  // en hasta 5 min (ISR). Revalidar una hoja que sigue en borrador no hace
-  // daño, las rutas públicas igual muestran la que esté published.
-  try {
-    await fetch('/api/revalidar-precios', { method: 'POST' });
-  } catch (err) {
-    console.error('[updatePriceSheet] no se pudo revalidar de inmediato:', err);
-  }
+  return { revalidated: opts.viva ? await revalidarPrecios() : null };
 }
 
 /**
  * Copia título, fechas, descripción y todos los ítems (mismas URLs de foto,
- * sin resubir nada) a un borrador nuevo. Es la manera de que recargar
- * precios cada 2 o 3 meses no implique volver a escribir cada flor desde
- * cero: se duplica la temporada anterior y se ajustan los precios que
- * cambiaron.
+ * sin resubir nada) a un borrador nuevo con el MISMO destino. Es la manera de
+ * que recargar precios cada 2 o 3 meses no implique volver a escribir cada
+ * flor desde cero: se duplica la temporada anterior y se ajustan los precios
+ * que cambiaron. Copiar a otro país no se ofrece: cada hoja se arma desde cero
+ * a propósito, copiar precios de Costa Rica a Guatemala es justo el error.
  */
 export async function duplicatePriceSheet(id: string): Promise<string> {
   const original = await getPriceSheetById(id);
-  if (!original) throw new Error('HOJA_NO_ENCONTRADA');
+  if (!original) throw new PriceSheetError('HOJA_NO_ENCONTRADA');
+  if (!original.destination) throw new PriceSheetError('SIN_DESTINO');
   return createPriceSheet({
     title: `${original.title} (copia)`,
     dateStart: original.dateStart,
     dateEnd: original.dateEnd,
     description: original.description,
     items: original.items,
+    destination: original.destination,
   });
 }
 
-/**
- * Publica una hoja: archiva la que esté publicada hoy (si hay alguna) y
- * marca esta como `published`, en un solo batch. La regla "un solo published
- * a la vez" se aplica ACÁ, no en Firestore Rules: no se puede consultar
- * "¿hay otro doc con status=published?" desde una regla sin leer todos los
- * documentos, y con un solo operador no vale esa complejidad.
- */
-export async function publishPriceSheet(id: string): Promise<void> {
+export interface PublishResult {
+  destination: PriceDestination | null;
+  /** Hojas que pasaron a archivadas al publicar. */
+  replacedIds: string[];
+  /** `true` el sitio ya lo muestra, `false` puede tardar hasta 5 min, `null` no hizo falta. */
+  revalidated: boolean | null;
+}
+
+async function hojasPublicadas(): Promise<Pick<PriceSheet, 'id' | 'status' | 'destination'>[]> {
   const db = getDb();
-  const q = query(collection(db, COLLECTION), where('status', '==', 'published'));
-  const snap = await getDocs(q);
+  // Una sola consulta por status y se filtra por destino en memoria: así
+  // también aparecen las publicadas sin destino (viejas) en vez de esconderse.
+  const snap = await getDocs(query(collection(db, COLLECTION), where('status', '==', 'published')));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    status: 'published' as const,
+    destination: normalizeDestination(d.data().destination),
+  }));
+}
+
+function exigirConfirmados(replaces: string[], confirmados: string[] | undefined) {
+  if (replaces.some((rid) => !(confirmados ?? []).includes(rid))) {
+    throw new PriceSheetError('REEMPLAZO_NO_CONFIRMADO', { replaces });
+  }
+}
+
+/**
+ * Publica una hoja (borrador, o archivada que se vuelve a publicar) en SU
+ * destino. Archiva solo la que esté publicada en ese mismo destino, en un
+ * batch: nunca quedan 0 ni 2 en un destino, y las hojas de los otros destinos
+ * ni se tocan. La regla "una publicada por destino" se aplica ACÁ y no en
+ * Firestore Rules: una regla no puede consultar "¿hay otro doc con
+ * status=published?" sin leer todos los documentos.
+ *
+ * Lee la hoja fresca de Firestore, no la de la pantalla (que puede estar
+ * desactualizada), y exige que quien llama diga qué hojas vio que se archivan
+ * (`confirmaReemplazo`): si la pantalla no mostró alguna, no se archiva en
+ * silencio.
+ */
+export async function publishPriceSheet(
+  id: string,
+  opts: { confirmaReemplazo?: string[] } = {}
+): Promise<PublishResult> {
+  const db = getDb();
+  const hoja = await getPriceSheetById(id);
+  if (!hoja) throw new PriceSheetError('HOJA_NO_ENCONTRADA');
+  if (hoja.status === 'published') return { destination: hoja.destination, replacedIds: [], revalidated: null };
+  if (!hoja.destination) throw new PriceSheetError('SIN_DESTINO');
+
+  const { errors } = checkSheet(hoja, hoyLocal());
+  if (errors.length > 0) throw new PriceSheetError('HOJA_INVALIDA', errors);
+
+  const { replaces } = planPlacement(await hojasPublicadas(), hoja, hoja.destination, true);
+  exigirConfirmados(replaces, opts.confirmaReemplazo);
 
   const batch = writeBatch(db);
-  snap.docs.forEach((d) => {
-    if (d.id !== id) batch.update(d.ref, { status: 'archived', updatedAt: serverTimestamp() });
-  });
+  for (const rid of replaces) {
+    batch.update(doc(db, COLLECTION, rid), { status: 'archived', updatedAt: serverTimestamp() });
+  }
   batch.update(doc(db, COLLECTION, id), {
     status: 'published',
     publishedAt: serverTimestamp(),
@@ -219,20 +323,63 @@ export async function publishPriceSheet(id: string): Promise<void> {
   });
   await batch.commit();
 
-  // Best-effort: si la revalidación falla, la hoja igual quedó publicada,
-  // solo tarda hasta 5 min en verse (ISR) en vez de al instante.
-  try {
-    await fetch('/api/revalidar-precios', { method: 'POST' });
-  } catch (err) {
-    console.error('[publishPriceSheet] no se pudo revalidar de inmediato:', err);
+  return { destination: hoja.destination, replacedIds: replaces, revalidated: await revalidarPrecios() };
+}
+
+/** Pasa una hoja publicada a archivada, sin reemplazarla: el enlace queda sin
+ *  hoja y muestra el aviso. Es la forma de apagar un destino; "eliminar" no
+ *  existe para una hoja viva. */
+export async function unpublishPriceSheet(id: string): Promise<PublishResult> {
+  const db = getDb();
+  const hoja = await getPriceSheetById(id);
+  if (!hoja) throw new PriceSheetError('HOJA_NO_ENCONTRADA');
+  if (hoja.status !== 'published') return { destination: hoja.destination, replacedIds: [], revalidated: null };
+  await updateDoc(doc(db, COLLECTION, id), { status: 'archived', updatedAt: serverTimestamp() });
+  return { destination: hoja.destination, replacedIds: [], revalidated: await revalidarPrecios() };
+}
+
+/**
+ * Cambia el destino de una hoja.
+ *
+ * - Borrador o archivada: es solo un dato, no desplaza a nadie y no se revalida.
+ * - Publicada: en un batch archiva a la que ocupa el destino de llegada y mueve
+ *   la hoja. El destino de origen queda sin hoja (muestra el aviso) y la
+ *   pantalla lo tiene que decir antes de confirmar (`vacates`).
+ */
+export async function changePriceSheetDestination(
+  id: string,
+  destino: PriceDestination,
+  opts: { confirmaReemplazo?: string[] } = {}
+): Promise<PublishResult> {
+  if (!normalizeDestination(destino)) throw new PriceSheetError('DESTINO_INVALIDO');
+  const db = getDb();
+  const hoja = await getPriceSheetById(id);
+  if (!hoja) throw new PriceSheetError('HOJA_NO_ENCONTRADA');
+  if (hoja.destination === destino) return { destination: destino, replacedIds: [], revalidated: null };
+
+  if (hoja.status !== 'published') {
+    await updateDoc(doc(db, COLLECTION, id), { destination: destino, updatedAt: serverTimestamp() });
+    return { destination: destino, replacedIds: [], revalidated: null };
   }
+
+  const { replaces } = planPlacement(await hojasPublicadas(), hoja, destino, false);
+  exigirConfirmados(replaces, opts.confirmaReemplazo);
+
+  const batch = writeBatch(db);
+  for (const rid of replaces) {
+    batch.update(doc(db, COLLECTION, rid), { status: 'archived', updatedAt: serverTimestamp() });
+  }
+  batch.update(doc(db, COLLECTION, id), { destination: destino, updatedAt: serverTimestamp() });
+  await batch.commit();
+
+  return { destination: destino, replacedIds: replaces, revalidated: await revalidarPrecios() };
 }
 
 /** Bloqueada también en firestore.rules; este chequeo evita el viaje de red
  *  y da un mensaje claro en vez de un "permission-denied" críptico. */
 export async function deletePriceSheet(sheet: Pick<PriceSheet, 'id' | 'status'>): Promise<void> {
   if (sheet.status === 'published') {
-    throw new Error('NO_SE_PUEDE_BORRAR_PUBLICADA');
+    throw new PriceSheetError('NO_SE_PUEDE_BORRAR_PUBLICADA');
   }
   const db = getDb();
   await deleteDoc(doc(db, COLLECTION, sheet.id));
