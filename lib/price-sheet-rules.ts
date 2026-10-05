@@ -234,6 +234,18 @@ export function checkSheet(hoja: Checkable, hoy: string): SheetCheck {
       text: `${raros.length === 1 ? '1 precio fuera' : `${raros.length} precios fuera`} de lo habitual: ${detalle.join('; ')}.`,
     });
   }
+  // Las notas se imprimen al pie de cada hoja y ahí solo caben unas pocas.
+  let desde = 0;
+  repartir(hoja.items.length).forEach((n, h) => {
+    const notas = hoja.items.slice(desde, desde + n).filter((i) => i.note).length;
+    desde += n;
+    if (notas > NOTAS_POR_HOJA) {
+      warnings.push({
+        code: 'DEMASIADAS_NOTAS',
+        text: `Hay ${notas} notas en la hoja impresa ${h + 1}; entran ${NOTAS_POR_HOJA}.`,
+      });
+    }
+  });
   if (hoja.dateEnd && hoja.dateEnd < hoy) {
     warnings.push({ code: 'VENCIDA', text: `Las fechas de esta hoja ya pasaron (hasta el ${hoja.dateEnd}).` });
   }
@@ -262,6 +274,36 @@ export class PriceSheetError extends Error {
     this.code = code;
     this.detail = detail;
   }
+}
+
+// ── Cómo se reparte la hoja al imprimir ────────────────────────────────────
+//
+// Una hoja impresa son 3 columnas por 3 filas, 9 flores, y cada hoja de papel es
+// una página explícita (no el flujo natural de Chrome, donde una nota más
+// empujaba una fila y todo se desacomodaba). 9 flores salen en 1 hoja; 18 salen
+// en 2 de 9; nunca se corta una fila a la mitad.
+
+export const COLUMNAS_IMPRESAS = 3;
+export const FILAS_POR_HOJA = 3;
+/** Notas al pie que caben en una hoja impresa antes de recortarse. */
+export const NOTAS_POR_HOJA = 5;
+
+/** Cuántas flores lleva cada hoja impresa. Las filas se reparten parejo entre
+ *  las hojas, con las primeras cargando más: 10 -> [6, 4], 19 -> [9, 6, 4]. */
+export function repartir(total: number): number[] {
+  if (total <= 0) return [0];
+  const filas = Math.ceil(total / COLUMNAS_IMPRESAS);
+  const hojas = Math.ceil(filas / FILAS_POR_HOJA);
+  const base = Math.floor(filas / hojas);
+  const resto = filas % hojas;
+  const salida: number[] = [];
+  let restantes = total;
+  for (let h = 0; h < hojas; h++) {
+    const n = Math.min((base + (h < resto ? 1 : 0)) * COLUMNAS_IMPRESAS, restantes);
+    salida.push(n);
+    restantes -= n;
+  }
+  return salida;
 }
 
 // ── Qué flores llegan a qué destino ────────────────────────────────────────
