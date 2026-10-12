@@ -175,10 +175,11 @@ if (!cr) {
   process.exit(1);
 }
 const aBunch = (i) => {
-  // eslint-disable-next-line no-unused-vars
-  const { price, priceByCountry, ...resto } = i;
+  const resto = { ...i };
+  delete resto.price; // forma vieja (por tallo): se convierte a bunchPrice
+  delete resto.priceByCountry; // ya no existe
   const bunchPrice =
-    typeof i.bunchPrice === 'number' ? i.bunchPrice : price != null && i.stemsPerBunch ? Math.round(price * i.stemsPerBunch * 100) / 100 : null;
+    typeof i.bunchPrice === 'number' ? i.bunchPrice : i.price != null && i.stemsPerBunch ? Math.round(i.price * i.stemsPerBunch * 100) / 100 : null;
   return { ...resto, bunchPrice };
 };
 const itemsGeneral = (cr.items ?? []).map(aBunch);
