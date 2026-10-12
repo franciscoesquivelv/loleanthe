@@ -3,7 +3,8 @@
 //
 // Es la ÚNICA lista de destinos. La usan las tres rutas públicas, la ruta que
 // revalida el caché, el admin y las reglas puras de publicación. Sumar un
-// destino es una fila acá, una línea en firestore.rules y un page.tsx.
+// destino es una fila acá, una línea en firestore.rules, un page.tsx y una línea
+// en next.config.ts (la cabecera noindex de su ruta).
 //
 // Sin imports de Firebase a propósito: lo importan el servidor, el cliente y
 // el cálculo puro, y ninguno de los tres debe arrastrar el SDK de otro.
@@ -34,6 +35,9 @@ export const PRICE_DESTINATIONS = [
     cardMoneda: 'Dólares, con referencia en colones',
     shareTitle: 'Lista de precios Costa Rica | Loleanthe',
     shareDescription: 'Flor ecuatoriana al por mayor. Precios en dólares, con referencia en colones.',
+    /** 1200x630, ~65 KB. Si cambia el arte, subir el sufijo (-v2): WhatsApp guarda la tarjeta por URL. */
+    shareImage: '/images/og/precios-cr-v1.jpg',
+    shareImageAlt: 'Loleanthe, lista de precios de flor ecuatoriana para Costa Rica',
     metaTitle: 'Precios Costa Rica',
     locale: 'es_CR',
   },
@@ -51,6 +55,9 @@ export const PRICE_DESTINATIONS = [
     cardMoneda: 'Dólares, con referencia en quetzales',
     shareTitle: 'Lista de precios Guatemala | Loleanthe',
     shareDescription: 'Flor ecuatoriana al por mayor. Precios en dólares, con referencia en quetzales.',
+    /** 1200x630, ~65 KB. Si cambia el arte, subir el sufijo (-v2): WhatsApp guarda la tarjeta por URL. */
+    shareImage: '/images/og/precios-gt-v1.jpg',
+    shareImageAlt: 'Loleanthe, lista de precios de flor ecuatoriana para Guatemala',
     metaTitle: 'Precios Guatemala',
     locale: 'es_GT',
   },
@@ -68,6 +75,9 @@ export const PRICE_DESTINATIONS = [
     cardMoneda: 'Solo dólares, sin moneda local',
     shareTitle: 'Lista de precios | Loleanthe',
     shareDescription: 'Flor ecuatoriana al por mayor. Precios en dólares (USD).',
+    /** 1200x630, ~65 KB. Si cambia el arte, subir el sufijo (-v2): WhatsApp guarda la tarjeta por URL. */
+    shareImage: '/images/og/precios-v1.jpg',
+    shareImageAlt: 'Loleanthe, lista de precios de flor ecuatoriana',
     metaTitle: 'Precios',
     locale: 'es_LA',
   },

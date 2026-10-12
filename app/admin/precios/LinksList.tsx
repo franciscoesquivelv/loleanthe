@@ -103,6 +103,108 @@ export default function LinksList({
 
   const etiquetaDestino = (s: PriceSheet) => (s.destination ? destinationInfo(s.destination).label : 'Sin destino');
 
+  /** Una fila por enlace: tenga hoja o no. */
+  const filaDe = (code: PriceDestination) => {
+    const info = destinationInfo(code);
+    const [viva, ...otras] = vivasDe(code);
+    const borradoresAca = borradoresDe(code);
+    return (
+      <li key={code} className="border-b border-line py-7">
+        <div className="flex items-center justify-between gap-4">
+          <p className="label text-muted">{info.label}</p>
+          <Estado vivo={!!viva} />
+        </div>
+        <p
+          id={`url-${code}`}
+          className={`mt-2 break-all font-serif text-[26px] font-light leading-tight ${viva ? 'text-ink' : 'text-muted'}`}
+        >
+          {urlVisible(code)}
+        </p>
+
+        {viva ? (
+          <>
+            <div className="mt-1 flex flex-wrap items-center gap-x-6">
+              <button type="button" onClick={() => copiar(code)} aria-label={`Copiar el enlace ${info.deLa}`} className={ACCION}>
+                {copiado === code ? 'Copiado' : 'Copiar'}
+              </button>
+              <a href={urlDe(code)} target="_blank" rel="noopener noreferrer" className={ACCION}>
+                Abrir
+              </a>
+              <a href={waLink(code)} target="_blank" rel="noopener noreferrer" className={ACCION}>
+                WhatsApp
+              </a>
+            </div>
+
+            <div className="mt-2 border-t border-line pt-4">
+              <p className="font-serif text-lg font-light text-ink">{viva.title}</p>
+              <p className="label mt-1 text-muted">
+                {[
+                  flores(viva.items.length),
+                  rangoFechas(viva.dateStart, viva.dateEnd),
+                  viva.publishedAt && `Publicada el ${fechaDeInstante(viva.publishedAt)}`,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </p>
+              <div className="mt-1 flex flex-wrap items-center gap-x-6">
+                <button type="button" onClick={() => onEditar(viva)} className={ACCION}>
+                  Editar
+                </button>
+                <button type="button" onClick={() => onDuplicar(viva)} className={ACCION_SUAVE}>
+                  Duplicar como borrador
+                </button>
+                <Mas>
+                  <button type="button" onClick={() => onQuitar(viva)} className={ACCION_SUAVE}>
+                    Quitar {info.deLa}
+                  </button>
+                </Mas>
+              </div>
+            </div>
+
+            {otras.map((o) => (
+              <div key={o.id} className={`${AVISO} mt-4`}>
+                Hay otra hoja publicada en este enlace: «{o.title}». Solo se muestra la más reciente.{' '}
+                <button type="button" onClick={() => onQuitar(o)} className="underline underline-offset-4">
+                  Archivar la otra
+                </button>
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-muted">
+              Quien abra este enlace hoy ve «{SIN_HOJA_TITULO}».
+            </p>
+            {borradoresAca.length > 0 ? (
+              <>
+                <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink">
+                  Tenés {borradoresAca.length === 1 ? '1 borrador' : `${borradoresAca.length} borradores`} para{' '}
+                  {info.label}: «{borradoresAca[0].title}», {flores(borradoresAca[0].items.length)}.
+                </p>
+                <div className="mt-1 flex flex-wrap items-center gap-x-8">
+                  <button type="button" onClick={() => onPublicar(borradoresAca[0])} className={ACCION_PRINC}>
+                    Publicar el borrador
+                    <span className="h-px w-8 bg-ink transition-all duration-500 group-hover:w-14" />
+                  </button>
+                  <button type="button" onClick={() => onNueva(code)} className={ACCION_SUAVE}>
+                    Crear otra hoja
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="mt-1">
+                <button type="button" onClick={() => onNueva(code)} className={ACCION_PRINC}>
+                  Crear la hoja {info.hojaDe}
+                  <span className="h-px w-8 bg-ink transition-all duration-500 group-hover:w-14" />
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </li>
+    );
+  };
+
   return (
     <div>
       <div className="flex items-start justify-between gap-4">
@@ -126,107 +228,14 @@ export default function LinksList({
 
       <h2 className="label mt-12 text-muted">Enlaces para clientes</h2>
       <ul className="mt-4 border-t border-line">
-        {PRICE_DESTINATIONS.map(({ code }) => {
-          const info = destinationInfo(code);
-          const [viva, ...otras] = vivasDe(code);
-          const borradoresAca = borradoresDe(code);
-          return (
-            <li key={code} className="border-b border-line py-7">
-              <div className="flex items-center justify-between gap-4">
-                <p className="label text-muted">{info.label}</p>
-                <Estado vivo={!!viva} />
-              </div>
-              <p
-                id={`url-${code}`}
-                className={`mt-2 break-all font-serif text-[26px] font-light leading-tight ${viva ? 'text-ink' : 'text-muted'}`}
-              >
-                {urlVisible(code)}
-              </p>
-
-              {viva ? (
-                <>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-6">
-                    <button type="button" onClick={() => copiar(code)} aria-label={`Copiar el enlace ${info.deLa}`} className={ACCION}>
-                      {copiado === code ? 'Copiado' : 'Copiar'}
-                    </button>
-                    <a href={urlDe(code)} target="_blank" rel="noopener noreferrer" className={ACCION}>
-                      Abrir
-                    </a>
-                    <a href={waLink(code)} target="_blank" rel="noopener noreferrer" className={ACCION}>
-                      WhatsApp
-                    </a>
-                  </div>
-
-                  <div className="mt-2 border-t border-line pt-4">
-                    <p className="font-serif text-lg font-light text-ink">{viva.title}</p>
-                    <p className="label mt-1 text-muted">
-                      {[
-                        flores(viva.items.length),
-                        rangoFechas(viva.dateStart, viva.dateEnd),
-                        viva.publishedAt && `Publicada el ${fechaDeInstante(viva.publishedAt)}`,
-                      ]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </p>
-                    <div className="mt-1 flex flex-wrap items-center gap-x-6">
-                      <button type="button" onClick={() => onEditar(viva)} className={ACCION}>
-                        Editar
-                      </button>
-                      <button type="button" onClick={() => onDuplicar(viva)} className={ACCION_SUAVE}>
-                        Duplicar como borrador
-                      </button>
-                      <Mas>
-                        <button type="button" onClick={() => onQuitar(viva)} className={ACCION_SUAVE}>
-                          Quitar {info.deLa}
-                        </button>
-                      </Mas>
-                    </div>
-                  </div>
-
-                  {otras.map((o) => (
-                    <div key={o.id} className={`${AVISO} mt-4`}>
-                      Hay otra hoja publicada en este enlace: «{o.title}». Solo se muestra la más reciente.{' '}
-                      <button type="button" onClick={() => onQuitar(o)} className="underline underline-offset-4">
-                        Archivar la otra
-                      </button>
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <>
-                  <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-muted">
-                    Quien abra este enlace hoy ve «{SIN_HOJA_TITULO}».
-                  </p>
-                  {borradoresAca.length > 0 ? (
-                    <>
-                      <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink">
-                        Tenés {borradoresAca.length === 1 ? '1 borrador' : `${borradoresAca.length} borradores`} para{' '}
-                        {info.label}: «{borradoresAca[0].title}», {flores(borradoresAca[0].items.length)}.
-                      </p>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-8">
-                        <button type="button" onClick={() => onPublicar(borradoresAca[0])} className={ACCION_PRINC}>
-                          Publicar el borrador
-                          <span className="h-px w-8 bg-ink transition-all duration-500 group-hover:w-14" />
-                        </button>
-                        <button type="button" onClick={() => onNueva(code)} className={ACCION_SUAVE}>
-                          Crear otra hoja
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="mt-1">
-                      <button type="button" onClick={() => onNueva(code)} className={ACCION_PRINC}>
-                        Crear la hoja {info.hojaDe}
-                        <span className="h-px w-8 bg-ink transition-all duration-500 group-hover:w-14" />
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            </li>
-          );
-        })}
+        {PRICE_DESTINATIONS.filter((d) => d.code !== 'GENERAL').map(({ code }) => filaDe(code))}
       </ul>
+
+      <h2 className="label mt-14 text-muted">Enlace general (opcional)</h2>
+      <p className="mt-2 max-w-md text-[14px] leading-relaxed text-muted">
+        Es {urlVisible('GENERAL')}: sirve para enlaces viejos o clientes de otros países. Si no tiene hoja, muestra un aviso.
+      </p>
+      <ul className="mt-4 border-t border-line">{filaDe('GENERAL')}</ul>
 
       {borradores.length > 0 && (
         <section className="mt-14">
