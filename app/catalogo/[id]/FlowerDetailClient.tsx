@@ -1,17 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FlowerCard from '@/components/FlowerCard';
+import FotoFlor from '@/components/FotoFlor';
 import { MaskLines, Reveal } from '@/components/motion';
 import { useQuote } from '@/context/QuoteContext';
 import toast from 'react-hot-toast';
 import { countryLabels, toQuoteItem, type Flower } from '@/lib/types';
 import { getCategoryByLabel } from '@/lib/categories';
+
+// Para las flores sin foto y para las que tienen foto pero no carga.
+const SIN_FOTO = (
+  <div className="flex h-full items-center justify-center">
+    <span className="font-serif text-4xl text-muted">LB</span>
+  </div>
+);
 
 export default function FlowerDetailClient({ flower, related = [] }: { flower: Flower; related?: Flower[] }) {
   const [currentImg, setCurrentImg] = useState(0);
@@ -75,18 +82,17 @@ export default function FlowerDetailClient({ flower, related = [] }: { flower: F
               <Reveal y={20}>
                 <div className="relative aspect-[4/5] overflow-hidden bg-line">
                   {flower.images.length > 0 ? (
-                    <Image
+                    <FotoFlor
                       src={flower.images[currentImg]}
                       alt={flower.name}
                       fill
                       priority
                       sizes="(max-width: 1024px) 100vw, 50vw"
                       className="object-cover"
+                      fallback={SIN_FOTO}
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center">
-                      <span className="font-serif text-4xl text-muted">LB</span>
-                    </div>
+                    SIN_FOTO
                   )}
                   {!flower.inStock && (
                     <div className="absolute inset-0 flex items-end bg-ink/45 p-6">
@@ -106,7 +112,7 @@ export default function FlowerDetailClient({ flower, related = [] }: { flower: F
                           i === currentImg ? 'opacity-100' : 'opacity-45 hover:opacity-80'
                         }`}
                       >
-                        <Image src={img} alt="" fill sizes="64px" className="object-cover" />
+                        <FotoFlor src={img} alt="" fill sizes="64px" className="object-cover" fallback={<span className="block h-full w-full bg-line" />} />
                       </button>
                     ))}
                   </div>
