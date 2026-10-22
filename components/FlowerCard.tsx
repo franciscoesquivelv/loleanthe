@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
+import FotoFlor from '@/components/FotoFlor';
 import { useQuote } from '@/context/QuoteContext';
 import toast from 'react-hot-toast';
 import { toQuoteItem, type Flower } from '@/lib/types';
@@ -19,6 +19,13 @@ interface Props {
 const IMAGE_POSITION: Record<string, string> = {
   dmp0797ppb2160xonrZM: 'center 80%', // Cotton Xpression
 };
+
+// Para las flores sin foto y para las que tienen foto pero no carga.
+const SIN_FOTO = (
+  <div className="flex h-full items-center justify-center">
+    <span className="font-serif text-2xl text-muted">LB</span>
+  </div>
+);
 
 export default function FlowerCard({ flower, priority = false, detailHref }: Props) {
   const { addToQuote, isInQuote, removeFromQuote } = useQuote();
@@ -42,7 +49,7 @@ export default function FlowerCard({ flower, priority = false, detailHref }: Pro
     <>
       <div className="relative aspect-[4/5] overflow-hidden bg-line">
         {flower.images.length > 0 ? (
-          <Image
+          <FotoFlor
             src={flower.images[0]}
             alt={flower.name}
             fill
@@ -50,11 +57,10 @@ export default function FlowerCard({ flower, priority = false, detailHref }: Pro
             sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
             style={{ objectPosition: IMAGE_POSITION[flower.id] }}
             className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
+            fallback={SIN_FOTO}
           />
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <span className="font-serif text-2xl text-muted">LB</span>
-          </div>
+          SIN_FOTO
         )}
 
         {!flower.inStock && (

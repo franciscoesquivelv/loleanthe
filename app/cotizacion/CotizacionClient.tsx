@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import FotoFlor from '@/components/FotoFlor';
 import { MaskLines, Reveal } from '@/components/motion';
 import { useQuote } from '@/context/QuoteContext';
 import { enviarSolicitud } from '@/lib/enviar-solicitud';
@@ -106,7 +106,16 @@ export default function CotizacionClient() {
                       <li key={item.flowerId} className="flex items-center gap-4 border-b border-line py-4">
                         {item.flowerImage ? (
                           <div className="relative h-14 w-12 shrink-0 overflow-hidden bg-line">
-                            <Image src={item.flowerImage} alt={item.flowerName} fill sizes="48px" className="object-cover" />
+                            <FotoFlor
+                              src={item.flowerImage}
+                              alt={item.flowerName}
+                              fill
+                              sizes="48px"
+                              className="object-cover"
+                              fallback={
+                                <span className="flex h-full items-center justify-center font-serif text-sm text-muted">LB</span>
+                              }
+                            />
                           </div>
                         ) : (
                           <div className="flex h-14 w-12 shrink-0 items-center justify-center bg-line">
