@@ -332,7 +332,6 @@ export default function SheetEditor({
                   </p>
                   <div className="mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1">
                     <PrecioEnLinea
-                      key={item.bunchPrice ?? 'sin-precio'}
                       nombre={item.name}
                       valor={item.bunchPrice}
                       onCambiar={(precio) => onCambiarPrecio(i, precio)}
@@ -430,7 +429,7 @@ export default function SheetEditor({
                   </>
                 ) : (
                   <button type="button" onClick={onGuardar} disabled={guardando} className={BOTON}>
-                    {guardando ? 'Guardando…' : 'Guardar'}
+                    {guardando ? 'Guardando…' : viva ? 'Guardar y actualizar el enlace' : 'Guardar'}
                   </button>
                 )}
               </>

@@ -51,6 +51,14 @@ input, textarea, select {
   outline: none;
 }
 
+/* En el admin los campos SÍ muestran dónde está el cursor: sin esto, los del
+   formulario de flor no cambiaban de ningún modo al enfocarlos. `currentColor`
+   sirve igual sobre el login oscuro y sobre el panel claro. */
+.admin-root :is(input, textarea, select):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 /* Etiqueta pequeña en versalitas, el único "adorno" tipográfico del sistema */
 .label {
   font-family: var(--font-body), sans-serif;

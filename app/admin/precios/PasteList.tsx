@@ -172,13 +172,15 @@ export default function PasteList({
             return (
               <li key={`${e.row.line}-${e.row.name}`} className="border-b border-line py-4">
                 <div className="flex items-start gap-4">
-                  <input
-                    type="checkbox"
-                    checked={e.incluir}
-                    onChange={(ev) => cambiar(i, { incluir: ev.target.checked })}
-                    aria-label={`Usar ${e.row.name}`}
-                    className="mt-1.5 h-5 w-5 shrink-0 accent-ink"
-                  />
+                  <label className="-ml-3 -mt-1 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={e.incluir}
+                      onChange={(ev) => cambiar(i, { incluir: ev.target.checked })}
+                      aria-label={`Usar ${e.row.name}`}
+                      className="h-5 w-5 accent-ink"
+                    />
+                  </label>
                   <div className={`min-w-0 flex-1 ${e.incluir ? '' : 'opacity-50'}`}>
                     <div className="flex flex-wrap items-baseline justify-between gap-x-4">
                       <p className="font-serif text-xl font-light text-ink">{e.row.name}</p>

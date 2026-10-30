@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import type { PriceSheet } from '@/lib/priceSheets';
 import { hoyLocal } from '@/lib/price-sheet-rules';
@@ -12,6 +12,7 @@ import {
   urlVisible,
   type PriceDestination,
 } from '@/lib/price-destinations';
+import Mas from './Mas';
 import { fechaCorta, fechaDeInstante, haceTiempo, rangoFechas } from './format';
 import { ACCION, ACCION_PRINC, ACCION_SUAVE, AVISO, BOTON, ETIQ_DESTINO } from './ui';
 
@@ -29,20 +30,6 @@ function editadaDespues(hoja: PriceSheet): string | null {
 function waLink(dest: PriceDestination): string {
   const para = dest === 'GENERAL' ? '' : ` para ${destinationInfo(dest).label}`;
   return `https://wa.me/?text=${encodeURIComponent(`Hola, te comparto la lista de precios de Loleanthe${para}: ${urlDe(dest)}`)}`;
-}
-
-/** Segunda fila de acciones, escondida tras "Más" para que la fila no se llene
- *  de verbos. */
-function Mas({ children }: { children: ReactNode }) {
-  const [abierto, setAbierto] = useState(false);
-  return (
-    <>
-      <button type="button" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)} className={ACCION_SUAVE}>
-        Más {abierto ? '-' : '+'}
-      </button>
-      {abierto && <div className="flex basis-full flex-wrap items-center gap-x-6">{children}</div>}
-    </>
-  );
 }
 
 function Estado({ vivo }: { vivo: boolean }) {

@@ -228,7 +228,7 @@ export default function ItemEditor({
                 key={etiqueta}
                 type="button"
                 onClick={() => setForm((p) => ({ ...p, stemsPerBunch: valor }))}
-                className="inline-flex min-h-11 items-center"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center"
               >
                 <span className={chip(form.stemsPerBunch.trim() === valor)}>{etiqueta}</span>
               </button>
