@@ -63,7 +63,7 @@ function mensajeDeError(err: unknown): string {
   if (code.includes('unauthenticated')) {
     return 'Tu sesión expiró. Recargá la página e iniciá sesión de nuevo.';
   }
-  return `No se pudo guardar${code ? ` (${code})` : ''}. Mirá la consola del navegador para el detalle.`;
+  return `No se pudo guardar. Revisá tu conexión y volvé a intentar. Si vuelve a pasar, avísale a Francisco y mándale una captura de pantalla${code ? ` (código: ${code})` : ''}.`;
 }
 
 const emptyForm = {
@@ -435,11 +435,6 @@ export default function AdminDashboard() {
             <span className="text-[#7B7369] text-xs tracking-widest uppercase font-display hidden sm:block">Panel de Administración</span>
           </div>
           <div className="flex items-center gap-5">
-            {/* Marcador de versión: si el navegador sirve un bundle viejo desde
-                la caché, este número lo delata sin tener que adivinar. */}
-            <span className="label text-bone/40" title="Versión desplegada">
-              {VERSION}
-            </span>
             <button
               onClick={handleLogout}
               className="label text-bone/55 transition-colors hover:text-bone"
@@ -482,7 +477,7 @@ export default function AdminDashboard() {
                 El almacenamiento ha alcanzado su límite (4.5 GB)
               </p>
               <p className="text-red-300 text-xs mt-1 leading-relaxed">
-                No es posible subir más imágenes. Para liberar espacio, elimina algunas imágenes de flores existentes desde el panel de edición. Si necesitas más espacio, contacta al administrador del sistema.
+                No es posible subir más imágenes. Para liberar espacio, elimina algunas imágenes de flores existentes desde el panel de edición. Si necesitas más espacio, avísale a Francisco.
               </p>
             </div>
           </div>
@@ -1039,6 +1034,13 @@ export default function AdminDashboard() {
           <InquiriesPanel />
         )}
       </div>
+
+      {/* Versión desplegada: si el navegador sirve un bundle viejo desde la
+          caché, este número lo delata sin tener que adivinar. Va al pie y
+          discreta: es para quien da soporte, no para quien administra. */}
+      <p className="label px-6 pb-6 text-center text-muted/70" title="Versión desplegada">
+        Versión {VERSION}
+      </p>
     </div>
   );
 }

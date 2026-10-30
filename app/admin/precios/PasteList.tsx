@@ -49,6 +49,7 @@ export default function PasteList({
   destination,
   onAplicar,
   onCancelar,
+  onSaltar,
 }: {
   /** Las flores que la hoja ya tiene: si la lista trae una de ellas, solo cambia su precio. */
   items: PriceItem[];
@@ -56,6 +57,8 @@ export default function PasteList({
   destination: PriceDestination | null;
   onAplicar: (resultado: ImportResult) => void;
   onCancelar: () => void;
+  /** Solo al crear una hoja nueva: salir sin pegar nada y cargar las flores de a una. */
+  onSaltar?: () => void;
 }) {
   const [texto, setTexto] = useState('');
   const [revision, setRevision] = useState<{ entradas: ImportEntry[]; ignoradas: PastedIgnored[] } | null>(null);
@@ -79,9 +82,11 @@ export default function PasteList({
     return (
       <div className="mx-auto w-full max-w-2xl">
         <button type="button" onClick={onCancelar} className={ACCION_SUAVE}>
-          ← Volver a la hoja
+          {onSaltar ? '← Volver a Precios' : '← Volver a la hoja'}
         </button>
-        <h2 className="mt-4 font-serif text-3xl font-light text-ink">Pegar la lista de precios</h2>
+        <h2 className="mt-4 font-serif text-3xl font-light text-ink">
+          {onSaltar && info ? `Pegar la lista ${info.hojaDe}` : 'Pegar la lista de precios'}
+        </h2>
         <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-muted">
           Pegá la lista tal como la tengas: una flor por línea, con su precio por bunch en dólares. Antes de que se
           agregue nada, vas a revisar qué flor del catálogo encontró para cada una.
@@ -98,7 +103,7 @@ export default function PasteList({
           rows={14}
           autoFocus
           placeholder="Pegá acá"
-          className={`${FIELD} mt-2 resize-y border border-muted/80 p-3`}
+          className="mt-2 w-full resize-y border border-muted bg-paper p-3 text-base leading-relaxed text-ink placeholder:text-muted transition-colors focus:border-ink"
         />
         <div className="mt-6 flex items-center gap-6">
           <button type="button" onClick={revisar} disabled={!texto.trim()} className={BOTON}>
@@ -108,6 +113,11 @@ export default function PasteList({
             Cancelar
           </button>
         </div>
+        {onSaltar && (
+          <button type="button" onClick={onSaltar} className={`${ACCION_SUAVE} mt-4`}>
+            Prefiero cargar las flores una por una
+          </button>
+        )}
       </div>
     );
   }

@@ -17,7 +17,8 @@ import {
   type PriceItem,
   type PublishResult,
 } from '@/lib/priceSheets';
-import { availabilityWarnings, checkSheet, hoyLocal, planPlacement, PriceSheetError, sumarMeses } from '@/lib/price-sheet-rules';
+import { availabilityWarnings, checkSheet, hoyLocal, planPlacement, PriceSheetError } from '@/lib/price-sheet-rules';
+import { finDeTemporada, nombreDeTemporada } from '@/lib/temporada';
 import { slugDe, type ImportResult } from '@/lib/price-import';
 import type { Category } from '@/lib/categories';
 import {
@@ -66,12 +67,18 @@ const formVacio = (destination: PriceDestination | null = null): SheetFormState 
   items: [],
 });
 
-/** Una hoja nueva arranca con las fechas de hoy a tres meses (una temporada): son
- *  obligatorias, y casi nunca se necesitan otras. Se cambian en un toque. */
+/** Una hoja nueva arranca con lo que casi siempre se escribe igual: las fechas de
+ *  la temporada (de hoy al fin del segundo mes siguiente) y su nombre, como
+ *  "Temporada Octubre - Diciembre". Todo se puede cambiar; solo se ahorra
+ *  empezar de cero un campo obligatorio. */
 const formNuevo = (destination: PriceDestination | null): SheetFormState => {
   const hoy = hoyLocal();
-  return { ...formVacio(destination), dateStart: hoy, dateEnd: sumarMeses(hoy, 3) };
+  const fin = finDeTemporada(hoy);
+  return { ...formVacio(destination), title: nombreDeTemporada(hoy, fin), dateStart: hoy, dateEnd: fin };
 };
+
+/** Qué se le dice a quien administra cuando algo falla y no es culpa suya. */
+const SI_SIGUE = 'Si vuelve a pasar, avísale a Francisco y mándale una captura de pantalla.';
 
 const formDe = (s: PriceSheet): SheetFormState => ({
   title: s.title,
@@ -108,7 +115,13 @@ function mensajeDeError(err: unknown, accion: string): string {
   if ((err as Error)?.message === 'TIMEOUT') {
     return 'El servidor tardó demasiado. Revisá tu conexión y probá de nuevo.';
   }
-  return `No se pudo ${accion}. Revisá tu conexión y probá de nuevo.`;
+  const codigo = (err as { code?: string })?.code ?? '';
+  if (codigo.includes('permission-denied') || codigo.includes('unauthenticated')) {
+    // Firebase comparte la sesión entre pestañas: volver a entrar en otra basta,
+    // y lo escrito en esta pantalla no se pierde.
+    return 'No se aceptó el guardado. Lo más probable es que se haya cerrado tu sesión: abrí loleanthe.com/admin en otra pestaña, iniciá sesión y volvé acá a guardar (lo que escribiste sigue en esta pantalla). Si no se arregla, avísale a Francisco.';
+  }
+  return `No se pudo ${accion}. Revisá tu conexión y probá de nuevo. ${SI_SIGUE}`;
 }
 
 export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flower[] }) {
@@ -132,6 +145,9 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
   const [itemImagePreview, setItemImagePreview] = useState<string>('');
   const [paso, setPaso] = useState('');
   const [verPrevia, setVerPrevia] = useState(false);
+  // Pegar la lista se abre desde la lista de enlaces (hoja nueva) o desde el editor:
+  // "Cancelar" vuelve al mismo lugar de donde se vino.
+  const [pegarVuelveA, setPegarVuelveA] = useState<'list' | 'sheet'>('sheet');
 
   const [dialogo, setDialogo] = useState<Dialogo | null>(null);
   const [dialogoOcupado, setDialogoOcupado] = useState(false);
@@ -187,11 +203,16 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
 
   // ── Navegación ─────────────────────────────────────────────────────────
 
+  /** Con país (el botón "Crear la hoja de Guatemala") la primera pantalla es la de
+   *  pegar la lista, que es lo único que hay que hacer. Sin país ("+ Nueva hoja")
+   *  se abre el editor para elegirlo. */
   const abrirNuevaHoja = (destination?: PriceDestination) => {
+    const nueva = formNuevo(destination ?? null);
     setEditing(null);
-    setSheetForm(formNuevo(destination ?? null));
-    setSavedForm(formNuevo(destination ?? null));
-    setVista('sheet');
+    setSheetForm(nueva);
+    setSavedForm(nueva);
+    setPegarVuelveA(destination ? 'list' : 'sheet');
+    setVista(destination ? 'pegar' : 'sheet');
   };
 
   const abrirHoja = (sheet: PriceSheet) => {
@@ -283,7 +304,7 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
       comprimida = await conTiempoLimite(compressImage(file), 30_000);
     } catch (err) {
       console.error('[precios] falló la preparación de la foto:', err);
-      toast.error('No se pudo preparar la foto. Si viene del iPhone, exportala como JPG y volvé a intentar.', { duration: 8000 });
+      toast.error('No se pudo preparar la foto. Probá con otra foto, o sacala de nuevo con la cámara.', { duration: 8000 });
       setPaso('');
       return;
     }
@@ -409,7 +430,7 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
           ? 'El almacenamiento está lleno. Elimina imágenes antes de subir nuevas.'
           : msg === 'TIMEOUT'
             ? 'La subida se quedó esperando al servidor. Revisá tu conexión y volvé a intentar.'
-            : 'No se pudo preparar la flor. Mirá la consola para el detalle.',
+            : `No se pudo preparar la flor. ${SI_SIGUE}`,
         { duration: 8000 }
       );
     } finally {
@@ -420,23 +441,25 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
 
   // ── La hoja: acá sí se escribe a Firestore ──────────────────────────────
 
-  /** Devuelve si se guardó (para "Guardar y salir"). */
-  const guardarHoja = async (): Promise<boolean> => {
+  /** Guarda la hoja. Devuelve la hoja ya guardada (releída de la base), o `null` si
+   *  no se pudo: "Guardar y salir" y "Guardar y publicar" siguen solo si hay hoja.
+   *  `silencioso` omite el aviso de "guardada" cuando lo que viene es otro paso. */
+  const guardarHoja = async (opts: { silencioso?: boolean } = {}): Promise<PriceSheet | null> => {
     if (!sheetForm.destination) {
       toast.error('Elegí para quién es la hoja');
-      return false;
+      return null;
     }
     if (!sheetForm.title.trim()) {
       toast.error('El título es requerido');
-      return false;
+      return null;
     }
     if (!sheetForm.dateStart || !sheetForm.dateEnd) {
       toast.error('Las fechas de inicio y fin son requeridas');
-      return false;
+      return null;
     }
     if (sheetForm.dateEnd < sheetForm.dateStart) {
       toast.error('La fecha final es anterior a la inicial');
-      return false;
+      return null;
     }
     setGuardando(true);
     try {
@@ -464,22 +487,23 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
       }
 
       const guardada = await getPriceSheetById(id);
-      if (guardada) {
-        setEditing(guardada);
-        setSheetForm(formDe(guardada));
-        setSavedForm(formDe(guardada));
-      }
+      if (!guardada) throw new Error('RELEER');
+      setEditing(guardada);
+      setSheetForm(formDe(guardada));
+      setSavedForm(formDe(guardada));
       cargarHojas(false);
 
-      if (!editing) toast.success('Hoja creada como borrador');
-      else if (revalidated === false) {
+      if (opts.silencioso) return guardada;
+      if (!editing) {
+        toast.success('Guardada como borrador. Los clientes no la ven hasta que la publiques.', { duration: 6000 });
+      } else if (revalidated === false) {
         toast('Guardada. El sitio puede tardar hasta 5 minutos en mostrar el cambio.', { duration: 6000 });
-      } else toast.success('Hoja guardada');
-      return true;
+      } else toast.success(editing.status === 'published' ? 'Guardada. Ya se ve en el enlace.' : 'Hoja guardada');
+      return guardada;
     } catch (err) {
       console.error('[precios] falló el guardado de la hoja:', err);
       toast.error(mensajeDeError(err, 'guardar la hoja'), { duration: 8000 });
-      return false;
+      return null;
     } finally {
       setGuardando(false);
     }
@@ -487,6 +511,13 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
 
   const descartar = () => {
     setSheetForm(savedForm);
+  };
+
+  /** Un solo toque para lo más común: guardar la hoja y, sin soltarla, abrir la
+   *  confirmación de publicar (que dice qué enlace queda y qué reemplaza). */
+  const guardarYPublicar = async () => {
+    const guardada = await guardarHoja({ silencioso: true });
+    if (guardada) abrirDialogo({ tipo: 'publicar', sheet: guardada });
   };
 
   const duplicar = async (sheet: PriceSheet) => {
@@ -627,6 +658,12 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
           busyLabel="Publicando…"
           busy={dialogoOcupado}
           error={dialogoError}
+          // Desde el editor se puede mirar cómo queda antes de confirmar.
+          secondaryLabel={vista === 'sheet' && editing?.id === sheet.id ? 'Ver cómo queda' : undefined}
+          onSecondary={() => {
+            setDialogo(null);
+            setVerPrevia(true);
+          }}
           onConfirm={() => confirmarPublicar(sheet)}
           onCancel={cerrarDialogo}
         >
@@ -831,7 +868,9 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
         flowers={catalogFlowers}
         destination={sheetForm.destination}
         onAplicar={aplicarLista}
-        onCancelar={volverAHoja}
+        onCancelar={() => (pegarVuelveA === 'list' ? volverALista() : volverAHoja())}
+        // Quien llegó desde "Crear la hoja de…" puede preferir cargar las flores de a una.
+        onSaltar={pegarVuelveA === 'list' ? volverAHoja : undefined}
       />
     );
   }
@@ -848,7 +887,8 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
           dirty={dirty}
           guardando={guardando}
           onVolver={pedirVolver}
-          onGuardar={guardarHoja}
+          onGuardar={() => guardarHoja()}
+          onGuardarYPublicar={guardarYPublicar}
           onDescartar={descartar}
           onPublicar={() => editing && abrirDialogo({ tipo: 'publicar', sheet: { ...editing, ...sheetForm } })}
           onMover={() =>
@@ -860,7 +900,10 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
             })
           }
           onAgregarFlor={abrirNuevoItem}
-          onPegar={() => setVista('pegar')}
+          onPegar={() => {
+            setPegarVuelveA('sheet');
+            setVista('pegar');
+          }}
           onVistaPrevia={() => setVerPrevia(true)}
           onCambiarPrecio={cambiarPrecio}
           onEditarItem={abrirItem}
