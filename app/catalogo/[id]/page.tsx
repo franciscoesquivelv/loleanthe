@@ -8,7 +8,7 @@ import FlowerDetailClient from './FlowerDetailClient';
 
 // Cuando la flor no tiene foto propia, la ficha igual necesita una imagen de
 // vista previa: sin esto, un enlace de WhatsApp o Twitter se ve roto.
-const IMAGEN_POR_DEFECTO = '/images/hero-dark.jpg';
+const IMAGEN_POR_DEFECTO = '/images/og/sitio-v1.jpg';
 
 // Pre-genera una página estática por cada flor del catálogo (ISR). Con 0 flores
 // no genera ninguna; en cuanto se cargue inventario, cada flor tiene su página.

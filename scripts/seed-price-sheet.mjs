@@ -83,6 +83,9 @@ async function main() {
     dateEnd: DATE_END,
     description: DESCRIPTION,
     status: 'published',
+    // Desde que cada hoja tiene destino, una publicada sin él no sale en ningún
+    // enlace. La hoja original era la de Costa Rica (2026-10-02).
+    destination: 'CR',
     items,
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),

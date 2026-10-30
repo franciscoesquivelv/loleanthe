@@ -1,7 +1,8 @@
-import type { CountryCode } from './types';
 import type { PriceItem, PriceSheet, PriceSheetStatus } from './priceSheets';
+import { storedDestination, type PriceDestination } from './price-destinations';
+import { readItem } from './price-sheet-rules';
 
-// Lectura pública de la hoja de precios ACTIVA desde el SERVIDOR (Server
+// Lectura pública de la hoja de precios ACTIVA de un destino desde el SERVIDOR (Server
 // Components), vía la API REST de Firestore, mismo patrón que
 // lib/flowers-server.ts. La lectura de `priceSheets` es pública en las
 // Security Rules, así que no se necesita Admin SDK ni credenciales.
@@ -41,37 +42,42 @@ function arr(v?: FsValue): FsValue[] {
   return v?.arrayValue?.values ?? [];
 }
 
+/** Pasa el valor de la REST de Firestore a un objeto plano y deja que `readItem`
+ *  (el mismo que usa el admin) arme el ítem: así los dos leen igual, también la
+ *  forma vieja con `price` por tallo. Cada campo del ítem TIENE que listarse acá. */
 function parsePriceItem(v: FsValue): PriceItem {
   const f = v.mapValue?.fields ?? {};
-  const priceByCountryFields = f.priceByCountry?.mapValue?.fields ?? {};
-  const priceByCountry: Partial<Record<CountryCode, number>> = {};
-  for (const [code, val] of Object.entries(priceByCountryFields)) {
-    const n = num(val);
-    if (n != null) priceByCountry[code as CountryCode] = n;
-  }
-  return {
-    slug: str(f.slug),
-    name: str(f.name),
+  return readItem({
+    slug: f.slug?.stringValue,
+    name: f.name?.stringValue,
     size: f.size?.stringValue,
-    stemsPerBunch: num(f.stemsPerBunch) ?? 0,
+    stemsPerBunch: num(f.stemsPerBunch),
     price: num(f.price),
-    priceByCountry: Object.keys(priceByCountry).length > 0 ? priceByCountry : undefined,
+    bunchPrice: num(f.bunchPrice),
     image: f.image?.stringValue,
     catalogFlowerId: f.catalogFlowerId?.stringValue,
     categorySlug: f.categorySlug?.stringValue,
     note: f.note?.stringValue,
-  };
+  });
 }
 
+// Cada campo nuevo del documento TIENE que sumarse acá: este parser es a mano
+// (REST, sin SDK) y un campo que falte llega vacío a la página sin ningún
+// error. Ya pasó con `note`, y `destination` es el que más duele olvidar.
 function parsePriceSheetDoc(doc: FsDoc): PriceSheet {
   const f = doc.fields ?? {};
+  const status = (f.status?.stringValue as PriceSheetStatus) ?? 'draft';
+  // Campo ausente o null = hoja de antes de los destinos (ver storedDestination).
+  // Un campo que existe pero no es texto llega como '' y falla cerrado.
+  const rawDestination = f.destination === undefined || 'nullValue' in f.destination ? undefined : str(f.destination);
   return {
     id: doc.name.split('/').pop() ?? '',
     title: str(f.title),
     dateStart: str(f.dateStart),
     dateEnd: str(f.dateEnd),
     description: str(f.description),
-    status: (f.status?.stringValue as PriceSheetStatus) ?? 'draft',
+    status,
+    destination: storedDestination(rawDestination, status),
     items: arr(f.items).map(parsePriceItem),
     createdAt: f.createdAt?.timestampValue ?? '',
     updatedAt: f.updatedAt?.timestampValue ?? '',
@@ -80,27 +86,43 @@ function parsePriceSheetDoc(doc: FsDoc): PriceSheet {
 }
 
 /**
- * La hoja de precios que se le muestra a un visitante: la única con
- * `status === 'published'`. `null` si todavía no se publicó ninguna (por
- * ejemplo, recién desplegado el sistema y falta correr la migración).
+ * La hoja que se le muestra a un visitante de UN destino: la `published` de
+ * ese destino. `null` solo si la consulta funcionó y no hay ninguna (el enlace
+ * muestra el aviso de "todavía no está publicada").
+ *
+ * El destino es argumento obligatorio y sin valor por defecto: ninguna ruta
+ * puede "olvidarse" de pasarlo y recibir la hoja más reciente de cualquier
+ * país. Una hoja sin destino válido no sale en ningún enlace; la única
+ * excepción es la publicada de antes de los destinos, que cuenta como Costa
+ * Rica (ver storedDestination).
+ *
+ * Si Firestore falla, LANZA en vez de devolver `null`. Antes se disfrazaba de
+ * "no hay hoja" y, con ISR, una falla pasajera reemplazaba una página buena
+ * por el aviso durante hasta 5 minutos para todos los visitantes. Lanzando,
+ * Next conserva la última versión buena y reintenta.
  */
-export async function getPublishedPriceSheetServer(): Promise<PriceSheet | null> {
-  try {
-    const res = await fetch(`${FIRESTORE_BASE}/priceSheets?pageSize=300`, {
-      next: { revalidate: REVALIDATE_SECONDS },
-    });
-    if (!res.ok) return null;
-    const data: { documents?: FsDoc[] } = await res.json();
-    const sheets = (data.documents ?? []).map(parsePriceSheetDoc);
-    // Por diseño solo debería haber una `published` a la vez (lo aplica
-    // publishPriceSheet en lib/priceSheets.ts, no estas reglas); si por
-    // algún motivo hubiera más de una, se toma la más reciente en vez de
-    // que la página se rompa.
-    const published = sheets
-      .filter((s) => s.status === 'published')
-      .sort((a, b) => (a.publishedAt ?? '') < (b.publishedAt ?? '') ? 1 : -1);
-    return published[0] ?? null;
-  } catch {
-    return null;
+export async function getPublishedPriceSheetServer(destination: PriceDestination): Promise<PriceSheet | null> {
+  const res = await fetch(`${FIRESTORE_BASE}/priceSheets?pageSize=300`, {
+    next: { revalidate: REVALIDATE_SECONDS },
+  });
+  if (!res.ok) throw new Error(`[priceSheets] Firestore respondió ${res.status}`);
+  const data: { documents?: FsDoc[] } = await res.json();
+
+  // Por diseño hay una sola `published` por destino (lo aplica
+  // publishPriceSheet en lib/priceSheets.ts, no las reglas). Si por una carrera
+  // o una edición en la consola hubiera más de una, gana la más reciente en
+  // vez de que la página se rompa, y se deja el aviso en el log.
+  const candidatas = (data.documents ?? [])
+    .map(parsePriceSheetDoc)
+    .filter((s) => s.status === 'published' && s.destination === destination)
+    .sort(
+      (a, b) =>
+        (b.publishedAt ?? '').localeCompare(a.publishedAt ?? '') ||
+        b.updatedAt.localeCompare(a.updatedAt) ||
+        a.id.localeCompare(b.id)
+    );
+  if (candidatas.length > 1) {
+    console.error(`[priceSheets] ${candidatas.length} hojas publicadas en ${destination}; se muestra la más reciente`);
   }
+  return candidatas[0] ?? null;
 }
