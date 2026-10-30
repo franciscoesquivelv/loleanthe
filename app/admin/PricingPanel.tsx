@@ -56,6 +56,7 @@ type Dialogo =
    *  se "mueve" desde ninguna parte, y el diálogo es el de elegirle uno. */
   | { tipo: 'mover'; sheet: PriceSheet; destino: PriceDestination }
   | { tipo: 'eliminar'; sheet: PriceSheet }
+  | { tipo: 'descartar' }
   | { tipo: 'salir' };
 
 const formVacio = (destination: PriceDestination | null = null): SheetFormState => ({
@@ -461,6 +462,15 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
       toast.error('La fecha final es anterior a la inicial');
       return null;
     }
+    // Una hoja en vivo se ve apenas se guarda: no puede quedar vacía ni con flores
+    // repetidas. Al publicar se revisa lo mismo; acá faltaba.
+    if (editing?.status === 'published') {
+      const { errors } = checkSheet(sheetForm, hoyLocal());
+      if (errors.length > 0) {
+        toast.error(`No se guardó: ${errors.map((e) => e.text).join(' ')}`, { duration: 8000 });
+        return null;
+      }
+    }
     setGuardando(true);
     try {
       const contenido = {
@@ -753,6 +763,12 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
               ))}
             </div>
           </fieldset>
+          {origen && (
+            <p className={AVISO}>
+              Estos son los precios {destinationInfo(origen).deLa}. Quien abra {urlVisible(destino)} los va a ver tal cual. Si
+              para ese enlace tenés otros precios, mejor creá una hoja nueva ahí en vez de mover esta.
+            </p>
+          )}
           <ul className="border-t border-line">
             {origen && (
               <li className="border-b border-line py-2.5 text-[14px] leading-snug">
@@ -792,6 +808,25 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
           <p>
             Se borra la hoja y sus {flores(sheet.items.length)}. No se puede deshacer.
           </p>
+        </ConfirmDialog>
+      );
+    }
+
+    if (dialogo.tipo === 'descartar') {
+      return (
+        <ConfirmDialog
+          open
+          eyebrow="Descartar"
+          title="Descartar los cambios"
+          confirmLabel="Descartar los cambios"
+          cancelLabel="Seguir editando"
+          onConfirm={() => {
+            descartar();
+            setDialogo(null);
+          }}
+          onCancel={cerrarDialogo}
+        >
+          <p>Se pierde lo que cambiaste desde la última vez que guardaste «{sheetForm.title || 'esta hoja'}».</p>
         </ConfirmDialog>
       );
     }
@@ -889,7 +924,7 @@ export default function PricingPanel({ catalogFlowers }: { catalogFlowers: Flowe
           onVolver={pedirVolver}
           onGuardar={() => guardarHoja()}
           onGuardarYPublicar={guardarYPublicar}
-          onDescartar={descartar}
+          onDescartar={() => abrirDialogo({ tipo: 'descartar' })}
           onPublicar={() => editing && abrirDialogo({ tipo: 'publicar', sheet: { ...editing, ...sheetForm } })}
           onMover={() =>
             editing &&

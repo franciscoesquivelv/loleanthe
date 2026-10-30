@@ -16,7 +16,7 @@ export const AVISO = 'border-l border-ink pl-4 text-[14px] leading-relaxed text-
 /** Campo subrayado. El subrayado en reposo es `muted/80` (3.2:1 sobre bone) en
  *  vez de `line` (1.2:1, casi invisible) y el placeholder es `muted` pleno. */
 export const FIELD =
-  'w-full border-0 border-b border-muted/80 bg-transparent py-2 text-[15px] text-ink placeholder:text-muted transition-colors duration-300 focus:border-ink';
+  'min-h-11 w-full border-0 border-b border-muted/80 bg-transparent py-2 text-base text-ink placeholder:text-muted transition-colors duration-300 focus:border-ink';
 /** Opción rápida (10, 25, por peso): mismo idioma que los filtros del catálogo.
  *  Va en un `<span>` dentro de un botón de 44 px: así el subrayado queda pegado
  *  al texto y el blanco táctil sigue siendo cómodo. */

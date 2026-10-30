@@ -3,14 +3,19 @@
 import { useState } from 'react';
 import { parseMoneyInput } from '@/lib/price-sheet-rules';
 
+const formato = (v: number | null) => (v != null ? v.toFixed(2) : '');
+
 /**
  * El precio por bunch de una flor, editable en la misma fila de la hoja: corregir
- * un precio es tocarlo, escribir y pasar al siguiente, sin abrir la flor.
+ * un precio es tocarlo y escribir, sin abrir la flor.
  *
- * Escribe en el formulario de la hoja (queda "sin guardar", como todo lo demás)
- * al salir del campo o con Enter, y solo si es un precio válido: lo que no se
- * entiende se dice ahí mismo y no se corrige en silencio. El padre lo vuelve a
- * montar (`key`) cuando el precio cambia por otro lado, así nunca muestra uno viejo.
+ * Escribe en el formulario de la hoja (queda "sin guardar") MIENTRAS se escribe,
+ * apenas lo escrito es un precio válido. Antes solo lo hacía al salir del campo, y
+ * el teclado decimal del iPhone no tiene Enter ni forma obvia de salir: la barra
+ * de abajo no mostraba "Guardar" hasta que se tocaba otra cosa.
+ *
+ * Lo que está a medias ("11.") no se manda y tampoco se marca como error: el aviso
+ * sale al salir del campo, y ahí se acomoda el formato ("11,4" queda "11.40").
  */
 export default function PrecioEnLinea({
   nombre,
@@ -21,17 +26,36 @@ export default function PrecioEnLinea({
   valor: number | null;
   onCambiar: (precio: number | null) => void;
 }) {
-  const [texto, setTexto] = useState(valor != null ? valor.toFixed(2) : '');
+  const [texto, setTexto] = useState(formato(valor));
   const [error, setError] = useState('');
+  const [valorVisto, setValorVisto] = useState(valor);
 
-  const confirmar = () => {
+  // Si el precio cambió por otro lado (pegar una lista, por ejemplo) y no coincide
+  // con lo escrito, se muestra el nuevo: nunca queda un número viejo en pantalla.
+  if (valor !== valorVisto) {
+    setValorVisto(valor);
+    const escrito = parseMoneyInput(texto);
+    if (!(escrito.ok && escrito.value === valor)) {
+      setTexto(formato(valor));
+      setError('');
+    }
+  }
+
+  const alEscribir = (nuevo: string) => {
+    setTexto(nuevo);
+    setError('');
+    const r = parseMoneyInput(nuevo);
+    if (r.ok && r.value !== valor) onCambiar(r.value);
+  };
+
+  const alSalir = () => {
     const r = parseMoneyInput(texto);
     if (!r.ok) {
       setError(r.error);
       return;
     }
     setError('');
-    if (r.value !== valor) onCambiar(r.value);
+    setTexto(formato(r.value));
   };
 
   return (
@@ -45,12 +69,12 @@ export default function PrecioEnLinea({
           aria-label={`Precio por bunch de ${nombre}, en dólares`}
           aria-invalid={error ? true : undefined}
           value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-          onBlur={confirmar}
+          onChange={(e) => alEscribir(e.target.value)}
+          onBlur={alSalir}
           onKeyDown={(e) => {
             if (e.key === 'Enter') e.currentTarget.blur();
           }}
-          className="w-20 border-0 bg-transparent py-1 font-serif text-xl font-light text-ink placeholder:text-muted focus-visible:outline-none!"
+          className="min-h-11 w-24 border-0 bg-transparent py-1 font-serif text-xl font-light text-ink placeholder:text-muted"
         />
         <span className="text-[13px] text-muted">por bunch</span>
       </div>
