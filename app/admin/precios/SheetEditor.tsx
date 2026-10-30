@@ -1,7 +1,8 @@
 'use client';
 
-import type { Dispatch, SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
 import type { PriceItem, PriceSheet } from '@/lib/priceSheets';
 import { availabilityNote, availabilityWarnings, priceRange, repartir, stemPriceLabel } from '@/lib/price-sheet-rules';
 import type { Flower } from '@/lib/types';
@@ -42,6 +43,7 @@ export default function SheetEditor({
   guardando,
   onVolver,
   onGuardar,
+  onGuardarYPublicar,
   onDescartar,
   onPublicar,
   onMover,
@@ -65,6 +67,8 @@ export default function SheetEditor({
   guardando: boolean;
   onVolver: () => void;
   onGuardar: () => void;
+  /** Guarda y, sin soltar la hoja, abre la confirmación de publicar. */
+  onGuardarYPublicar: () => void;
   onDescartar: () => void;
   onPublicar: () => void;
   /** Hoja viva: abre el diálogo de "Mover a otro destino". */
@@ -91,6 +95,25 @@ export default function SheetEditor({
   const avisosCatalogo = availabilityWarnings(form, catalogFlowers);
   const hojasImpresas = repartir(nFlores);
 
+  const puedePublicar = !viva && !!dest && nFlores > 0;
+  // Con el país ya elegido las tres tarjetas ocupan media pantalla y solo sirven
+  // para equivocarse: se muestra el país y un "Cambiar".
+  const [cambiandoPais, setCambiandoPais] = useState(false);
+  const mostrarTarjetas = !dest || (cambiandoPais && !viva);
+  const [copiado, setCopiado] = useState(false);
+  const copiarEnlace = async () => {
+    if (!dest) return;
+    try {
+      await navigator.clipboard.writeText(urlDe(dest));
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch {
+      // Algunos navegadores embebidos niegan el portapapeles: se muestra el
+      // enlace para copiarlo a mano.
+      toast(`Copia este enlace: ${urlDe(dest)}`, { duration: 10000 });
+    }
+  };
+
   const estado = esNueva ? 'Nueva' : viva ? `En vivo ${info?.en ?? ''}`.trim() : archivada ? 'Archivada' : 'Borrador';
 
   return (
@@ -103,33 +126,47 @@ export default function SheetEditor({
       {/* ── Para quién es ─────────────────────────────────────────────── */}
       <fieldset className="mt-8">
         <legend className="label text-muted">Para quién es esta hoja</legend>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          {PRICE_DESTINATIONS.map((d) => (
-            <label
-              key={d.code}
-              className={`relative block ${viva ? `cursor-not-allowed ${dest === d.code ? '' : 'opacity-50'}` : 'cursor-pointer'}`}
-            >
-              <input
-                type="radio"
-                name="destino"
-                value={d.code}
-                checked={dest === d.code}
-                disabled={viva}
-                onChange={() => setForm((p) => ({ ...p, destination: d.code }))}
-                className="peer sr-only"
-              />
-              <span className="block border border-line p-4 pr-10 transition-colors hover:border-muted peer-checked:border-ink peer-checked:bg-paper peer-focus-visible:outline peer-focus-visible:outline-1 peer-focus-visible:outline-offset-2">
-                <span className="block font-serif text-xl font-light text-ink">{d.label}</span>
-                <span className="label mt-2 block text-muted">{d.route}</span>
-                <span className="mt-3 block text-[13px] leading-snug text-muted">{d.cardMoneda}</span>
-              </span>
-              <span
-                aria-hidden="true"
-                className="absolute right-4 top-4 h-2.5 w-2.5 border border-muted peer-checked:border-ink peer-checked:bg-ink"
-              />
-            </label>
-          ))}
-        </div>
+        {mostrarTarjetas ? (
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {PRICE_DESTINATIONS.map((d) => (
+              <label
+                key={d.code}
+                className={`relative block ${viva ? `cursor-not-allowed ${dest === d.code ? '' : 'opacity-50'}` : 'cursor-pointer'}`}
+              >
+                <input
+                  type="radio"
+                  name="destino"
+                  value={d.code}
+                  checked={dest === d.code}
+                  disabled={viva}
+                  onChange={() => {
+                    setForm((p) => ({ ...p, destination: d.code }));
+                    setCambiandoPais(false);
+                  }}
+                  className="peer sr-only"
+                />
+                <span className="block border border-line p-4 pr-10 transition-colors hover:border-muted peer-checked:border-ink peer-checked:bg-paper peer-focus-visible:outline peer-focus-visible:outline-1 peer-focus-visible:outline-offset-2">
+                  <span className="block font-serif text-xl font-light text-ink">{d.label}</span>
+                  <span className="label mt-2 block text-muted">{d.route}</span>
+                  <span className="mt-3 block text-[13px] leading-snug text-muted">{d.cardMoneda}</span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="absolute right-4 top-4 h-2.5 w-2.5 border border-muted peer-checked:border-ink peer-checked:bg-ink"
+                />
+              </label>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4">
+            <p className="font-serif text-3xl font-light text-ink">{info?.label}</p>
+            {!viva && (
+              <button type="button" onClick={() => setCambiandoPais(true)} className={ACCION_SUAVE}>
+                Cambiar
+              </button>
+            )}
+          </div>
+        )}
 
         {viva && (
           <div className="mt-2">
@@ -356,9 +393,10 @@ export default function SheetEditor({
         )}
       </section>
 
-      {/* ── Barra inferior: estado a la izquierda, la acción a la derecha ── */}
+      {/* ── Barra inferior: estado a la izquierda, las acciones a la derecha. En
+          el celular las acciones pasan a una segunda línea en vez de apretarse. ── */}
       <div className="sticky bottom-0 z-10 -mx-6 mt-10 border-t border-line bg-paper px-6">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 py-3">
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2">
           <p className="label text-muted" aria-live="polite">
             {dirty || esNueva
               ? 'Sin guardar'
@@ -370,7 +408,7 @@ export default function SheetEditor({
                     ? 'Guardada · agregá al menos una flor'
                     : 'Guardada'}
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-end gap-x-5">
             <button type="button" onClick={onVistaPrevia} disabled={nFlores === 0} className={ACCION_SUAVE}>
               Vista previa
             </button>
@@ -381,21 +419,32 @@ export default function SheetEditor({
                     Descartar
                   </button>
                 )}
-                <button type="button" onClick={onGuardar} disabled={guardando} className={BOTON}>
-                  {guardando ? 'Guardando…' : 'Guardar'}
-                </button>
+                {puedePublicar ? (
+                  <>
+                    <button type="button" onClick={onGuardar} disabled={guardando} className={ACCION}>
+                      {archivada ? 'Guardar' : 'Guardar borrador'}
+                    </button>
+                    <button type="button" onClick={onGuardarYPublicar} disabled={guardando} className={BOTON}>
+                      {guardando ? 'Guardando…' : 'Guardar y publicar'}
+                    </button>
+                  </>
+                ) : (
+                  <button type="button" onClick={onGuardar} disabled={guardando} className={BOTON}>
+                    {guardando ? 'Guardando…' : 'Guardar'}
+                  </button>
+                )}
               </>
             ) : viva && dest ? (
-              <a href={urlDe(dest)} target="_blank" rel="noopener noreferrer" className={ACCION}>
-                Abrir el enlace
-              </a>
+              <>
+                <button type="button" onClick={copiarEnlace} className={ACCION_SUAVE}>
+                  {copiado ? 'Copiado' : 'Copiar enlace'}
+                </button>
+                <a href={urlDe(dest)} target="_blank" rel="noopener noreferrer" className={ACCION}>
+                  Abrir el enlace
+                </a>
+              </>
             ) : (
-              <button
-                type="button"
-                onClick={onPublicar}
-                disabled={!dest || nFlores === 0}
-                className={BOTON}
-              >
+              <button type="button" onClick={onPublicar} disabled={!puedePublicar} className={BOTON}>
                 {archivada ? 'Volver a publicar' : 'Publicar'}
                 {info ? ` ${info.en}` : ''}
               </button>

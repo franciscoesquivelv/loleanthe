@@ -146,16 +146,6 @@ export function hoyLocal(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-/** "YYYY-MM-DD" más `n` meses, con componentes locales (ver hoyLocal). Un 31 que
- *  no existe en el mes de llegada cae en el último día de ese mes. */
-export function sumarMeses(iso: string, n: number): string {
-  const [a, m, d] = iso.split('-').map(Number);
-  const f = new Date(a, m - 1 + n, 1);
-  const ultimo = new Date(f.getFullYear(), f.getMonth() + 1, 0).getDate();
-  f.setDate(Math.min(d, ultimo));
-  return `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, '0')}-${String(f.getDate()).padStart(2, '0')}`;
-}
-
 // ── Validación antes de publicar ─────────────────────────────────────────
 
 export interface SheetIssue {
