@@ -67,10 +67,11 @@ service cloud.firestore {
 
     // ── priceSheets (hoja de precios / oferta) ────────────────────
     // Un documento por temporada. `/precios`, `/precios-cr` y `/precios-gt`
-    // leen la que tenga status == 'published' (filtrado en el servidor, no
-    // acá: Firestore Rules no puede exigir "que no haya otra publicada").
-    // Esa regla de negocio, un solo published a la vez, la aplica la acción
-    // Publicar del admin (lib/priceSheets.ts), no estas reglas.
+    // leen la que tenga status == 'published' Y su destino (`destination`:
+    // 'GENERAL', 'CR' o 'GT'), filtrado en el servidor, no acá: Firestore Rules
+    // no puede exigir "que no haya otra publicada". Esa regla de negocio, una
+    // sola published por destino, la aplica la acción Publicar del admin
+    // (lib/priceSheets.ts), no estas reglas.
     match /priceSheets/{sheetId} {
       // Lectura pública: la consumen las tres rutas sin login.
       allow read: if true;
@@ -90,6 +91,14 @@ service cloud.firestore {
         && request.resource.data.description is string
         && request.resource.data.description.size() <= 2000
         && request.resource.data.status in ['draft', 'published', 'archived']
+        // En qué enlace sale la hoja. El 'CR' por defecto solo deja pasar las
+        // hojas viejas que todavía no traen el campo (en un update,
+        // request.resource.data es el documento ya fusionado); que una hoja
+        // PUBLICADA sin el campo se lea como Costa Rica lo decide el código
+        // (storedDestination), no estas reglas. Un valor mal escrito ('cr',
+        // 'gt ', '') queda fuera de la lista y se rechaza. Seguro de desplegar
+        // antes o después del código.
+        && request.resource.data.get('destination', 'CR') in ['CR', 'GT', 'GENERAL']
         && request.resource.data.items is list
         && request.resource.data.items.size() <= 60;
 

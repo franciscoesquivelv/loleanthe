@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import FloresParaBodasClient from './FloresParaBodasClient';
 
-const OG_IMAGE = { url: '/images/hero-dark.jpg', width: 1200, height: 630, alt: 'Loleanthe, flor ecuatoriana' };
+const OG_IMAGE = { url: '/images/og/sitio-v1.jpg', width: 1200, height: 630, alt: 'Loleanthe, flor ecuatoriana' };
 
 const DESCRIPTION =
   'Flor ecuatoriana al por mayor para floristas de bodas y eventos en Costa Rica y Guatemala. Importada bajo pedido, de varias fincas. Cotizá tu boda.';

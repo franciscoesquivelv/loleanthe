@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import CotizacionClient from './CotizacionClient';
 
-const OG_IMAGE = { url: '/images/hero-dark.jpg', width: 1200, height: 630, alt: 'Loleanthe, flor ecuatoriana' };
+const OG_IMAGE = { url: '/images/og/sitio-v1.jpg', width: 1200, height: 630, alt: 'Loleanthe, flor ecuatoriana' };
 
 /**
  * Antes este archivo era `'use client'` de punta a punta, así que no podía
